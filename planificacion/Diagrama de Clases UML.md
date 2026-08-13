@@ -1,5 +1,8 @@
 ```mermaid
 classDiagram
+    %% ==========================================
+    %% CAPA VISTA Y CONTROLADOR (Resumida para enfoque en Modelo)
+    %% ==========================================
     class Main {
         +main(args: String[]) void
     }
@@ -32,21 +35,36 @@ classDiagram
         +ejecutarQuery(query: String) void
     }
 
+    %% ==========================================
+    %% CAPA MODELO (Con Getters, Setters y Métodos de Negocio)
+    %% ==========================================
     class Actividad {
         -idActividad : String
         -nombre : String
         -cupoMaximo : int
         -reservasAnidadas : ArrayList~Reserva~
+        +getIdActividad() String
+        +setIdActividad(id: String) void
+        +getNombre() String
+        +setNombre(nombre: String) void
+        +getCupoMaximo() int
+        +setCupoMaximo(cupo: int) void
+        +getReservasAnidadas() ArrayList~Reserva~
+        +agregarReserva(nuevaReserva: Reserva) boolean
         +mostrarDetalles() void
     }
     
     class ClaseGrupal {
         -profesor : String
+        +getProfesor() String
+        +setProfesor(profesor: String) void
         +mostrarDetalles() void
     }
     
     class EntrenamientoLibre {
         -requiereAsistencia : boolean
+        +isRequiereAsistencia() boolean
+        +setRequiereAsistencia(requiere: boolean) void
         +mostrarDetalles() void
     }
     
@@ -56,6 +74,16 @@ classDiagram
         -edad : int
         -deuda : int
         -esMoroso : boolean
+        +getRut() String
+        +setRut(rut: String) void
+        +getNombre() String
+        +setNombre(nombre: String) void
+        +getEdad() int
+        +setEdad(edad: int) void
+        +getDeuda() int
+        +setDeuda(deuda: int) void
+        +isEsMoroso() boolean
+        +setEsMoroso(estado: boolean) void
         +abonarDeuda(monto: int) void
         +abonarDeuda() void
     }
@@ -65,12 +93,23 @@ classDiagram
         -fecha : Date
         -estado : String
         -rutSocio : String
+        +getIdReserva() int
+        +setIdReserva(id: int) void
+        +getFecha() Date
+        +setFecha(fecha: Date) void
+        +getEstado() String
+        +setEstado(estado: String) void
+        +getRutSocio() String
+        +setRutSocio(rut: String) void
     }
     
     class MorosidadException {
         +getMessage() String
     }
 
+    %% ==========================================
+    %% RELACIONES 
+    %% ==========================================
     Actividad <|-- ClaseGrupal
     Actividad <|-- EntrenamientoLibre
 
