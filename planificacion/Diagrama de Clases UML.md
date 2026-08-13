@@ -91,6 +91,7 @@ classDiagram
         -fecha : Date
         -estado : String
         -rutSocio : String
+	-idActividad : String
         +getIdReserva() int
         +setIdReserva(id: int) void
         +getFecha() Date
@@ -99,6 +100,8 @@ classDiagram
         +setEstado(estado: String) void
         +getRutSocio() String
         +setRutSocio(rut: String) void
+	+getIdActividad() String
+	+setIdActividad(rut: String) void
     }
     
     class MorosidadException {
