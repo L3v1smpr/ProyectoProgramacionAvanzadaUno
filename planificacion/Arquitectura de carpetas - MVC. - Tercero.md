@@ -2,7 +2,8 @@
 
 ```text
 MVC/
-├── Main.java
+├──main/
+│   ├──Main.java
 ├── modelo/
 │   ├── Actividad.java
 │   ├── ClaseGrupal.java
