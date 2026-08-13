@@ -1,5 +1,5 @@
 1. Gestionar Actividades :
-	1.1 Agregar Actividad [idActividad, nombre, cupoMaximo, edadMinima...] (Preguntar 1 o 2 - Crear Clase Grupal o Entrenamiento Libre)
+	1.1 Agregar Actividad [idActividad, nombre, cupoMaximo, edadMinima...]
 	1.2 Modificar Actividad [idActividad]
 	1.3 Listar Actividades [TODAS] [SIA-7]
 	1.4 Buscar Actividad [idActividad/idReserva/Rut -> Sobrecarga de métodos (SIA 5[1])]
