@@ -23,7 +23,6 @@ classDiagram
         -db : DBConnection
         +agregarSocio(rut: String, nombre: String) boolean
         +buscarActividad(idActividad: String) Actividad
-        +buscarActividad(rutSocio: String) Actividad
         +agendarReserva(rut: String, idAct: String) void
         +cargarDatosBatch() void
         +guardarDatosBatch() void
@@ -52,6 +51,7 @@ classDiagram
         +getReservasAnidadas() ArrayList~Reserva~
         +agregarReserva(nuevaReserva: Reserva) boolean
         +mostrarDetalles() void
+	+mostrarDetalles(formatoCorto: boolean) void
     }
     
     class ClaseGrupal {
