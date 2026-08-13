@@ -41,7 +41,7 @@ classDiagram
         -idActividad : String
         -nombre : String
         -cupoMaximo : int
-        -reservasAnidadas : ArrayList~Reserva~
+        -arraySocios : ArrayList~Socio~
         +getIdActividad() String
         +setIdActividad(id: String) void
         +getNombre() String
@@ -74,6 +74,7 @@ classDiagram
         -edad : int
         -deuda : int
         -esMoroso : boolean
+        -arrayReservas : ArrayList~Reserva~
         +getRut() String
         +setRut(rut: String) void
         +getNombre() String
@@ -117,7 +118,7 @@ classDiagram
     Actividad <|-- ClaseGrupal
     Actividad <|-- EntrenamientoLibre
 
-    Actividad "1" *-- "n" Reserva : 1 a Muchos
+    Socio "1" *-- "n" Reserva : 1 a Muchos
     SistemaClub "1" --> "n" Actividad : 1 a Muchos
     SistemaClub "1" --> "n" Socio : 1 a Muchos
     SistemaClub "1" --> "1" DBConnection : 1 a 1
@@ -129,6 +130,5 @@ classDiagram
     Main ..> MenuVentana : Instancia
     SistemaClub ..> MorosidadException : Lanza
     SistemaClub ..> CupoMaximoException : Lanza
-
 
 ```
