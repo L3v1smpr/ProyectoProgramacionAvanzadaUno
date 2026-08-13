@@ -128,4 +128,7 @@ classDiagram
     Main ..> MenuConsola : Instancia
     Main ..> MenuVentana : Instancia
     SistemaClub ..> MorosidadException : Lanza
+    SistemaClub ..> CupoMaximoException : Lanza
+
+
 ```
