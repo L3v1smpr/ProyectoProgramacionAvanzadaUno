@@ -104,7 +104,11 @@ classDiagram
     }
     
     class MorosidadException {
-        +getMessage() String
+        +getMessageMorosidad() String
+    }
+
+    class CupoMaximoException {
+	+getMessageCupoMaximo() String
     }
 
     %% ==========================================
