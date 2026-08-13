@@ -41,17 +41,14 @@ classDiagram
         -idActividad : String
         -nombre : String
         -cupoMaximo : int
-        -arraySocios : ArrayList~Socio~
         +getIdActividad() String
         +setIdActividad(id: String) void
         +getNombre() String
         +setNombre(nombre: String) void
         +getCupoMaximo() int
         +setCupoMaximo(cupo: int) void
-        +getReservasAnidadas() ArrayList~Reserva~
-        +agregarReserva(nuevaReserva: Reserva) boolean
         +mostrarDetalles() void
-	+mostrarDetalles(formatoCorto: boolean) void
+        +mostrarDetalles(formatoCorto: boolean) void
     }
     
     class ClaseGrupal {
