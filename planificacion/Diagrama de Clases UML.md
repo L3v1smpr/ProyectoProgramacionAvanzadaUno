@@ -100,8 +100,8 @@ classDiagram
         +setEstado(estado: boolean) void
         +getRutSocio() String
         +setRutSocio(rut: String) void
-	+getIdActividad() String
-	+setIdActividad(rut: String) void
+	+getIdActividadEnReserva() String
+	+setIdActividadEnReserva	(rut: String) void
     }
     
     class MorosidadException {
