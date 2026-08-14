@@ -89,15 +89,15 @@ classDiagram
     class Reserva {
         -idReserva : int
         -fecha : Date
-        -estado : String
+        -estado : boolean
         -rutSocio : String
 	-idActividad : String
         +getIdReserva() int
         +setIdReserva(id: int) void
         +getFecha() Date
         +setFecha(fecha: Date) void
-        +getEstado() String
-        +setEstado(estado: String) void
+        +getEstado() boolean
+        +setEstado(estado: boolean) void
         +getRutSocio() String
         +setRutSocio(rut: String) void
 	+getIdActividad() String
