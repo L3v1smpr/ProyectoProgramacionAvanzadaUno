@@ -21,9 +21,34 @@ classDiagram
         -mapaSocios : HashMap~String, Socio~
         -listaActividades : ArrayList~Actividad~
         -db : DBConnection
-        +agregarSocio(rut: String, nombre: String) boolean
+        +agregarSocio(rut: String, nombre: String, edad: int) boolean
+	   +modificarSocio(rut: String, nombre: String, edad: int, deuda: int, esMoroso: boolean) boolean
+	   +eliminarSocio(rut: String) boolean
+	   +obtenerListaSocios() ArrayList~Socio~
+	   +obtenerListaSociosDeudores() ArrayList~Socio~
+	   +buscarSocio(rut: String) Socio
+	   
+	   
+	   
+        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int) boolean
+        +modificarActividad(idActividad: String, nombre: String, cupoMaximo: int) boolean
+        +eliminarActividad(idActividad: String) boolean
         +buscarActividad(idActividad: String) Actividad
-        +agendarReserva(rut: String, idAct: String) void
+        +buscarActividad(idReserva: int) Actividad
+        +obtenerActividades() Arraylist~Actividad~
+        
+        +agendarReserva(rut: String, idAct: String, fecha: String) void
+        +modificarReserva(idReserva: int, fecha: String, estado: boolean, rutSocio: String, idActividad: String) boolean
+        +eliminarReserva(idReserva: int) boolean
+        +listarReservasGlobales() ArrayList~Reserva~
+        
+        
+        
+        +pagarFacturacion(rut: String) boolean
+        +pagarFacturacion(rut: String, abono: int) boolean
+        
+        +generarCobroMensual() boolean
+        
         +cargarDatosBatch() void
         +guardarDatosBatch() void
     }
@@ -100,8 +125,8 @@ classDiagram
         +setEstado(estado: boolean) void
         +getRutSocio() String
         +setRutSocio(rut: String) void
-	+getIdActividadEnReserva() String
-	+setIdActividadEnReserva	(rut: String) void
+		+getIdActividadEnReserva() String
+		+setIdActividadEnReserva	(rut: String) void
     }
     
     class MorosidadException {
@@ -109,7 +134,7 @@ classDiagram
     }
 
     class CupoMaximoException {
-	+getMessageCupoMaximo() String
+		+getMessageCupoMaximo() String
     }
 
     %% ==========================================
