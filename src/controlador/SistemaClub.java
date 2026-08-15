@@ -1,4 +1,8 @@
 package controlador;
+import modelo.Socio;
+import modelo.Actividad;
+import modelo.Reserva;
+import controlador.DBConnection;
 
 
 import java.util.HashMap;
@@ -7,7 +11,7 @@ import java.util.ArrayList;
 public class SistemaClub {
 
 	//Atributos
-	private HashMap<String, Socio> mapaSocio;
+	private HashMap<String, Socio> mapaSocios;
 	private ArrayList<Actividad> listaActividades;
 	private DBConnection connection;
 	
@@ -17,18 +21,18 @@ public class SistemaClub {
 	
 	public SistemaClub(){
 	
-		this.mapaSocio = new HashMap<>();
+		this.mapaSocios = new HashMap<>();
 		this.listaActividades = new ArrayList<>();
 		this.connection = new DBConnection();
 	}
 	
 	
 	//Metodos relacionados a Socio
-	public boolean agregarSocio(String rut, String nombre) {
+	public boolean agregarSocio(String rut, String nombre, int edad) {
 		
 	}
 	
-	public boolean modificarSocio(String rut, String nombre, int deuda, boolean esMoroso) {
+	public boolean modificarSocio(String rut, String nombre, int edad, int deuda, boolean esMoroso) {
 		
 	}
 	
@@ -36,7 +40,7 @@ public class SistemaClub {
 		
 	}
 	
-	public ArrayList<Socio> obtenerListaSocio(){
+	public ArrayList<Socio> obtenerListaSocios(){
 		
 	}
 	
@@ -71,7 +75,7 @@ public class SistemaClub {
 		
 	}
 
-	public ArrayList<Actividad> obtenerActivdades(){
+	public ArrayList<Actividad> obtenerActividades(){
 		
 	}
 	
