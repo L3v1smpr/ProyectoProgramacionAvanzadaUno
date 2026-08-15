@@ -20,7 +20,7 @@ classDiagram
     class SistemaClub {
         -mapaSocios : HashMap~String, Socio~
         -listaActividades : ArrayList~Actividad~
-        -db : DBConnection
+        -connection : DBConnection
         +agregarSocio(rut: String, nombre: String, edad: int) boolean
 	   +modificarSocio(rut: String, nombre: String, edad: int, deuda: int, esMoroso: boolean) boolean
 	   +eliminarSocio(rut: String) boolean

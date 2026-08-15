@@ -12,7 +12,7 @@ public class Socio {
 	
 	//Constructor
 	
-	public void Socio(String rut, String nombre, int edad, int deuda, boolean esMoroso) {
+	public Socio(String rut, String nombre, int edad, int deuda, boolean esMoroso) {
 		
 	}
 	
