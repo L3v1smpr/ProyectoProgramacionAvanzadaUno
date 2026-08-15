@@ -1,6 +1,6 @@
 package modelo;
 
-public class MorosidadException {
+public class MorosidadException extends Exception{
 
 	public String getMessageMorosidad() {
 		

@@ -32,7 +32,7 @@ public class SistemaClub {
 		
 	}
 	
-	public boolean modificarSocio(String rut, String nombre, int edad, int deuda, boolean esMoroso) {
+	public boolean modificarSocio(String rut, String nombre, int edad, int deuda, boolean esMoroso) throws MorosidadException{
 		
 	}
 	
@@ -55,11 +55,11 @@ public class SistemaClub {
 	
 	//Métodos relacionados a Actividad
 	
-	public boolean agregarActividad(String idActividad, String nombre, int cupoMaximo) {
+	public boolean agregarActividad(String idActividad, String nombre, int cupoMaximo) throws MorosidadException, CupoMaximoException{
 		
 	}
 	
-	public boolean modificarActividad(String nuevoIdActividad, String nuevoNombre, int nuevoCupoMaximo) {
+	public boolean modificarActividad(String nuevoIdActividad, String nuevoNombre, int nuevoCupoMaximo) throws MorosidadException, CupoMaximoException{
 		
 	}
 	
@@ -81,11 +81,11 @@ public class SistemaClub {
 	
 	//Métodos relacionados a Reserva
 	
-	public void agendarReserva(String rut, String idActividad, String fecha) {
+	public void agendarReserva(String rut, String idActividad, String fecha) throws MorosidadException{
 		
 	}
 	
-	public boolean modificarReserva(int idReserva, String fecha, boolean estado, String rutSocio, String idActividad) {
+	public boolean modificarReserva(int idReserva, String fecha, boolean estado, String rutSocio, String idActividad) throws MorosidadException{
 	
 	}
 		

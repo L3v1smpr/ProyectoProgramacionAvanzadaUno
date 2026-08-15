@@ -88,6 +88,7 @@ classDiagram
         -deuda : int
         -esMoroso : boolean
         -arrayReservas : ArrayList~Reserva~
+        +Socio(rut: String, nombre: String, edad: int, deuda: int, esMoroso:boolean) void
         +getRut() String
         +setRut(rut: String) void
         +getNombre() String
@@ -96,7 +97,7 @@ classDiagram
         +setEdad(edad: int) void
         +getDeuda() int
         +setDeuda(deuda: int) void
-        +isEsMoroso() boolean
+        +getIsMoroso() boolean
         +setEsMoroso(estado: boolean) void
         +abonarDeuda(monto: int) void
         +abonarDeuda() void

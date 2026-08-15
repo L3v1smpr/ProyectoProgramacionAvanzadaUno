@@ -1,4 +1,5 @@
 package modelo;
+import java.util.ArrayList;
 
 public class Socio {
 
@@ -6,10 +7,14 @@ public class Socio {
 	private String rut, nombre;
 	private int edad, deuda;
 	private boolean esMoroso;
-	private ArrayList<Reserva> listaReservas;
+	private ArrayList<Reserva> arrayReservas;
 	
 	
 	//Constructor
+	
+	public void Socio(String rut, String nombre, int edad, int deuda, boolean esMoroso) {
+		
+	}
 	
 	//Getters
 	public String getRut() {
@@ -20,13 +25,19 @@ public class Socio {
 		
 	}
 	
-	public String getEdad() {
+	public int getEdad() {
 		
 	}
 	
-	public String getDeuda() {
+	public int getDeuda() {
 		
 	}
+	
+	public boolean getIsMoroso() {
+		
+	}
+	
+	
 	
 	
 	

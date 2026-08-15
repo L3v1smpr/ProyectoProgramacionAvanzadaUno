@@ -1,6 +1,6 @@
 package modelo;
 
-public class CupoMaximoException {
+public class CupoMaximoException extends Exception{
 
 	public String getMessageCupoMaximo() {
 		

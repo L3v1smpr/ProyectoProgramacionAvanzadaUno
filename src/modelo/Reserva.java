@@ -1,4 +1,5 @@
 package modelo;
+import java.util.Date;
 
 public class Reserva {
 	private int idReserva;
@@ -8,7 +9,7 @@ public class Reserva {
 	
 	
 	//Getters
-	public String getIdReserva() {
+	public int getIdReserva() {
 		
 	}
 	

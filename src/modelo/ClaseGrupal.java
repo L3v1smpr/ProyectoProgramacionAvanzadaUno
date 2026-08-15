@@ -1,6 +1,6 @@
 package modelo;
 
-public class ClaseGrupal {
+public class ClaseGrupal extends Actividad {
 
 	//Atributos
 	private String profesor;

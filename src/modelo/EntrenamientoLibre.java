@@ -1,6 +1,6 @@
 package modelo;
 
-public class EntrenamientoLibre {
+public class EntrenamientoLibre extends Actividad{
 
 	private boolean requiereAsistencia;
 	
