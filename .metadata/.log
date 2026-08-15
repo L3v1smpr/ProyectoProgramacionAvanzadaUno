@@ -1,0 +1,220 @@
+!SESSION 2026-08-14 08:24:05.682 -----------------------------------------------
+eclipse.buildId=4.40.0.20260604-0652
+java.version=21.0.11
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=es_MX
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-14 08:25:38.420
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-14 08:26:17.222
+!MESSAGE Logback config file: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno\.metadata\.plugins\org.eclipse.m2e.logback\logback.2.7.101.20251017-1242.xml
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-08-14 08:26:53.037
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Elvis'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+!SESSION 2026-08-14 08:29:02.700 -----------------------------------------------
+eclipse.buildId=4.40.0.20260604-0652
+java.version=21.0.11
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=es_MX
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-14 08:29:08.310
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-14 08:29:21.169
+!MESSAGE Logback config file: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno\.metadata\.plugins\org.eclipse.m2e.logback\logback.2.7.101.20251017-1242.xml
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-08-14 08:29:31.829
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Elvis'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.egit.ui 4 0 2026-08-14 08:32:24.139
+!MESSAGE Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException: Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+	at org.eclipse.core.internal.resources.Project.checkDescription(Project.java:219)
+	at org.eclipse.core.internal.resources.Project.assertCreateRequirements(Project.java:95)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:316)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:302)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createExistingProject(ProjectUtils.java:179)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils$1.run(ProjectUtils.java:104)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2505)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2528)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createProjects(ProjectUtils.java:138)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createProjects(ProjectUtils.java:62)
+	at org.eclipse.egit.ui.internal.clone.GitImportWizard.importProjects(GitImportWizard.java:254)
+	at org.eclipse.egit.ui.internal.clone.GitImportWizard$4.run(GitImportWizard.java:206)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:123)
+Contains: OK
+Contains: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno overlaps the workspace location: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2026-08-14 08:32:24.140
+!MESSAGE Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+!SUBENTRY 2 unknown 0 0 2026-08-14 08:32:24.141
+!MESSAGE OK
+!SUBENTRY 2 org.eclipse.core.resources 4 77 2026-08-14 08:32:24.141
+!MESSAGE C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno overlaps the workspace location: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno
+
+!ENTRY org.eclipse.egit.ui 4 0 2026-08-14 08:32:53.317
+!MESSAGE Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException: Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+	at org.eclipse.core.internal.resources.Project.checkDescription(Project.java:219)
+	at org.eclipse.core.internal.resources.Project.assertCreateRequirements(Project.java:95)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:316)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:302)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createExistingProject(ProjectUtils.java:179)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils$1.run(ProjectUtils.java:104)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2505)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2528)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createProjects(ProjectUtils.java:138)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createProjects(ProjectUtils.java:62)
+	at org.eclipse.egit.ui.internal.clone.GitImportWizard.importProjects(GitImportWizard.java:254)
+	at org.eclipse.egit.ui.internal.clone.GitImportWizard$4.run(GitImportWizard.java:206)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:123)
+Contains: OK
+Contains: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno overlaps the workspace location: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2026-08-14 08:32:53.317
+!MESSAGE Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+!SUBENTRY 2 unknown 0 0 2026-08-14 08:32:53.317
+!MESSAGE OK
+!SUBENTRY 2 org.eclipse.core.resources 4 77 2026-08-14 08:32:53.317
+!MESSAGE C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno overlaps the workspace location: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno
+
+!ENTRY org.eclipse.egit.ui 4 0 2026-08-14 08:33:00.051
+!MESSAGE Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException: Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+	at org.eclipse.core.internal.resources.Project.checkDescription(Project.java:219)
+	at org.eclipse.core.internal.resources.Project.assertCreateRequirements(Project.java:95)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:316)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:302)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createExistingProject(ProjectUtils.java:179)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils$1.run(ProjectUtils.java:104)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2505)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2528)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createProjects(ProjectUtils.java:138)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createProjects(ProjectUtils.java:62)
+	at org.eclipse.egit.ui.internal.clone.GitImportWizard.importProjects(GitImportWizard.java:254)
+	at org.eclipse.egit.ui.internal.clone.GitImportWizard$4.run(GitImportWizard.java:206)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:123)
+Contains: OK
+Contains: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno overlaps the workspace location: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2026-08-14 08:33:00.051
+!MESSAGE Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+!SUBENTRY 2 unknown 0 0 2026-08-14 08:33:00.051
+!MESSAGE OK
+!SUBENTRY 2 org.eclipse.core.resources 4 77 2026-08-14 08:33:00.051
+!MESSAGE C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno overlaps the workspace location: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno
+
+!ENTRY org.eclipse.egit.ui 4 0 2026-08-14 08:33:07.985
+!MESSAGE Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException: Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+	at org.eclipse.core.internal.resources.Project.checkDescription(Project.java:219)
+	at org.eclipse.core.internal.resources.Project.assertCreateRequirements(Project.java:95)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:316)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:302)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createExistingProject(ProjectUtils.java:179)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils$1.run(ProjectUtils.java:104)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2505)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2528)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createProjects(ProjectUtils.java:138)
+	at org.eclipse.egit.ui.internal.clone.ProjectUtils.createProjects(ProjectUtils.java:62)
+	at org.eclipse.egit.ui.internal.clone.GitImportWizard.importProjects(GitImportWizard.java:254)
+	at org.eclipse.egit.ui.internal.clone.GitImportWizard$4.run(GitImportWizard.java:206)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:123)
+Contains: OK
+Contains: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno overlaps the workspace location: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2026-08-14 08:33:07.986
+!MESSAGE Invalid project description for project 'ProyectoProgramacionAvanzadaUno' at 'file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno' 
+!SUBENTRY 2 unknown 0 0 2026-08-14 08:33:07.986
+!MESSAGE OK
+!SUBENTRY 2 org.eclipse.core.resources 4 77 2026-08-14 08:33:07.986
+!MESSAGE C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno overlaps the workspace location: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno
+!SESSION 2026-08-14 08:35:50.595 -----------------------------------------------
+eclipse.buildId=4.40.0.20260604-0652
+java.version=21.0.11
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=es_MX
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product -data file:/C:/Users/Elvis/Documents/ProyectoProgramacionAvanzadaUno/
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-14 08:35:56.274
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-14 08:35:58.536
+!MESSAGE Logback config file: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno\.metadata\.plugins\org.eclipse.m2e.logback\logback.2.7.101.20251017-1242.xml
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-08-14 08:36:09.744
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Elvis'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+!SESSION 2026-08-14 08:38:34.144 -----------------------------------------------
+eclipse.buildId=4.40.0.20260604-0652
+java.version=21.0.11
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=es_MX
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-14 08:38:39.877
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-14 08:39:03.355
+!MESSAGE Logback config file: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno\.metadata\.plugins\org.eclipse.m2e.logback\logback.2.7.101.20251017-1242.xml
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-08-14 08:39:16.210
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Elvis'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+!SESSION 2026-08-15 11:25:12.789 -----------------------------------------------
+eclipse.buildId=4.40.0.20260604-0652
+java.version=21.0.11
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=es_MX
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-15 11:25:18.285
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-15 11:25:30.654
+!MESSAGE Logback config file: C:\Users\Elvis\Documents\ProyectoProgramacionAvanzadaUno\.metadata\.plugins\org.eclipse.m2e.logback\logback.2.7.101.20251017-1242.xml
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-08-15 11:25:38.769
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Elvis'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.oomph.ui 4 0 2026-08-15 11:25:43.936
+!MESSAGE java.lang.ExceptionInInitializerError
+!STACK 0
+java.lang.ExceptionInInitializerError
+	at org.eclipse.oomph.setup.ui.recorder.RecorderManager.<clinit>(RecorderManager.java:114)
+	at org.eclipse.oomph.setup.ui.SetupUIPlugin.performStartup(SetupUIPlugin.java:230)
+	at org.eclipse.oomph.setup.ui.EarlyStartup.earlyStartup(EarlyStartup.java:23)
+	at org.eclipse.oomph.internal.ui.EarlyStart.run(EarlyStart.java:119)
+	at org.eclipse.oomph.internal.ui.EarlyStart$1.run(EarlyStart.java:98)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Caused by: java.lang.NullPointerException: Cannot invoke "org.osgi.framework.BundleContext.getServiceReference(java.lang.Class)" because "context" is null
+	at org.eclipse.oomph.p2.internal.core.AgentManagerImpl.getCurrentAgent(AgentManagerImpl.java:207)
+	at org.eclipse.oomph.p2.core.P2Util.getCurrentProvisioningAgent(P2Util.java:117)
+	at org.eclipse.oomph.setup.internal.core.util.SetupCoreUtil.<clinit>(SetupCoreUtil.java:158)
+	... 6 more

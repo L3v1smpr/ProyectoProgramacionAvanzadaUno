@@ -3,12 +3,11 @@
 	1.2 Modificar Actividad [idActividad]
 	1.3 Listar Actividades [TODAS] [SIA-7]
 	1.4 Buscar Actividad [idActividad/idReserva/Rut -> Sobrecarga de métodos (SIA 5[1])]
-	1.5 Listar Reservas de la Actividad [idActividad] [SIA-7]
-	1.6 Eliminar Actividad [idActividad]
+	1.5 Eliminar Actividad [idActividad]
 
 2. Gestionar Socios :
-	2.1 Agregar Socio [Atributos: RUT, nombre, edad, morosidad, deuda (Preguntar qué modificar)]
-	2.2 Modificar Socio [RUT | Modificaciones: edad, morosidad, deuda (Preguntar qué modificar)]
+	2.1 Agregar Socio [Atributos: RUT, nombre, edad, morosidad, deuda]
+	2.2 Modificar Socio [RUT | Modificaciones: edad, morosidad, deuda]
 	2.3 Listar Socios [SIA-7]
 	2.4 Listar Socios con Deuda [SIA-9]
 	2.5 Listar Reservas Socio [No deudor] [SIA-7]

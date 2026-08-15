@@ -9,7 +9,7 @@ classDiagram
     
     class MenuConsola {
         -controlador : SistemaClub
-        +iniciarMenu() void
+        +iniciarConsola() void
     }
     
     class MenuVentana {
@@ -21,9 +21,25 @@ classDiagram
         -mapaSocios : HashMap~String, Socio~
         -listaActividades : ArrayList~Actividad~
         -db : DBConnection
-        +agregarSocio(rut: String, nombre: String) boolean
+        +agregarSocio(rut: String, nombre: String, edad: int) boolean
+	   +modificarSocio(rut: String, nombre: String, edad: int, deuda: int, esMoroso: boolean) boolean
+	   +eliminarSocio(rut: String) boolean
+	   +obtenerListaSocios() ArrayList~Socio~
+	   +obtenerListaSociosDeudores() ArrayList~Socio~
+	   +buscarSocio(rut: String) Socio
+        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int) boolean
+        +modificarActividad(nuevoIdActividad: String, nuevoNombre: String, nuevoCupoMaximo: int) boolean
+        +eliminarActividad(idActividad: String) boolean
         +buscarActividad(idActividad: String) Actividad
-        +agendarReserva(rut: String, idAct: String) void
+        +buscarActividad(idReserva: int) Actividad
+        +obtenerActividades() Arraylist~Actividad~
+        +agendarReserva(rut: String, idAct: String, fecha: String) void
+        +modificarReserva(idReserva: int, fecha: String, estado: boolean, rutSocio: String, idActividad: String) boolean
+        +eliminarReserva(idReserva: int) boolean
+        +listarReservasGlobales() ArrayList~Reserva~
+        +pagarFacturacion(rut: String) boolean
+        +pagarFacturacion(rut: String, abono: int) boolean
+        +generarCobroMensual() boolean   
         +cargarDatosBatch() void
         +guardarDatosBatch() void
     }
@@ -41,31 +57,28 @@ classDiagram
         -idActividad : String
         -nombre : String
         -cupoMaximo : int
-        -reservasAnidadas : ArrayList~Reserva~
         +getIdActividad() String
         +setIdActividad(id: String) void
         +getNombre() String
         +setNombre(nombre: String) void
         +getCupoMaximo() int
         +setCupoMaximo(cupo: int) void
-        +getReservasAnidadas() ArrayList~Reserva~
-        +agregarReserva(nuevaReserva: Reserva) boolean
-        +mostrarDetalles() void
-	+mostrarDetalles(formatoCorto: boolean) void
+        +mostrarDetalles() String
+        +mostrarDetalles(formatoCorto: boolean) String
     }
     
     class ClaseGrupal {
         -profesor : String
         +getProfesor() String
         +setProfesor(profesor: String) void
-        +mostrarDetalles() void
+        +mostrarDetalles() String
     }
     
     class EntrenamientoLibre {
         -requiereAsistencia : boolean
         +isRequiereAsistencia() boolean
         +setRequiereAsistencia(requiere: boolean) void
-        +mostrarDetalles() void
+        +mostrarDetalles() String
     }
     
     class Socio {
@@ -74,6 +87,7 @@ classDiagram
         -edad : int
         -deuda : int
         -esMoroso : boolean
+        -arrayReservas : ArrayList~Reserva~
         +getRut() String
         +setRut(rut: String) void
         +getNombre() String
@@ -91,16 +105,19 @@ classDiagram
     class Reserva {
         -idReserva : int
         -fecha : Date
-        -estado : String
+        -estado : boolean
         -rutSocio : String
+	-idActividad : String
         +getIdReserva() int
         +setIdReserva(id: int) void
         +getFecha() Date
         +setFecha(fecha: Date) void
-        +getEstado() String
-        +setEstado(estado: String) void
+        +getEstado() boolean
+        +setEstado(estado: boolean) void
         +getRutSocio() String
         +setRutSocio(rut: String) void
+		+getIdActividadEnReserva() String
+		+setIdActividadEnReserva	(rut: String) void
     }
     
     class MorosidadException {
@@ -108,7 +125,7 @@ classDiagram
     }
 
     class CupoMaximoException {
-	+getMessageCupoMaximo() String
+		+getMessageCupoMaximo() String
     }
 
     %% ==========================================
@@ -117,7 +134,7 @@ classDiagram
     Actividad <|-- ClaseGrupal
     Actividad <|-- EntrenamientoLibre
 
-    Actividad "1" *-- "n" Reserva : 1 a Muchos
+    Socio "1" *-- "n" Reserva : 1 a Muchos
     SistemaClub "1" --> "n" Actividad : 1 a Muchos
     SistemaClub "1" --> "n" Socio : 1 a Muchos
     SistemaClub "1" --> "1" DBConnection : 1 a 1
@@ -129,6 +146,5 @@ classDiagram
     Main ..> MenuVentana : Instancia
     SistemaClub ..> MorosidadException : Lanza
     SistemaClub ..> CupoMaximoException : Lanza
-
 
 ```
