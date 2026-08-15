@@ -9,7 +9,7 @@ classDiagram
     
     class MenuConsola {
         -controlador : SistemaClub
-        +iniciarMenu() void
+        +iniciarConsola() void
     }
     
     class MenuVentana {
@@ -63,22 +63,22 @@ classDiagram
         +setNombre(nombre: String) void
         +getCupoMaximo() int
         +setCupoMaximo(cupo: int) void
-        +mostrarDetalles() void
-        +mostrarDetalles(formatoCorto: boolean) void
+        +mostrarDetalles() String
+        +mostrarDetalles(formatoCorto: boolean) String
     }
     
     class ClaseGrupal {
         -profesor : String
         +getProfesor() String
         +setProfesor(profesor: String) void
-        +mostrarDetalles() void
+        +mostrarDetalles() String
     }
     
     class EntrenamientoLibre {
         -requiereAsistencia : boolean
         +isRequiereAsistencia() boolean
         +setRequiereAsistencia(requiere: boolean) void
-        +mostrarDetalles() void
+        +mostrarDetalles() String
     }
     
     class Socio {

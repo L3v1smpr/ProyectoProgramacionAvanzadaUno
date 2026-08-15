@@ -7,16 +7,20 @@ import java.util.ArrayList;
 public class SistemaClub {
 
 	//Atributos
-	private HashMap<String, Socio> mapaSocios = new Socio();
-	private ArrayList<Actividad> listaActividades = new ArrayList<>();
+	private HashMap<String, Socio> mapaSocio;
+	private ArrayList<Actividad> listaActividades;
 	private DBConnection connection;
 	
 	
 	
 	//Constructor
 	
+	public SistemaClub(){
 	
-	
+		this.mapaSocio = new HashMap<>();
+		this.listaActividades = new ArrayList<>();
+		this.connection = new DBConnection();
+	}
 	
 	
 	//Metodos relacionados a Socio
