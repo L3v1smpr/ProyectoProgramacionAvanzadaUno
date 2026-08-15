@@ -12,7 +12,7 @@ public class SistemaClub {
 
 	//Atributos
 	private HashMap<String, Socio> mapaSocios;
-	private ArrayList<Actividad> listaActividades;
+	private ArrayList<Actividad> arrayActividades;
 	private DBConnection connection;
 	
 	
@@ -22,7 +22,7 @@ public class SistemaClub {
 	public SistemaClub(){
 	
 		this.mapaSocios = new HashMap<>();
-		this.listaActividades = new ArrayList<>();
+		this.arrayActividades = new ArrayList<>();
 		this.connection = new DBConnection();
 	}
 	
