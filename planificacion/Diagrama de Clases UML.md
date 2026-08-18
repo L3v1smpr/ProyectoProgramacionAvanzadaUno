@@ -57,6 +57,7 @@ classDiagram
         -idActividad : String
         -nombre : String
         -cupoMaximo : int
+        -edadMinima : int
         +getIdActividad() String
         +setIdActividad(id: String) void
         +getNombre() String
