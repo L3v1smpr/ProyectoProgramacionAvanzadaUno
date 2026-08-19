@@ -34,7 +34,7 @@ classDiagram
         +buscarActividad(idReserva: int) Actividad
         +obtenerActividades() Arraylist~Actividad~
         +agendarReserva(rut: String, idAct: String, fecha: String) void
-        +modificarReserva(idReserva: int, fecha: String, estado: boolean, rutSocio: String, idActividad: String) boolean
+        +modificarReserva(idReserva: int, fecha: String, estado: EstadoReserva, rutSocio: String, idActividad: String) boolean
         +eliminarReserva(idReserva: int) boolean
         +listarReservasGlobales() ArrayList~Reserva~
         +pagarFacturacion(rut: String) boolean
@@ -58,12 +58,17 @@ classDiagram
         -nombre : String
         -cupoMaximo : int
         -edadMinima : int
+        -activo : boolean
         +getIdActividad() String
         +setIdActividad(id: String) void
         +getNombre() String
         +setNombre(nombre: String) void
         +getCupoMaximo() int
         +setCupoMaximo(cupo: int) void
+        +getEdadMinima() int
+        +setEdadMinima(edad: int) void
+        +getActivo() boolean
+        +setActivo(activo: boolean) void 
         +mostrarDetalles() String
         +mostrarDetalles(formatoCorto: boolean) String
     }
@@ -89,6 +94,7 @@ classDiagram
         -deuda : int
         -esMoroso : boolean
         -arrayReservas : ArrayList~Reserva~
+        -activo : boolean
         +Socio(rut: String, nombre: String, edad: int, deuda: int, esMoroso:boolean) void
         +getRut() String
         +setRut(rut: String) void
@@ -100,6 +106,8 @@ classDiagram
         +setDeuda(deuda: int) void
         +getIsMoroso() boolean
         +setEsMoroso(estado: boolean) void
+        +getActivo() boolean
+        +setActivo(activo: boolean) void
         +abonarDeuda(monto: int) void
         +abonarDeuda() void
     }
@@ -107,19 +115,27 @@ classDiagram
     class Reserva {
         -idReserva : int
         -fecha : Date
-        -estado : boolean
+        -estado : EstadoReserva
         -rutSocio : String
 	-idActividad : String
         +getIdReserva() int
         +setIdReserva(id: int) void
         +getFecha() Date
         +setFecha(fecha: Date) void
-        +getEstado() boolean
-        +setEstado(estado: boolean) void
+        +getEstado() EstadoReserva
+        +setEstado(estado: EstadoReserva) void
         +getRutSocio() String
         +setRutSocio(rut: String) void
 		+getIdActividadEnReserva() String
 		+setIdActividadEnReserva	(rut: String) void
+    }
+    
+    class EstadoReserva {
+    		<<enumeration>>
+    		PENDIENTE
+    		COMPLETADA
+    		CANCELADA
+    		
     }
     
     class MorosidadException {
@@ -136,6 +152,7 @@ classDiagram
     Actividad <|-- ClaseGrupal
     Actividad <|-- EntrenamientoLibre
 
+	Reserva ..> EstadoReserva : usa
     Socio "1" *-- "n" Reserva : 1 a Muchos
     SistemaClub "1" --> "n" Actividad : 1 a Muchos
     SistemaClub "1" --> "n" Socio : 1 a Muchos
