@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 
 
-
+//Clase encargada de darle la decisión al usuario para ejecutar consola o ventana (GUI).
 public class Main {
 
 	public static void main(String[] args) {

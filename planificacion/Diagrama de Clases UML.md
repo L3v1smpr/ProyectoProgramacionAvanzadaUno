@@ -27,8 +27,8 @@ classDiagram
 	   +obtenerListaSocios() ArrayList~Socio~
 	   +obtenerListaSociosDeudores() ArrayList~Socio~
 	   +buscarSocio(rut: String) Socio
-        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int) boolean
-        +modificarActividad(nuevoIdActividad: String, nuevoNombre: String, nuevoCupoMaximo: int) boolean
+        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima : int) boolean
+        +modificarActividad(nuevoIdActividad: String, nuevoNombre: String, nuevoCupoMaximo: int, nuevaEdadMinima : int) boolean
         +eliminarActividad(idActividad: String) boolean
         +buscarActividad(idActividad: String) Actividad
         +buscarActividad(idReserva: int) Actividad
