@@ -3,7 +3,9 @@ import modelo.Socio;
 import modelo.Actividad;
 import modelo.Reserva;
 import controlador.DBConnection;
-
+import modelo.CupoMaximoException;
+import modelo.MorosidadException;
+import modelo.EstadoReserva;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -12,7 +14,7 @@ public class SistemaClub {
 
 	//Atributos
 	private HashMap<String, Socio> mapaSocios;
-	private ArrayList<Actividad> arrayActividades;
+	private ArrayList<Actividad> listaActividades;
 	private DBConnection connection;
 	
 	
@@ -22,7 +24,7 @@ public class SistemaClub {
 	public SistemaClub(){
 	
 		this.mapaSocios = new HashMap<>();
-		this.arrayActividades = new ArrayList<>();
+		this.listaActividades = new ArrayList<>();
 		this.connection = new DBConnection();
 	}
 	
@@ -32,7 +34,7 @@ public class SistemaClub {
 		
 	}
 	
-	public boolean modificarSocio(String rut, String nombre, int edad, int deuda, boolean esMoroso) throws MorosidadException{
+	public boolean modificarSocio(String rut, String nombre, int edad, int deuda, boolean esMoroso) {
 		
 	}
 	
@@ -55,11 +57,11 @@ public class SistemaClub {
 	
 	//Métodos relacionados a Actividad
 	
-	public boolean agregarActividad(String idActividad, String nombre, int cupoMaximo) throws MorosidadException, CupoMaximoException{
+	public boolean agregarActividad(String idActividad, String nombre, int cupoMaximo, int edadMinima) {
 		
 	}
 	
-	public boolean modificarActividad(String nuevoIdActividad, String nuevoNombre, int nuevoCupoMaximo) throws MorosidadException, CupoMaximoException{
+	public boolean modificarActividad(String nuevoIdActividad, String nuevoNombre, int nuevoCupoMaximo, int nuevaEdadMinima) throws CupoMaximoException {
 		
 	}
 	
@@ -81,11 +83,11 @@ public class SistemaClub {
 	
 	//Métodos relacionados a Reserva
 	
-	public void agendarReserva(String rut, String idActividad, String fecha) throws MorosidadException{
+	public void agendarReserva(String rut, String idActividad, String fecha) throws MorosidadException, CupoMaximoException{
 		
 	}
 	
-	public boolean modificarReserva(int idReserva, String fecha, boolean estado, String rutSocio, String idActividad) throws MorosidadException{
+	public boolean modificarReserva(int idReserva, String fecha, EstadoReserva estado, String rutSocio, String idActividad) throws MorosidadException{
 	
 	}
 		
