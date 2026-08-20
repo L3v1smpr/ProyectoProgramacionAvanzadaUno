@@ -43,7 +43,22 @@ public class SistemaClub {
 	}
 	
 	public boolean modificarSocio(String rut, String nombre, int edad, int deuda, boolean esMoroso) {
+		if (!mapaSocios.containsKey(rut)) {
+			return false;
+		}
 		
+		Socio socioBuscado = mapaSocios.get(rut);
+		
+		socioBuscado.setNombre(nombre);
+		socioBuscado.setEdad(edad);
+		socioBuscado.setEsMoroso(esMoroso);
+		if (esMoroso) {
+			socioBuscado.setDeuda(deuda);
+		} else {
+			socioBuscado.setDeuda(0);
+		}
+		
+		return true;
 	}
 	
 	public boolean eliminarSocio(String rut) {
