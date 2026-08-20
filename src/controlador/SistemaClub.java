@@ -31,7 +31,15 @@ public class SistemaClub {
 	
 	//Metodos relacionados a Socio
 	public boolean agregarSocio(String rut, String nombre, int edad) {
+		if (mapaSocios.containsKey(rut)) {
+			return false;
+		}
 		
+		Socio nuevoSocio = new Socio(rut, nombre, edad, 0, false);
+		
+		mapaSocios.put(rut, nuevoSocio);
+		
+		return true;
 	}
 	
 	public boolean modificarSocio(String rut, String nombre, int edad, int deuda, boolean esMoroso) {
