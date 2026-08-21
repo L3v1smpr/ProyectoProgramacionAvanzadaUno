@@ -61,20 +61,42 @@ public class SistemaClub {
 		return true;
 	}
 	
+	
+	//De uso administrativo, no será utilizado en el menú - Ya que se implementará un sistema de soft-delete
+	//con el atributo "activo : boolean" de Socio.
 	public boolean eliminarSocio(String rut) {
+		if (!mapaSocios.containsKey(rut)) {
+			return false;
+		}
 		
+		mapaSocios.remove(rut);
+		return true;
 	}
 	
 	public ArrayList<Socio> obtenerListaSocios(){
+		ArrayList<Socio> listaSocios = new ArrayList<>();
 		
+		for (Socio s : mapaSocios.values()) {
+			if (s.getActivo()) {
+				listaSocios.add(s);
+			}
+		}
+		return listaSocios;
 	}
 	
 	public ArrayList<Socio> obtenerListaSociosDeudores(){
+		ArrayList<Socio> listaSociosDeudores = new ArrayList<>();
 		
+		for (Socio s : mapaSocios.values()) {
+			if (s.getActivo() && s.getIsMoroso()) {
+				listaSociosDeudores.add(s);
+			}
+		}
+		return listaSociosDeudores;
 	}
 	
 	public Socio buscarSocio(String rut) {
-		
+		return mapaSocios.get(rut);
 	}
 	
 	
