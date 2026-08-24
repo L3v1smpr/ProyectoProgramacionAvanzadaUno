@@ -29,7 +29,8 @@ classDiagram
 	   +obtenerListaSocios() ArrayList~Socio~
 	   +obtenerListaSociosDeudores() ArrayList~Socio~
 	   +buscarSocio(rut: String) Socio
-        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima : int) boolean
+        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima : int, profesor: String) boolean
+        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima : int, requiereAsistencia: boolean) boolean
         +modificarActividad(nuevoIdActividad: String, nuevoNombre: String, nuevoCupoMaximo: int, nuevaEdadMinima : int) boolean
         +eliminarActividad(idActividad: String) boolean
         +desactivarActividad(idActividad: String) boolean
@@ -58,11 +59,13 @@ classDiagram
     %% CAPA MODELO (Con Getters, Setters y Métodos de Negocio)
     %% ==========================================
     class Actividad {
+    		<<abstract>>
         -idActividad : String
         -nombre : String
         -cupoMaximo : int
         -edadMinima : int
         -activo : boolean
+        +Actividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int)
         +getIdActividad() String
         +setIdActividad(id: String) void
         +getNombre() String
@@ -79,6 +82,7 @@ classDiagram
     
     class ClaseGrupal {
         -profesor : String
+        +ClaseGrupal(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, profesor: String)
         +getProfesor() String
         +setProfesor(profesor: String) void
         +mostrarDetalles() String
@@ -86,6 +90,7 @@ classDiagram
     
     class EntrenamientoLibre {
         -requiereAsistencia : boolean
+        +EntrenamientoLibre(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, requiereAsistencia: boolean)
         +isRequiereAsistencia() boolean
         +setRequiereAsistencia(requiere: boolean) void
         +mostrarDetalles() String
@@ -99,7 +104,7 @@ classDiagram
         -esMoroso : boolean
         -arrayReservas : ArrayList~Reserva~
         -activo : boolean
-        +Socio(rut: String, nombre: String, edad: int, deuda: int, esMoroso:boolean) void
+        +Socio(rut: String, nombre: String, edad: int, deuda: int, esMoroso:boolean)
         +getRut() String
         +setRut(rut: String) void
         +getNombre() String
