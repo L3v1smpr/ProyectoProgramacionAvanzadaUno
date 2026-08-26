@@ -64,14 +64,31 @@ public class Socio {
 	}
 	
 	
-	//Sobrecarga - Si se ingresa un valor inferior a la deuda total, es solo un abono a la deuda, no deja de ser moroso.
+	/*
+	 * Sobrecarga 1: Realiza un abono parcial o total segun el monto indicado.
+	 * Si el monto cubre o supera la deuda, queda en 0 y se anula la morosidad.
+	 * Si es inferior, se descuenta el monto manteniendo el estado de morosidad.
+	 */
 	public void abonarDeuda(int monto) {
-		
+		if (monto <= 0){
+			return;
+		}
+		if (monto >= this.deuda) {
+			this.deuda = 0;
+			this.esMoroso = false;
+		} else {
+			this.deuda -= monto;
+			this.esMoroso = (this.deuda > 0);
+		}
 	}
 	
-	//Si no se ingresa un valor, salda la deuda completa, deja de ser moroso.
+	/*
+	 * Sobrecarga 2: Salda la totalidad de la deuda pendiente.
+	 * Fija la deuda en 0 y remueve automaticamente la morosidad del socio.
+	 */
 	public void abonarDeuda() {
-		
+		this.deuda = 0;
+		this.esMoroso = false;
 	}
 		
 }
