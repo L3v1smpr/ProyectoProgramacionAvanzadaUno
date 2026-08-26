@@ -6,7 +6,7 @@ public class Socio {
 	//Atributos
 	private String rut, nombre;
 	private int edad, deuda;
-	private boolean esMoroso;
+	private boolean esMoroso, activo;
 	private ArrayList<Reserva> arrayReservas;
 	
 	
@@ -18,6 +18,7 @@ public class Socio {
 		this.edad = edad;
 		this.deuda = deuda;
 		this.esMoroso = esMoroso;
+		this.activo = true;
 		this.arrayReservas = new ArrayList<>();
 	}
 	
@@ -42,6 +43,14 @@ public class Socio {
 		return esMoroso;
 	}
 	
+	public boolean getActivo() {
+		return activo;
+	}
+	
+	public ArrayList<Reserva> getArrayReservas(){
+		return this.arrayReservas;
+	}
+	
 	//Setters
 	public void setRut(String rut) {
 		this.rut = rut;
@@ -63,9 +72,17 @@ public class Socio {
 		this.esMoroso = esMoroso;
 	}
 	
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
 	
-	/*
-	 * Sobrecarga 1: Realiza un abono parcial o total segun el monto indicado.
+	public void setArrayReservas(ArrayList<Reserva> arrayReservas) {
+		this.arrayReservas = arrayReservas;
+	}
+	
+	//Metodos
+	
+	/* Sobrecarga 1: Realiza un abono parcial o total segun el monto indicado.
 	 * Si el monto cubre o supera la deuda, queda en 0 y se anula la morosidad.
 	 * Si es inferior, se descuenta el monto manteniendo el estado de morosidad.
 	 */
@@ -82,13 +99,53 @@ public class Socio {
 		}
 	}
 	
-	/*
-	 * Sobrecarga 2: Salda la totalidad de la deuda pendiente.
+	/* Sobrecarga 2: Salda la totalidad de la deuda pendiente.
 	 * Fija la deuda en 0 y remueve automaticamente la morosidad del socio.
 	 */
 	public void abonarDeuda() {
 		this.deuda = 0;
 		this.esMoroso = false;
 	}
-		
+	
+	/* Agrega una reserva a la coleccion interna del socio si NO se encuentra repetida.
+	 * Recibe como parametro un objeto Reserva a registrar.
+	 * Retorna true si la reserva se agrego con exito.
+	 * Retorna false si es nula o ya existe su id.
+	 */
+	public boolean agregarReserva(Reserva reserva) {
+		if (reserva == null) {
+			return false;
+		}
+		for (Reserva r : this.arrayReservas) {
+			if ( (r != null) && (r.getIdReserva() == reserva.getIdReserva()) ) {
+				return false;
+			}
+		}
+		return this.arrayReservas.add(reserva);
+	}
+	
+	/* Busca una reserva especifica del socio mediante su identificador.
+	 * Recibe como parametro el identificador numerico de la reserva.
+	 * Retorna un objeto Reserva encontrado (si existe) o null (si no existe).
+	 */
+	public Reserva buscarReserva(int idReserva) {
+		for (Reserva r : this.arrayReservas) {
+			if ( (r != null) && (r.getIdReserva() == idReserva) ) {
+				return r;
+			}
+		}
+		return null;
+	}
+	
+	/* Elimina una reserva de la coleccion del socio por su identificador.
+	 * Recibe como parametro el identificador numerico de la reserva a remover.
+	 * Retorna true (si se elimino) o false (si no existe).
+	 */
+	public boolean eliminarReserva(int idReserva) {
+		Reserva reserva = buscarReserva(idReserva);
+		if (reserva != null) {
+			return this.arrayReservas.remove(reserva); //true
+		}
+		return false;
+	}
 }
