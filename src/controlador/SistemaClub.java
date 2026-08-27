@@ -102,11 +102,20 @@ public class SistemaClub {
 	
 	//Métodos relacionados a Actividad
 	
-	public boolean agregarActividad(String idActividad, String nombre, int cupoMaximo, int edadMinima) {
+	//------------------Sobrecarga de agregar actividad para la herencia----------------------------
+	public boolean agregarActividad(String idActividad, String nombre, int cupoMaximo, int edadMinima, String profesor) {
 		
 	}
 	
-	public boolean modificarActividad(String nuevoIdActividad, String nuevoNombre, int nuevoCupoMaximo, int nuevaEdadMinima) throws CupoMaximoException {
+	public boolean agregarActividad(String idActividad, String nombre, int cupoMaximo, int edadMinima, boolean requiereAsistencia) {
+		//..
+	}
+	
+	//-------------------------------------------FIN SOBRECARGA--------------------------------------
+	
+	public boolean modificarActividad(String idActividad, String nuevoIdActividad, String nuevoNombre, int nuevoCupoMaximo, int nuevaEdadMinima) throws CupoMaximoException {
+		actividadBuscada = buscarActividad(idActividad);
+		
 		
 	}
 	
@@ -115,11 +124,24 @@ public class SistemaClub {
 	}
 	
 	public Actividad buscarActividad(String idActividad) {
+		for (Actividad a : listaActividades) {
+			if (a.getIdActividad().equals(idActividad)) return a;
+		}
 		
+		return null;
 	}
 	
 	public Actividad buscarActividad(int idReserva) {
+		for (Socio s : mapaSocios.values()) {
+			for (Reserva r : s.getArrayReserva()) {
+				if (r.getIdReserva() == idReserva) {
+					String idBuscado = r.getIdActividadEnReserva();
+					return buscarActividad(idBuscado);
+				}
+			}
+		}
 		
+		return null;
 	}
 
 	public ArrayList<Actividad> obtenerActividades(){
