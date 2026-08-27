@@ -31,7 +31,7 @@ classDiagram
 	   +buscarSocio(rut: String) Socio
         +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima : int, profesor: String) boolean
         +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima : int, requiereAsistencia: boolean) boolean
-        +modificarActividad(nuevoIdActividad: String, nuevoNombre: String, nuevoCupoMaximo: int, nuevaEdadMinima : int) boolean
+        +modificarActividad(idActividad: String, nuevoIdActividad: String, nuevoNombre: String, nuevoCupoMaximo: int, nuevaEdadMinima : int) boolean
         +eliminarActividad(idActividad: String) boolean
         +desactivarActividad(idActividad: String) boolean
         +activarActividad(idActividad: String) boolean
@@ -119,6 +119,7 @@ classDiagram
         +setActivo(activo: boolean) void
         +abonarDeuda(monto: int) void
         +abonarDeuda() void
+        +getArrayReservas() ArrayList~Reserva~
     }
     
     class Reserva {
