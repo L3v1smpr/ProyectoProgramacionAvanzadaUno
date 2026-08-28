@@ -47,7 +47,7 @@ public class Socio {
 		return activo;
 	}
 	
-	public ArrayList<Reserva> getArrayReservas(){
+	public ArrayList<Reserva> getListaReservas(){
 		return this.listaReservas;
 	}
 	
@@ -76,8 +76,8 @@ public class Socio {
 		this.activo = activo;
 	}
 	
-	public void setArrayReservas(ArrayList<Reserva> arrayReservas) {
-		this.listaReservas = arrayReservas;
+	public void setListaReservas(ArrayList<Reserva> listaReservas) {
+		this.listaReservas = listaReservas;
 	}
 	
 	//Metodos
