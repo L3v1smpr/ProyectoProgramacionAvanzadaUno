@@ -38,8 +38,8 @@ classDiagram
         +buscarActividad(idActividad: String) Actividad
         +buscarActividad(idReserva: int) Actividad
         +obtenerActividades() Arraylist~Actividad~
-        +agendarReserva(rut: String, idAct: String, fecha: String) void
-        +modificarReserva(idReserva: int, fecha: String, estado: EstadoReserva, rutSocio: String, idActividad: String) boolean
+        +agendarReserva(rut: String, idAct: String, fecha: Date) boolean
+        +modificarReserva(idReserva: int, fecha: Date, estado: EstadoReserva, rutSocio: String, idActividad: String) boolean
         +eliminarReserva(idReserva: int) boolean
         +listarReservasGlobales() ArrayList~Reserva~
         +pagarFacturacion(rut: String) boolean
@@ -67,14 +67,14 @@ classDiagram
         -activo : boolean
         +Actividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int)
         +getIdActividad() String
-        +setIdActividad(id: String) void
         +getNombre() String
-        +setNombre(nombre: String) void
         +getCupoMaximo() int
-        +setCupoMaximo(cupo: int) void
         +getEdadMinima() int
-        +setEdadMinima(edad: int) void
         +getActivo() boolean
+        +setIdActividad(id: String) void
+        +setNombre(nombre: String) void
+        +setCupoMaximo(cupo: int) void
+        +setEdadMinima(edad: int) void
         +setActivo(activo: boolean) void 
         +mostrarDetalles() String
         +mostrarDetalles(formatoCorto: boolean) String
