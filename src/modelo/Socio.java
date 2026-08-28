@@ -7,7 +7,7 @@ public class Socio {
 	private String rut, nombre;
 	private int edad, deuda;
 	private boolean esMoroso, activo;
-	private ArrayList<Reserva> arrayReservas;
+	private ArrayList<Reserva> listaReservas;
 	
 	
 	//Constructor
@@ -19,7 +19,7 @@ public class Socio {
 		this.deuda = deuda;
 		this.esMoroso = esMoroso;
 		this.activo = true;
-		this.arrayReservas = new ArrayList<>();
+		this.listaReservas = new ArrayList<>();
 	}
 	
 	//Getters
@@ -39,7 +39,7 @@ public class Socio {
 		return deuda;
 	}
 	
-	public boolean getIsMoroso() {
+	public boolean getEsMoroso() {
 		return esMoroso;
 	}
 	
@@ -48,7 +48,7 @@ public class Socio {
 	}
 	
 	public ArrayList<Reserva> getArrayReservas(){
-		return this.arrayReservas;
+		return this.listaReservas;
 	}
 	
 	//Setters
@@ -77,7 +77,7 @@ public class Socio {
 	}
 	
 	public void setArrayReservas(ArrayList<Reserva> arrayReservas) {
-		this.arrayReservas = arrayReservas;
+		this.listaReservas = arrayReservas;
 	}
 	
 	//Metodos
@@ -116,12 +116,12 @@ public class Socio {
 		if (reserva == null) {
 			return false;
 		}
-		for (Reserva r : this.arrayReservas) {
+		for (Reserva r : this.listaReservas) {
 			if ( (r != null) && (r.getIdReserva() == reserva.getIdReserva()) ) {
 				return false;
 			}
 		}
-		return this.arrayReservas.add(reserva);
+		return this.listaReservas.add(reserva);
 	}
 	
 	/* Busca una reserva especifica del socio mediante su identificador.
@@ -129,7 +129,7 @@ public class Socio {
 	 * Retorna un objeto Reserva encontrado (si existe) o null (si no existe).
 	 */
 	public Reserva buscarReserva(int idReserva) {
-		for (Reserva r : this.arrayReservas) {
+		for (Reserva r : this.listaReservas) {
 			if ( (r != null) && (r.getIdReserva() == idReserva) ) {
 				return r;
 			}
@@ -144,7 +144,7 @@ public class Socio {
 	public boolean eliminarReserva(int idReserva) {
 		Reserva reserva = buscarReserva(idReserva);
 		if (reserva != null) {
-			return this.arrayReservas.remove(reserva); //true
+			return this.listaReservas.remove(reserva); //true
 		}
 		return false;
 	}
