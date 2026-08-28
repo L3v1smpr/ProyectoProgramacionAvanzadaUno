@@ -113,8 +113,8 @@ public class SistemaClub {
 	
 	//-------------------------------------------FIN SOBRECARGA--------------------------------------
 	
-	public boolean modificarActividad(String idActividad, String nuevoIdActividad, String nuevoNombre, int nuevoCupoMaximo, int nuevaEdadMinima) throws CupoMaximoException {
-		actividadBuscada = buscarActividad(idActividad);
+	public boolean modificarActividad(String idActividad, String nuevoNombre, int nuevoCupoMaximo, int nuevaEdadMinima) throws CupoMaximoException {
+		
 		
 		
 	}

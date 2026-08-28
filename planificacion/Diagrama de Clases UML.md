@@ -6,19 +6,16 @@ classDiagram
     class Main {
         +main(args: String[]) void
     }
-    
-    
+      
     class MenuConsola {
         -controlador : SistemaClub
         +iniciarConsola() void
     }
     
-    
     class MenuVentana {
         -controlador : SistemaClub
         +iniciarVentana() void
     }
-
 
     class SistemaClub {
         -mapaSocios : HashMap~String, Socio~
@@ -51,17 +48,12 @@ classDiagram
         +cargarDatosBatch() void
         +guardarDatosBatch() void
     }
-    
-    
-    
-    
+        
     class DBConnection {
         -url : String
         +conectar() void
         +ejecutarQuery(query: String) void
     }
-
-
 
     %% ==========================================
     %% CAPA MODELO (Con Getters, Setters y Métodos de Negocio)
@@ -87,12 +79,7 @@ classDiagram
         +mostrarDetalles() String
         +mostrarDetalles(formatoCorto: boolean) String
     }
-    
-    
-    
-    
-    
-    
+        
     class ClaseGrupal {
         -profesor : String
         +ClaseGrupal(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, profesor: String)
@@ -100,10 +87,6 @@ classDiagram
         +setProfesor(profesor: String) void
         +mostrarDetalles() String
     }
-    
-
-    
-    
     
     class EntrenamientoLibre {
         -requiereAsistencia : boolean
@@ -147,7 +130,7 @@ classDiagram
         -fecha : Date
         -estado : EstadoReserva
         -rutSocio : String
-	-idActividad : String
+		-idActividad : String
         +getIdReserva() int
         +getFecha() Date
         +getEstado() EstadoReserva
@@ -159,8 +142,6 @@ classDiagram
         +setRutSocio(rut: String) void
 		+setIdActividadEnReserva (rut: String) void
     }
-    
-    
     
     class EstadoReserva {
     		<<enumeration>>
