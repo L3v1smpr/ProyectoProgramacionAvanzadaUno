@@ -372,7 +372,7 @@ public class SistemaClub {
 		for (Socio s: mapaSocios.values()) {
 			if (s.getActivo()) {
 				int deudaAnterior = s.getDeuda();
-				s.abonarDeuda(tarifaMensual + deudaAnterior);
+				s.setDeuda(deudaAnterior + tarifaMensual);
 				s.setEsMoroso(true);
 			}
 		}
