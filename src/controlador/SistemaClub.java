@@ -173,7 +173,7 @@ public class SistemaClub {
 		return true; //La actividad fue modificada correctamente
 	}
 	
-	public boolean eliminarActividad(String idActividad) {
+		public boolean eliminarActividad(String idActividad) {
 		Actividad actividadBuscada = buscarActividad(idActividad);
 		
 		if (actividadBuscada == null) {
@@ -340,15 +340,44 @@ public class SistemaClub {
 	//Otras opciones del menú
 	
 	public boolean pagarFacturacion(String rut) {
+		if (!mapaSocios.containsKey(rut)) {
+			return false; //El socio no existe
+		}
 		
+		Socio socioBuscado = buscarSocio(rut);
+		
+		socioBuscado.abonarDeuda();
+		
+		return true;
 	}
 	
 	public boolean pagarFacturacion(String rut, int abono) {
+		if (!mapaSocios.containsKey(rut)) {
+			return false; //El socio no existe
+		}
 		
+		Socio socioBuscado = buscarSocio(rut);
+		
+		socioBuscado.abonarDeuda(abono);
+		return true;
 	}
 	
-	public boolean generarCobroMensual() {
+	public boolean generarCobroMensual() { //El precio fijo mensual será de 10.000
+		if (mapaSocios.isEmpty()) {
+			return false; //No hay socios registrados en el sistema
+		}
 		
+		int tarifaMensual = 10000;
+		
+		for (Socio s: mapaSocios.values()) {
+			if (s.getActivo()) {
+				int deudaAnterior = s.getDeuda();
+				s.abonarDeuda(tarifaMensual + deudaAnterior);
+				s.setEsMoroso(true);
+			}
+		}
+		
+		return true; //Se hizo el cobro correctamente a cada socio del sistema
 	}
 
 	
