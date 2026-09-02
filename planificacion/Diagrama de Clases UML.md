@@ -6,7 +6,7 @@ classDiagram
     class Main {
         +main(args: String[]) void
     }
-    
+      
     class MenuConsola {
         -controlador : SistemaClub
         +iniciarConsola() void
@@ -22,24 +22,24 @@ classDiagram
         -listaActividades : ArrayList~Actividad~
         -connection : DBConnection
         +agregarSocio(rut: String, nombre: String, edad: int) boolean
-	   +modificarSocio(rut: String, nombre: String, edad: int, deuda: int, esMoroso: boolean) boolean
-	   +eliminarSocio(rut: String) boolean
-	   +desactivarSocio(rut: String) boolean
-	   +activarSocio(rut: String) boolean
-	   +obtenerListaSocios() ArrayList~Socio~
-	   +obtenerListaSociosDeudores() ArrayList~Socio~
-	   +buscarSocio(rut: String) Socio
+	    +modificarSocio(rut: String, nombre: String, edad: int, deuda: int, esMoroso: boolean) boolean
+	    +eliminarSocio(rut: String) boolean
+	    +desactivarSocio(rut: String) boolean
+	    +activarSocio(rut: String) boolean
+	    +obtenerListaSocios() ArrayList~Socio~
+	    +obtenerListaSociosDeudores() ArrayList~Socio~
+	    +buscarSocio(rut: String) Socio
         +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima : int, profesor: String) boolean
         +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima : int, requiereAsistencia: boolean) boolean
-        +modificarActividad(nuevoIdActividad: String, nuevoNombre: String, nuevoCupoMaximo: int, nuevaEdadMinima : int) boolean
+        +modificarActividad(idActividad: String, nuevoNombre: String, nuevoCupoMaximo: int, nuevaEdadMinima : int) boolean
         +eliminarActividad(idActividad: String) boolean
         +desactivarActividad(idActividad: String) boolean
         +activarActividad(idActividad: String) boolean
         +buscarActividad(idActividad: String) Actividad
         +buscarActividad(idReserva: int) Actividad
         +obtenerActividades() Arraylist~Actividad~
-        +agendarReserva(rut: String, idAct: String, fecha: String) void
-        +modificarReserva(idReserva: int, fecha: String, estado: EstadoReserva, rutSocio: String, idActividad: String) boolean
+        +agendarReserva(rut: String, idAct: String, fecha: Date) boolean
+        +modificarReserva(idReserva: int, fecha: Date, estado: EstadoReserva, rutSocio: String, idActividad: String) boolean
         +eliminarReserva(idReserva: int) boolean
         +listarReservasGlobales() ArrayList~Reserva~
         +pagarFacturacion(rut: String) boolean
@@ -48,7 +48,7 @@ classDiagram
         +cargarDatosBatch() void
         +guardarDatosBatch() void
     }
-    
+        
     class DBConnection {
         -url : String
         +conectar() void
@@ -67,19 +67,19 @@ classDiagram
         -activo : boolean
         +Actividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int)
         +getIdActividad() String
-        +setIdActividad(id: String) void
         +getNombre() String
-        +setNombre(nombre: String) void
         +getCupoMaximo() int
-        +setCupoMaximo(cupo: int) void
         +getEdadMinima() int
-        +setEdadMinima(edad: int) void
         +getActivo() boolean
+        +setIdActividad(id: String) void
+        +setNombre(nombre: String) void
+        +setCupoMaximo(cupo: int) void
+        +setEdadMinima(edad: int) void
         +setActivo(activo: boolean) void 
         +mostrarDetalles() String
         +mostrarDetalles(formatoCorto: boolean) String
     }
-    
+        
     class ClaseGrupal {
         -profesor : String
         +ClaseGrupal(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, profesor: String)
@@ -102,23 +102,27 @@ classDiagram
         -edad : int
         -deuda : int
         -esMoroso : boolean
-        -arrayReservas : ArrayList~Reserva~
+        -listaReservas : ArrayList~Reserva~
         -activo : boolean
-        +Socio(rut: String, nombre: String, edad: int, deuda: int, esMoroso:boolean)
+        +Socio(rut: String, nombre: String, edad: int, deuda: int, esMoroso: boolean)
         +getRut() String
-        +setRut(rut: String) void
         +getNombre() String
-        +setNombre(nombre: String) void
         +getEdad() int
-        +setEdad(edad: int) void
         +getDeuda() int
-        +setDeuda(deuda: int) void
-        +getIsMoroso() boolean
-        +setEsMoroso(estado: boolean) void
+        +getEsMoroso() boolean
         +getActivo() boolean
+        +getListaReservas() ArrayList~Reserva~
+        +setRut(rut: String) void
+        +setNombre(nombre: String) void
+        +setEdad(edad: int) void
+        +setDeuda(deuda: int) void
+        +setEsMoroso(estado: boolean) void
         +setActivo(activo: boolean) void
         +abonarDeuda(monto: int) void
         +abonarDeuda() void
+        +agregarReserva(reserva: Reserva) boolean
+        +buscarReserva(idReserva: int) Reserva
+        +eliminarReserva(idReserva: int) boolean
     }
     
     class Reserva {
@@ -126,17 +130,17 @@ classDiagram
         -fecha : Date
         -estado : EstadoReserva
         -rutSocio : String
-	-idActividad : String
+		-idActividad : String
         +getIdReserva() int
-        +setIdReserva(id: int) void
         +getFecha() Date
-        +setFecha(fecha: Date) void
         +getEstado() EstadoReserva
-        +setEstado(estado: EstadoReserva) void
         +getRutSocio() String
+        +getIdActividadEnReserva() String
+        +setIdReserva(id: int) void
+        +setFecha(fecha: Date) void
+        +setEstado(estado: EstadoReserva) void
         +setRutSocio(rut: String) void
-		+getIdActividadEnReserva() String
-		+setIdActividadEnReserva	(rut: String) void
+		+setIdActividadEnReserva (rut: String) void
     }
     
     class EstadoReserva {
