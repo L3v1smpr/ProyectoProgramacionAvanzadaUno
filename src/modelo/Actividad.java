@@ -4,8 +4,19 @@ public class Actividad {
 
 	private String idActividad, nombre;
 	private int cupoMaximo;
+	private int edadMinima; 
+	private boolean activo; 
 	
-	//Getters
+	
+	public Actividad(String idActividad, String nombre, int cupoMaximo, int edadMinima) {
+		this.idActividad = idActividad;
+		this.nombre = nombre;
+		this.cupoMaximo = cupoMaximo;
+		this.edadMinima = edadMinima;
+		this.activo = true; 
+	}
+	
+	// Getters
 	public String getIdActividad() {
 		return idActividad;
 	}
@@ -17,9 +28,16 @@ public class Actividad {
 	public int getCupoMaximo() {
 		return cupoMaximo;
 	}
-
 	
-	//Setters
+	public int getEdadMinima() {
+		return edadMinima;
+	}
+
+	public boolean isActivo() {
+		return activo;
+	}
+	
+	// Setters
 	public void setIdActividad(String id) {
 		this.idActividad = id;
 	}
@@ -32,17 +50,23 @@ public class Actividad {
 		this.cupoMaximo = cupoMaximo;
 	}
 	
-	public String mostrarDetalles() {
-		return "ID de actividad" + idActividad +
-				" Nombre" + nombre +
-				" Cupo Maximo" + cupoMaximo;
+	public void setEdadMinima(int edadMinima) {
+		this.edadMinima = edadMinima;
 	}
 	
-	 public String mostrarDetalles(boolean formatoCorto) {
-	        if (formatoCorto) {
-	            return "Actividad: " + nombre + " (ID: " + idActividad + ")";
-	        } else {
-	            return mostrarDetalles();
-	        }
-	    }
+	public void setActivo(boolean activo) {
+		this.activo = activo;
 	}
+	
+	// Métodos
+	public String mostrarDetalles() {
+		return "ID: " + idActividad + " | Nombre: " + nombre + " | Cupos: " + cupoMaximo + " | Edad Mínima: " + edadMinima + " años | Activa: " + (activo ? "Sí" : "No");
+	}
+	
+	public String mostrarDetalles(boolean formatoCorto) {
+		if (formatoCorto) {
+			return idActividad + " - " + nombre;
+		}
+		return mostrarDetalles();
+	}
+}
