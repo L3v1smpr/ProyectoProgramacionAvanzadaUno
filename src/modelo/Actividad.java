@@ -1,6 +1,6 @@
 package modelo;
 
-public class Actividad {
+public abstract class Actividad {
 
 	private String idActividad, nombre;
 	private int cupoMaximo;
@@ -33,7 +33,7 @@ public class Actividad {
 		return edadMinima;
 	}
 
-	public boolean isActivo() {
+	public boolean getActivo() {
 		return activo;
 	}
 	
