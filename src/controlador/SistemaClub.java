@@ -391,6 +391,15 @@ public class SistemaClub {
 		
 		return true; //Se hizo el cobro correctamente a cada socio del sistema
 	}
+	
+	public ArrayList<Evento> obtenerEventos(){
+		ArrayList<Evento> listaEventos = new ArrayList<>();
+		
+		for (Actividad actividad : listaActividades) {
+			if (actividad )
+		}
+		
+	}
 
 	
 	//Relacionado a la base de datos
