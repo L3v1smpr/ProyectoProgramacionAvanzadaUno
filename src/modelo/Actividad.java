@@ -58,6 +58,10 @@ public abstract class Actividad {
 		this.activo = activo;
 	}
 	
+	public boolean esEvento() {
+	    return false;
+	}
+	
 	// Métodos
 	public String mostrarDetalles() {
 		return "ID: " + idActividad + " | Nombre: " + nombre + " | Cupos: " + cupoMaximo + " | Edad Mínima: " + edadMinima + " años | Activa: " + (activo ? "Sí" : "No");

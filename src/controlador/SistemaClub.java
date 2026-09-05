@@ -392,13 +392,16 @@ public class SistemaClub {
 		return true; //Se hizo el cobro correctamente a cada socio del sistema
 	}
 	
-	public ArrayList<Evento> obtenerEventos(){
-		ArrayList<Evento> listaEventos = new ArrayList<>();
+	public ArrayList<Actividad> obtenerEventos(){
+		ArrayList<Actividad> listaEventos = new ArrayList<>();
 		
 		for (Actividad actividad : listaActividades) {
-			if (actividad )
+			if (actividad.esEvento() && actividad.getActivo()) {
+	            listaEventos.add(actividad);
+	        }
 		}
-		
+	
+		return listaEventos;
 	}
 
 	

@@ -28,6 +28,11 @@ public class Evento extends Actividad {
     public String getTipoEvento() {
         return tipoEvento;
     }
+    
+    @Override
+    public boolean esEvento() {
+        return true;
+    }
 
 
 	//Setters
@@ -45,7 +50,7 @@ public class Evento extends Actividad {
     }
     
     
-    //Sobrecarga
+    //Sobreescritura
     @Override
     public String mostrarDetalles() {
         return super.mostrarDetalles()

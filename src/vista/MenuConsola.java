@@ -62,7 +62,8 @@ public class MenuConsola {
 		System.out.println("2. Modificar Actividad");
 		System.out.println("3. Listar Actividades");
 		System.out.println("4. Buscar Actividad");
-		System.out.println("5. Eliminar Actividad");
+		System.out.println("5. Listar Eventos");
+		System.out.println("6. Eliminar Actividad");
 		System.out.print("Opción: ");
 		int opt = scanner.nextInt();
 		scanner.nextLine();
@@ -77,6 +78,11 @@ public class MenuConsola {
 				int tipoAct = scanner.nextInt();
 				scanner.nextLine();
 				
+				if (tipoAct < 1 || tipoAct > 3) {
+				    System.out.println("Error: Tipo de actividad no válido.");
+				    break;
+				}
+				
 				System.out.print("ID Actividad: ");
 				String id = scanner.nextLine();
 				System.out.print("Nombre: ");
@@ -89,7 +95,6 @@ public class MenuConsola {
 				
 				
 				if (tipoAct == 1) {
-
 				    System.out.print("Nombre del Profesor: ");
 				    String profesor = scanner.nextLine();
 
@@ -100,7 +105,6 @@ public class MenuConsola {
 				    }
 
 				} else if (tipoAct == 2) {
-
 				    System.out.print("¿Requiere asistencia obligatoria? (true/false): ");
 				    boolean requiereAsistencia = scanner.nextBoolean();
 				    scanner.nextLine();
@@ -112,19 +116,15 @@ public class MenuConsola {
 				    }
 
 				} else if (tipoAct == 3) {
-
 				    System.out.print("Ingrese la fecha (dd-MM-yyyy): ");
 				    String fechaStr = scanner.nextLine();
-
 				    System.out.print("Ingrese la ubicación: ");
 				    String ubicacion = scanner.nextLine();
-
 				    System.out.print("Ingrese el tipo del evento: ");
 				    String tipoEvento = scanner.nextLine();
 
 				    try {
 				        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
-
 				        sdf.setLenient(false);
 				        java.util.Date fecha = sdf.parse(fechaStr);
 
@@ -140,10 +140,8 @@ public class MenuConsola {
 				            "Error: La fecha ingresada no es válida. Utilice el formato dd-MM-yyyy."
 				        );
 				    }
-
-				} else {
-				    System.out.println("Error: Tipo de actividad no válido.");
 				}
+				break;
 				
 			case 2: //Modificar Actividad
 				System.out.println("--- MODIFICAR ACTIVIDAD ---");
@@ -206,10 +204,7 @@ public class MenuConsola {
 					System.out.println("No hay actividades registradas o activas en el sistema.");
 				} else {
 					for (modelo.Actividad a : listaAct) {
-						System.out.println("ID: " + a.getIdActividad() + 
-										   " | Nombre: " + a.getNombre() + 
-										   " | Cupos: " + a.getCupoMaximo() + 
-										   " | Edad Mínima: " + a.getEdadMinima());
+					    System.out.println(a.mostrarDetalles());
 					}
 				}
 				System.out.println("------------------------------");
@@ -239,15 +234,31 @@ public class MenuConsola {
 				}
 
 				if (actEncontrada != null) {
-					System.out.println("Actividad encontrada: " + actEncontrada.getNombre() + 
-									   " | Cupos: " + actEncontrada.getCupoMaximo() + 
-									   " | Edad Mínima: " + actEncontrada.getEdadMinima());
+				    System.out.println("Actividad encontrada:");
+				    System.out.println(actEncontrada.mostrarDetalles());
 				} else if (tipoBusqueda == 1 || tipoBusqueda == 2) {
-					System.out.println("No se encontró ninguna actividad con los datos proporcionados.");
+				    System.out.println(
+				        "No se encontró ninguna actividad con los datos proporcionados."
+				    );
 				}
-				break;
+				break; 
+				
+			case 5:
+			    System.out.println("--- LISTADO DE EVENTOS ---");
 
-			case 5: // Eliminar Actividad
+			    java.util.ArrayList<modelo.Actividad> listaEventos = controlador.obtenerEventos();
+
+			    if (listaEventos.isEmpty()) {
+			        System.out.println("No hay eventos registrados o activos.");
+			    } else {
+			        for (modelo.Actividad evento : listaEventos) {
+			            System.out.println(evento.mostrarDetalles());
+			        }
+			    }
+
+			    break;
+				
+			case 6: // Eliminar Actividad
 				System.out.println("--- ELIMINAR ACTIVIDAD ---");
 				System.out.print("Ingrese el ID de la actividad a eliminar (desactivar): ");
 				String idEliminar = scanner.nextLine();
