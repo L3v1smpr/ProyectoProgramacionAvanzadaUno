@@ -6,12 +6,12 @@ classDiagram
     class Main {
         +main(args: String[]) void
     }
-      
+
     class MenuConsola {
         -controlador : SistemaClub
         +iniciarConsola() void
     }
-    
+
     class MenuVentana {
         -controlador : SistemaClub
         +iniciarVentana() void
@@ -22,33 +22,35 @@ classDiagram
         -listaActividades : ArrayList~Actividad~
         -connection : DBConnection
         +agregarSocio(rut: String, nombre: String, edad: int) boolean
-	    +modificarSocio(rut: String, nombre: String, edad: int, deuda: int, esMoroso: boolean) boolean
-	    +eliminarSocio(rut: String) boolean
-	    +desactivarSocio(rut: String) boolean
-	    +activarSocio(rut: String) boolean
-	    +obtenerListaSocios() ArrayList~Socio~
-	    +obtenerListaSociosDeudores() ArrayList~Socio~
-	    +buscarSocio(rut: String) Socio
-        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima : int, profesor: String) boolean
-        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima : int, requiereAsistencia: boolean) boolean
-        +modificarActividad(idActividad: String, nuevoNombre: String, nuevoCupoMaximo: int, nuevaEdadMinima : int) boolean
+        +modificarSocio(rut: String, nombre: String, edad: int, deuda: int, esMoroso: boolean) boolean
+        +eliminarSocio(rut: String) boolean
+        +desactivarSocio(rut: String) boolean
+        +activarSocio(rut: String) boolean
+        +obtenerListaSocios() ArrayList~Socio~
+        +obtenerListaSociosDeudores() ArrayList~Socio~
+        +buscarSocio(rut: String) Socio
+        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, profesor: String) boolean
+        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, requiereAsistencia: boolean) boolean
+        +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, fecha: Date, lugar: String, tipoEvento: String) boolean
+        +modificarActividad(idActividad: String, nuevoNombre: String, nuevoCupoMaximo: int, nuevaEdadMinima: int) boolean
         +eliminarActividad(idActividad: String) boolean
         +desactivarActividad(idActividad: String) boolean
         +activarActividad(idActividad: String) boolean
         +buscarActividad(idActividad: String) Actividad
         +buscarActividad(idReserva: int) Actividad
-        +obtenerActividades() Arraylist~Actividad~
+        +obtenerActividades() ArrayList~Actividad~
+        +obtenerEventos() ArrayList~Actividad~
         +agendarReserva(rut: String, idAct: String, fecha: Date) boolean
         +modificarReserva(idReserva: int, fecha: Date, estado: EstadoReserva, rutSocio: String, idActividad: String) boolean
         +eliminarReserva(idReserva: int) boolean
         +listarReservasGlobales() ArrayList~Reserva~
         +pagarFacturacion(rut: String) boolean
         +pagarFacturacion(rut: String, abono: int) boolean
-        +generarCobroMensual() boolean   
+        +generarCobroMensual() boolean
         +cargarDatosBatch() void
         +guardarDatosBatch() void
     }
-        
+
     class DBConnection {
         -url : String
         +conectar() void
@@ -59,7 +61,7 @@ classDiagram
     %% CAPA MODELO (Con Getters, Setters y Métodos de Negocio)
     %% ==========================================
     class Actividad {
-    		<<abstract>>
+        <<abstract>>
         -idActividad : String
         -nombre : String
         -cupoMaximo : int
@@ -75,11 +77,12 @@ classDiagram
         +setNombre(nombre: String) void
         +setCupoMaximo(cupo: int) void
         +setEdadMinima(edad: int) void
-        +setActivo(activo: boolean) void 
+        +setActivo(activo: boolean) void
+        +esEvento() boolean
         +mostrarDetalles() String
         +mostrarDetalles(formatoCorto: boolean) String
     }
-        
+
     class ClaseGrupal {
         -profesor : String
         +ClaseGrupal(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, profesor: String)
@@ -87,7 +90,7 @@ classDiagram
         +setProfesor(profesor: String) void
         +mostrarDetalles() String
     }
-    
+
     class EntrenamientoLibre {
         -requiereAsistencia : boolean
         +EntrenamientoLibre(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, requiereAsistencia: boolean)
@@ -95,7 +98,22 @@ classDiagram
         +setRequiereAsistencia(requiere: boolean) void
         +mostrarDetalles() String
     }
-    
+
+    class Evento {
+        -fecha : Date
+        -lugar : String
+        -tipoEvento : String
+        +Evento(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, fecha: Date, lugar: String, tipoEvento: String)
+        +getFecha() Date
+        +getLugar() String
+        +getTipoEvento() String
+        +setFecha(fecha: Date) void
+        +setLugar(lugar: String) void
+        +setTipoEvento(tipoEvento: String) void
+        +esEvento() boolean
+        +mostrarDetalles() String
+    }
+
     class Socio {
         -rut : String
         -nombre : String
@@ -124,13 +142,13 @@ classDiagram
         +buscarReserva(idReserva: int) Reserva
         +eliminarReserva(idReserva: int) boolean
     }
-    
+
     class Reserva {
         -idReserva : int
         -fecha : Date
         -estado : EstadoReserva
         -rutSocio : String
-		-idActividad : String
+        -idActividad : String
         +getIdReserva() int
         +getFecha() Date
         +getEstado() EstadoReserva
@@ -140,43 +158,42 @@ classDiagram
         +setFecha(fecha: Date) void
         +setEstado(estado: EstadoReserva) void
         +setRutSocio(rut: String) void
-		+setIdActividadEnReserva (rut: String) void
+        +setIdActividadEnReserva(idActividad: String) void
     }
-    
+
     class EstadoReserva {
-    		<<enumeration>>
-    		PENDIENTE
-    		COMPLETADA
-    		CANCELADA
-    		
+        <<enumeration>>
+        PENDIENTE
+        COMPLETADA
+        CANCELADA
     }
-    
+
     class MorosidadException {
         +getMessageMorosidad() String
     }
 
     class CupoMaximoException {
-		+getMessageCupoMaximo() String
+        +getMessageCupoMaximo() String
     }
 
     %% ==========================================
-    %% RELACIONES 
+    %% RELACIONES
     %% ==========================================
     Actividad <|-- ClaseGrupal
     Actividad <|-- EntrenamientoLibre
+    Actividad <|-- Evento
 
-	Reserva ..> EstadoReserva : usa
+    Reserva ..> EstadoReserva : usa
     Socio "1" *-- "n" Reserva : 1 a Muchos
     SistemaClub "1" --> "n" Actividad : 1 a Muchos
     SistemaClub "1" --> "n" Socio : 1 a Muchos
     SistemaClub "1" --> "1" DBConnection : 1 a 1
-    
+
     MenuConsola "1" --> "1" SistemaClub : 1 a 1
     MenuVentana "1" --> "1" SistemaClub : 1 a 1
-    
+
     Main ..> MenuConsola : Instancia
     Main ..> MenuVentana : Instancia
     SistemaClub ..> MorosidadException : Lanza
     SistemaClub ..> CupoMaximoException : Lanza
-
 ```
