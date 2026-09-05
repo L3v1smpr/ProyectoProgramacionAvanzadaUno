@@ -1,5 +1,6 @@
 package controlador;
 import modelo.Socio;
+import modelo.Evento;
 import java.util.Date;
 import modelo.Actividad;
 import modelo.Reserva;
@@ -151,6 +152,17 @@ public class SistemaClub {
 		
 		return true; //El entrenamiento se añadió correctamente
 	
+	}
+	
+	public boolean agregarActividad(String idActividad, String nombre, int cupoMaximo, int edadMinima, Date fecha, String lugar, String tipoEvento) {
+		if (buscarActividad(idActividad) != null) {
+			return false;
+		}
+		
+		Actividad nuevaActividad = new Evento(idActividad, nombre, cupoMaximo, edadMinima, fecha, lugar, tipoEvento);
+		listaActividades.add(nuevaActividad);
+		
+		return true; //El evento fue añadido correctamente
 	}
 	
 	//-------------------------------------------FIN SOBRECARGA--------------------------------------

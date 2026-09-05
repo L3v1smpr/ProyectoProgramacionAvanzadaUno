@@ -5,6 +5,8 @@ import modelo.CupoMaximoException;
 import controlador.SistemaClub;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.util.Date;
+import modelo.Socio;
 
 public class MenuConsola {
 	private Scanner scanner;
@@ -70,6 +72,7 @@ public class MenuConsola {
 				System.out.println("--- NUEVA ACTIVIDAD ---");
 				System.out.println("1. Clase Grupal (Requiere profesor)");
 				System.out.println("2. Entrenamiento Libre (Define asistencia)");
+				System.out.println("3. Registrar Evento");
 				System.out.print("Seleccione el tipo: ");
 				int tipoAct = scanner.nextInt();
 				scanner.nextLine();
@@ -84,23 +87,63 @@ public class MenuConsola {
 				int edadMin = scanner.nextInt();
 				scanner.nextLine();
 				
+				
 				if (tipoAct == 1) {
-					System.out.print("Nombre del Profesor: ");
-					String profesor = scanner.nextLine();
-					controlador.agregarActividad(id, nombre, cupo, edadMin, profesor);
-					System.out.println("Clase grupal agregada exitosamente.");
-					
+
+				    System.out.print("Nombre del Profesor: ");
+				    String profesor = scanner.nextLine();
+
+				    if (controlador.agregarActividad(id, nombre, cupo, edadMin, profesor)) {
+				        System.out.println("Clase grupal agregada exitosamente.");
+				    } else {
+				        System.out.println("Error: Ya existe una actividad registrada con ese ID.");
+				    }
+
 				} else if (tipoAct == 2) {
-					System.out.print("¿Requiere asistencia obligatoria? (true/false): ");
-					boolean requiereAsistencia = scanner.nextBoolean();
-					scanner.nextLine();
-					controlador.agregarActividad(id, nombre, cupo, edadMin, requiereAsistencia);
-					System.out.println("Entrenamiento libre agregado exitosamente.");
-					
+
+				    System.out.print("¿Requiere asistencia obligatoria? (true/false): ");
+				    boolean requiereAsistencia = scanner.nextBoolean();
+				    scanner.nextLine();
+
+				    if (controlador.agregarActividad(id, nombre, cupo, edadMin, requiereAsistencia)) {
+				        System.out.println("Entrenamiento libre agregado exitosamente.");
+				    } else {
+				        System.out.println("Error: Ya existe una actividad registrada con ese ID.");
+				    }
+
+				} else if (tipoAct == 3) {
+
+				    System.out.print("Ingrese la fecha (dd-MM-yyyy): ");
+				    String fechaStr = scanner.nextLine();
+
+				    System.out.print("Ingrese la ubicación: ");
+				    String ubicacion = scanner.nextLine();
+
+				    System.out.print("Ingrese el tipo del evento: ");
+				    String tipoEvento = scanner.nextLine();
+
+				    try {
+				        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
+
+				        sdf.setLenient(false);
+				        java.util.Date fecha = sdf.parse(fechaStr);
+
+				        if (controlador.agregarActividad(id, nombre, cupo, edadMin, fecha, ubicacion, tipoEvento)) {
+				            System.out.println("Evento agregado correctamente.");
+
+				        } else {
+				            System.out.println("Error: Ya existe una actividad registrada con ese ID.");
+				        }
+
+				    } catch (java.text.ParseException e) {
+				        System.out.println(
+				            "Error: La fecha ingresada no es válida. Utilice el formato dd-MM-yyyy."
+				        );
+				    }
+
 				} else {
-					System.out.println("Error: Tipo de actividad no válido.");
+				    System.out.println("Error: Tipo de actividad no válido.");
 				}
-				break;
 				
 			case 2: //Modificar Actividad
 				System.out.println("--- MODIFICAR ACTIVIDAD ---");
@@ -228,7 +271,8 @@ public class MenuConsola {
         System.out.println("3. Listar Socios");
         System.out.println("4. Listar Socios con Deuda");
         System.out.println("5. Listar Reservas de Socio");
-        System.out.println("6. Eliminar Socio");
+        System.out.println("6. Buscar Socio");
+        System.out.println("7. Eliminar Socio");
         System.out.print("Opción: ");
         int opt = scanner.nextInt();
         scanner.nextLine();
@@ -359,7 +403,29 @@ public class MenuConsola {
                 }
                 break;
 
-            case 6: // Eliminar Socio
+            case 6:
+                System.out.println("--- BUSCAR SOCIO ---");
+                System.out.print("Ingrese RUT: ");
+                String rutBuscar = scanner.nextLine();
+
+                Socio socioEncontrado = controlador.buscarSocio(rutBuscar);
+
+                if (socioEncontrado == null) {
+                    System.out.println("No se encontró un socio con ese RUT.");
+                } else {
+                    System.out.println(
+                        "RUT: " + socioEncontrado.getRut()
+                        + " | Nombre: " + socioEncontrado.getNombre()
+                        + " | Edad: " + socioEncontrado.getEdad()
+                        + " | Deuda: $" + socioEncontrado.getDeuda()
+                        + " | Moroso: "
+                        + (socioEncontrado.getEsMoroso() ? "Sí" : "No")
+                    );
+                }
+                break;
+                
+                
+            case 7: // Eliminar Socio
                 System.out.println("--- ELIMINAR SOCIO ---");
                 System.out.print("Ingrese el RUT del socio a eliminar (desactivar): ");
                 String rutElim = scanner.nextLine();
