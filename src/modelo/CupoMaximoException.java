@@ -1,8 +1,8 @@
 package modelo;
 
-public class CupoMaximoException extends Exception{
+public class CupoMaximoException extends Exception {
 
-	public String getMessageCupoMaximo() {
-		return "ERROR SE HA EXCEDIDO EL CUPO MAXIMO";
-	}
+    public CupoMaximoException(String mensaje) {
+        super(mensaje);
+    }
 }
