@@ -7,7 +7,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import modelo.ConexionBDException;
-import modelo.PersistenciaDatosException;
+import java.sql.PreparedStatement;
+import modelo.Socio;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 
 
 
@@ -28,7 +31,7 @@ public class DBConnection {
                 statement.execute("PRAGMA foreign_keys = ON;");
             }
             
-            System.out.println("Conexión a SQLite establecida correctamente.");
+            
         } catch (SQLException e) {
             throw new ConexionBDException("No fue posible conectar con la base de datos.", e);
         }
@@ -54,6 +57,75 @@ public class DBConnection {
             }
         } catch (SQLException e) {
             throw new ConexionBDException("No fue posible cerrar la conexión con la base de datos.",
+                e
+            );
+        }
+    }
+    
+    public void guardarSocio(Socio socio)
+            throws ConexionBDException, PersistenciaDatosException {
+
+        String sql =
+            "INSERT INTO SOCIOS "
+            + "(rut, nombre, edad, deuda, es_moroso, activo) "
+            + "VALUES (?, ?, ?, ?, ?, ?);";
+
+        try (PreparedStatement statement =
+                getConnection().prepareStatement(sql)) {
+
+            statement.setString(1, socio.getRut());
+            statement.setString(2, socio.getNombre());
+            statement.setInt(3, socio.getEdad());
+            statement.setInt(4, socio.getDeuda());
+            statement.setInt(5, socio.getEsMoroso() ? 1 : 0);
+            statement.setInt(6, socio.getActivo() ? 1 : 0);
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new PersistenciaDatosException(
+                "No fue posible guardar el socio en la base de datos.",
+                e
+            );
+        }
+    }
+    
+    public ArrayList<Socio> cargarSocios()
+            throws ConexionBDException, PersistenciaDatosException {
+
+        String sql =
+            "SELECT rut, nombre, edad, deuda, es_moroso, activo "
+            + "FROM SOCIOS;";
+
+        ArrayList<Socio> socios = new ArrayList<>();
+
+        try (PreparedStatement statement =
+                getConnection().prepareStatement(sql);
+
+             ResultSet resultado = statement.executeQuery()) {
+
+            while (resultado.next()) {
+
+                Socio socio = new Socio(
+                    resultado.getString("rut"),
+                    resultado.getString("nombre"),
+                    resultado.getInt("edad"),
+                    resultado.getInt("deuda"),
+                    resultado.getInt("es_moroso") == 1
+                );
+
+                socio.setActivo(
+                    resultado.getInt("activo") == 1
+                );
+
+                socios.add(socio);
+            }
+
+            return socios;
+
+        } catch (SQLException e) {
+            throw new PersistenciaDatosException(
+                "No fue posible cargar los socios desde la base de datos.",
                 e
             );
         }
