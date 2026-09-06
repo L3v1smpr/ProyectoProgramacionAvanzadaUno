@@ -296,7 +296,8 @@ public class MenuConsola {
         System.out.println("4. Listar Socios con Deuda");
         System.out.println("5. Listar Reservas de Socio");
         System.out.println("6. Buscar Socio");
-        System.out.println("7. Eliminar Socio");
+        System.out.println("7. Desactivar Socio");
+        System.out.println("8. Reactivar Socio");
         System.out.print("Opción: ");
         int opt = scanner.nextInt();
         scanner.nextLine();
@@ -450,8 +451,8 @@ public class MenuConsola {
                 
                 
             case 7: // Eliminar Socio
-                System.out.println("--- ELIMINAR SOCIO ---");
-                System.out.print("Ingrese el RUT del socio a eliminar (desactivar): ");
+                System.out.println("--- DESACTIVAR SOCIO ---");
+                System.out.print("Ingrese el RUT del socio a desactivar: ");
                 String rutElim = scanner.nextLine();
 
                 if (controlador.desactivarSocio(rutElim)) {
@@ -461,6 +462,18 @@ public class MenuConsola {
                 }
                 break;
 
+            case 8: // Reactivar Socio
+                System.out.println("--- REACTIVAR SOCIO ---");
+                System.out.print("Ingrese el RUT del socio a reactivar: ");
+                String rutActivar = scanner.nextLine();
+
+                if (controlador.activarSocio(rutActivar)) {
+                    System.out.println("Socio reactivado correctamente.");
+                } else {
+                    System.out.println("Error: No se encontró un socio con ese RUT.");
+                }
+                break;
+                
             default:
                 System.out.println("Opción no válida.");
         }
