@@ -10,17 +10,26 @@ public class ClaseGrupal extends Actividad {
  		this.profesor = profesor;
  	}
     // Métodos
-    public String getProfesor() {
+ 	@Override
+ 	public String getProfesor() {
         return profesor;
     }
 
+    
     public void setProfesor(String profesor) {
         this.profesor = profesor;
     }
 
+    //Sobreescritura
+    
     @Override
     public String mostrarDetalles() {
         return super.mostrarDetalles() + " | Profesor: " + profesor;
+    }
+    
+    @Override
+    public String getTipoActividad() {
+        return "CLASE_GRUPAL";
     }
 }
 

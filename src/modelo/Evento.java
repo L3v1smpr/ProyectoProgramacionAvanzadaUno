@@ -17,14 +17,17 @@ public class Evento extends Actividad {
 	
 	//Getters
 	
+	@Override
 	public Date getFecha() {
         return fecha;
     }
 
+	@Override
     public String getLugar() {
         return lugar;
     }
 
+	@Override
     public String getTipoEvento() {
         return tipoEvento;
     }
@@ -57,5 +60,10 @@ public class Evento extends Actividad {
             + " | Tipo: " + tipoEvento
             + " | Fecha: " + fecha
             + " | Lugar: " + lugar;
+    }
+    
+    @Override
+    public String getTipoActividad() {
+        return "EVENTO";
     }
 }

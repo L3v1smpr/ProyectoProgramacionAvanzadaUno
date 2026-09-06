@@ -1,16 +1,25 @@
 package controlador;
 
-
-import java.sql.Statement;
 import modelo.PersistenciaDatosException;
+import modelo.ConexionBDException;
+import modelo.Socio;
+import modelo.Actividad;
+import modelo.ClaseGrupal;
+import modelo.EntrenamientoLibre;
+import modelo.Evento;
+import modelo.Reserva;
+import modelo.EstadoReserva;
+
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.sql.Types;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import modelo.ConexionBDException;
-import java.sql.PreparedStatement;
-import modelo.Socio;
-import java.sql.ResultSet;
-import java.util.ArrayList;
 
 
 
@@ -190,4 +199,282 @@ public class DBConnection {
             );
         }
     }
+    
+    
+    public void guardarActividad(Actividad actividad)
+            throws ConexionBDException, PersistenciaDatosException {
+
+        String sql =
+            "INSERT INTO ACTIVIDADES "
+            + "(id_actividad, nombre, cupo_maximo, edad_minima, tipo, "
+            + "profesor, requiere_asistencia, fecha_evento, lugar, tipo_evento, activo) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            + "ON CONFLICT(id_actividad) DO UPDATE SET "
+            + "nombre = excluded.nombre, "
+            + "cupo_maximo = excluded.cupo_maximo, "
+            + "edad_minima = excluded.edad_minima, "
+            + "tipo = excluded.tipo, "
+            + "profesor = excluded.profesor, "
+            + "requiere_asistencia = excluded.requiere_asistencia, "
+            + "fecha_evento = excluded.fecha_evento, "
+            + "lugar = excluded.lugar, "
+            + "tipo_evento = excluded.tipo_evento, "
+            + "activo = excluded.activo;";
+
+        try (PreparedStatement statement =
+                getConnection().prepareStatement(sql)) {
+
+            statement.setString(1, actividad.getIdActividad());
+            statement.setString(2, actividad.getNombre());
+            statement.setInt(3, actividad.getCupoMaximo());
+            statement.setInt(4, actividad.getEdadMinima());
+            statement.setString(5, actividad.getTipoActividad());
+
+            statement.setString(6, actividad.getProfesor());
+
+            if (actividad.getRequiereAsistencia() == null) {
+                statement.setNull(7, Types.INTEGER);
+            } else {
+                statement.setInt(
+                    7,
+                    actividad.getRequiereAsistencia() ? 1 : 0
+                );
+            }
+
+            if (actividad.getFecha() == null) {
+                statement.setNull(8, Types.VARCHAR);
+            } else {
+                SimpleDateFormat formato =
+                    new SimpleDateFormat("yyyy-MM-dd");
+
+                statement.setString(
+                    8,
+                    formato.format(actividad.getFecha())
+                );
+            }
+
+            statement.setString(9, actividad.getLugar());
+            statement.setString(10, actividad.getTipoEvento());
+
+            statement.setInt(
+                11,
+                actividad.getActivo() ? 1 : 0
+            );
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new PersistenciaDatosException(
+                "No fue posible guardar la actividad en la base de datos.",
+                e
+            );
+        }
+    }
+    
+    public ArrayList<Actividad> cargarActividades()
+            throws ConexionBDException, PersistenciaDatosException {
+
+        String sql =
+            "SELECT id_actividad, nombre, cupo_maximo, edad_minima, tipo, "
+            + "profesor, requiere_asistencia, fecha_evento, lugar, "
+            + "tipo_evento, activo "
+            + "FROM ACTIVIDADES;";
+
+        ArrayList<Actividad> actividades = new ArrayList<>();
+
+        try (PreparedStatement statement =
+                getConnection().prepareStatement(sql);
+             ResultSet resultado = statement.executeQuery()) {
+
+            while (resultado.next()) {
+
+                String tipo = resultado.getString("tipo");
+
+                Actividad actividad;
+
+                switch (tipo) {
+
+                    case "CLASE_GRUPAL":
+                        actividad = new ClaseGrupal(
+                            resultado.getString("id_actividad"),
+                            resultado.getString("nombre"),
+                            resultado.getInt("cupo_maximo"),
+                            resultado.getInt("edad_minima"),
+                            resultado.getString("profesor")
+                        );
+                        break;
+
+                    case "ENTRENAMIENTO_LIBRE":
+                        actividad = new EntrenamientoLibre(
+                            resultado.getString("id_actividad"),
+                            resultado.getString("nombre"),
+                            resultado.getInt("cupo_maximo"),
+                            resultado.getInt("edad_minima"),
+                            resultado.getInt("requiere_asistencia") == 1
+                        );
+                        break;
+
+                    case "EVENTO":
+                        String fechaTexto =
+                            resultado.getString("fecha_evento");
+
+                        if (fechaTexto == null) {
+                            throw new PersistenciaDatosException(
+                                "El evento almacenado no posee una fecha válida."
+                            );
+                        }
+
+                        actividad = new Evento(
+                            resultado.getString("id_actividad"),
+                            resultado.getString("nombre"),
+                            resultado.getInt("cupo_maximo"),
+                            resultado.getInt("edad_minima"),
+                            new SimpleDateFormat("yyyy-MM-dd").parse(fechaTexto),
+                            resultado.getString("lugar"),
+                            resultado.getString("tipo_evento")
+                        );
+                        break;
+
+                    default:
+                        throw new PersistenciaDatosException(
+                            "Tipo de actividad desconocido: " + tipo
+                        );
+                }
+
+                actividad.setActivo(
+                    resultado.getInt("activo") == 1
+                );
+
+                actividades.add(actividad);
+            }
+
+            return actividades;
+
+        } catch (SQLException | ParseException e) {
+            throw new PersistenciaDatosException(
+                "No fue posible cargar las actividades desde la base de datos.",
+                e
+            );
+        }
+    }
+    
+    public void guardarReserva(Reserva reserva)
+            throws ConexionBDException, PersistenciaDatosException {
+
+        if (reserva.getFecha() == null || reserva.getEstado() == null) {
+            throw new PersistenciaDatosException(
+                "La reserva posee datos inválidos para ser guardada."
+            );
+        }
+
+        String sql =
+            "INSERT INTO RESERVAS "
+            + "(id_reserva, fecha, estado, rut_socio, id_actividad) "
+            + "VALUES (?, ?, ?, ?, ?) "
+            + "ON CONFLICT(id_reserva) DO UPDATE SET "
+            + "fecha = excluded.fecha, "
+            + "estado = excluded.estado, "
+            + "rut_socio = excluded.rut_socio, "
+            + "id_actividad = excluded.id_actividad;";
+
+        try (PreparedStatement statement =
+                getConnection().prepareStatement(sql)) {
+
+            SimpleDateFormat formato =
+                new SimpleDateFormat("yyyy-MM-dd");
+
+            statement.setInt(
+                1,
+                reserva.getIdReserva()
+            );
+
+            statement.setString(
+                2,
+                formato.format(reserva.getFecha())
+            );
+
+            statement.setString(
+                3,
+                reserva.getEstado().name()
+            );
+
+            statement.setString(
+                4,
+                reserva.getRutSocio()
+            );
+
+            statement.setString(
+                5,
+                reserva.getIdActividadEnReserva()
+            );
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new PersistenciaDatosException(
+                "No fue posible guardar la reserva en la base de datos.",
+                e
+            );
+        }
+    }
+    
+    public ArrayList<Reserva> cargarReservas()
+            throws ConexionBDException, PersistenciaDatosException {
+
+        String sql =
+            "SELECT id_reserva, fecha, estado, rut_socio, id_actividad "
+            + "FROM RESERVAS;";
+
+        ArrayList<Reserva> reservas = new ArrayList<>();
+
+        try (PreparedStatement statement =
+                getConnection().prepareStatement(sql);
+             ResultSet resultado = statement.executeQuery()) {
+
+            SimpleDateFormat formato =
+                new SimpleDateFormat("yyyy-MM-dd");
+
+            while (resultado.next()) {
+
+                Reserva reserva = new Reserva(
+                    resultado.getInt("id_reserva"),
+                    formato.parse(resultado.getString("fecha")),
+                    EstadoReserva.valueOf(
+                        resultado.getString("estado")
+                    ),
+                    resultado.getString("rut_socio"),
+                    resultado.getString("id_actividad")
+                );
+
+                reservas.add(reserva);
+            }
+
+            return reservas;
+
+        } catch (SQLException | ParseException | IllegalArgumentException e) {
+            throw new PersistenciaDatosException(
+                "No fue posible cargar las reservas desde la base de datos.",
+                e
+            );
+        }
+    }
+    
+    public void limpiarReservas()
+            throws ConexionBDException, PersistenciaDatosException {
+
+        String sql = "DELETE FROM RESERVAS;";
+
+        try (PreparedStatement statement =
+                getConnection().prepareStatement(sql)) {
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new PersistenciaDatosException(
+                "No fue posible limpiar las reservas de la base de datos.",
+                e
+            );
+        }
+    }
+    
 }

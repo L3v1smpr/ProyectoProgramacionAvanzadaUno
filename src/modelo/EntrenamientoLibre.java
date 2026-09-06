@@ -10,18 +10,26 @@ public class EntrenamientoLibre extends Actividad {
  		this.requiereAsistencia = requiereAsistencia;
  	}
     // Getter
-    public boolean isRequiereAsistencia() {
-        return requiereAsistencia;
-    }
+ 	@Override
+ 	public Boolean getRequiereAsistencia() {
+ 	    return requiereAsistencia;
+ 	}
 
     // Setter
     public void setRequiereAsistencia(boolean requiere) {
         this.requiereAsistencia = requiere;
     }
+    
+    //Sobreescritura
 
     @Override
     public String mostrarDetalles() {
         return super.mostrarDetalles() + " | Requiere asistencia: " + (requiereAsistencia ? "Sí" : "No");
+    }
+    
+    @Override
+    public String getTipoActividad() {
+        return "ENTRENAMIENTO_LIBRE";
     }
 }
 

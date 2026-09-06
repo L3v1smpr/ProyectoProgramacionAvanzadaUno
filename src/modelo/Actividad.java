@@ -1,4 +1,5 @@
 package modelo;
+import java.util.Date;
 
 public abstract class Actividad {
 
@@ -37,6 +38,27 @@ public abstract class Actividad {
 		return activo;
 	}
 	
+	// Getters de atributos específicos (Polimorfismo)
+	public String getProfesor() {
+	    return null;
+	}
+
+	public Boolean getRequiereAsistencia() {
+	    return null;
+	}
+
+	public Date getFecha() {
+	    return null;
+	}
+
+	public String getLugar() {
+	    return null;
+	}
+
+	public String getTipoEvento() {
+	    return null;
+	}
+	
 	// Setters
 	public void setIdActividad(String id) {
 		this.idActividad = id;
@@ -73,4 +95,7 @@ public abstract class Actividad {
 		}
 		return mostrarDetalles();
 	}
+	
+	//Método Abstracto
+	public abstract String getTipoActividad();
 }

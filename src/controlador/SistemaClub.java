@@ -1,5 +1,4 @@
 package controlador;
-import controlador.DBConnection;
 
 import modelo.Socio;
 import modelo.Evento;
@@ -409,7 +408,6 @@ public class SistemaClub {
 
 	
 	//Relacionado a la base de datos
-
 	public void cargarDatosBatch() throws ConexionBDException, PersistenciaDatosException {
 
 	    connection.crearTablas();
@@ -421,13 +419,58 @@ public class SistemaClub {
 	    for (Socio socio : sociosCargados) {
 	        mapaSocios.put(socio.getRut(), socio);
 	    }
+
+	    ArrayList<Actividad> actividadesCargadas =
+	            connection.cargarActividades();
+
+	    listaActividades.clear();
+	    listaActividades.addAll(actividadesCargadas);
+	    
+	    ArrayList<Reserva> reservasCargadas =
+	            connection.cargarReservas();
+
+	    for (Reserva reserva : reservasCargadas) {
+
+	        Socio socio =
+	                mapaSocios.get(reserva.getRutSocio());
+
+	        Actividad actividad =
+	                buscarActividad(reserva.getIdActividadEnReserva());
+
+	        if (socio == null || actividad == null) {
+	            throw new PersistenciaDatosException(
+	                "Existe una reserva asociada a un socio o actividad inexistente."
+	            );
+	        }
+
+	        if (!socio.agregarReserva(reserva)) {
+	            throw new PersistenciaDatosException(
+	                "No fue posible reconstruir la reserva "
+	                + reserva.getIdReserva() + "."
+	            );
+	        }
+	    }
 	}
 	
-	public void guardarDatosBatch() throws ConexionBDException, PersistenciaDatosException{
-		connection.crearTablas();
+	public void guardarDatosBatch() throws ConexionBDException, PersistenciaDatosException {
+
+	    connection.crearTablas();
 
 	    for (Socio socio : mapaSocios.values()) {
 	        connection.guardarSocio(socio);
-	    }		
+	    }
+
+	    for (Actividad actividad : listaActividades) {
+	        connection.guardarActividad(actividad);
+	    }
+
+	    connection.limpiarReservas();
+
+	    for (Socio socio : mapaSocios.values()) {
+
+	        for (Reserva reserva : socio.getListaReservas()) {
+	            connection.guardarReserva(reserva);
+	        }
+	    }
 	}
 }

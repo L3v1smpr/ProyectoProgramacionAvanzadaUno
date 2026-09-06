@@ -46,9 +46,20 @@ public class MenuConsola {
                     case 3: submenuReservas(); break;
                     case 4: submenuPagarFacturacion(); break;
                     case 5: ejecutarCobroMensual(); break;
-                    case 6: System.out.println("En construcción");; break;
+                    case 6: System.out.println("En construcción"); break;
                     case 7: guardarCambios(); break;
-                    case 8: System.out.println("Cerrando el programa..."); break;
+                    //Al cerrar el programa realizamos el guardado de cambios automaticamente, en caso de que guardar los cambios falle, no se cerrará el programa hasta que sea manualmente guardado.
+                    case 8:
+                        if (guardarCambios()) {
+                            System.out.println("Cerrando el programa...");
+                        } else {
+                            System.out.println(
+                                "No se cerrará el programa porque los datos no pudieron guardarse."
+                            );
+                            opcion = -1;
+                        }
+                        break;
+                        
                     default: System.out.println("Opción no válida.");
                 }
             } catch (InputMismatchException e) {
@@ -653,17 +664,17 @@ public class MenuConsola {
     }
 	
 	
-    private void guardarCambios() {
-    	try {
+    private boolean guardarCambios() {
+        try {
             controlador.guardarDatosBatch();
             System.out.println("Datos guardados correctamente.");
+            return true;
 
         } catch (ConexionBDException | PersistenciaDatosException e) {
             System.out.println(
                 "Error al guardar los datos: " + e.getMessage()
             );
+            return false;
         }
-  
     }
-	
 }
