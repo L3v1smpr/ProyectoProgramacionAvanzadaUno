@@ -450,7 +450,7 @@ public class MenuConsola {
                 break;
                 
                 
-            case 7: // Eliminar Socio
+            case 7: // Desactivar Socio
                 System.out.println("--- DESACTIVAR SOCIO ---");
                 System.out.print("Ingrese el RUT del socio a desactivar: ");
                 String rutElim = scanner.nextLine();
