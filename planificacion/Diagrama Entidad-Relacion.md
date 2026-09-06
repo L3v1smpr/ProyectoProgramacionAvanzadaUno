@@ -17,6 +17,9 @@ erDiagram
         TEXT tipo
         TEXT profesor
         INTEGER requiere_asistencia
+        TEXT fecha_evento
+        TEXT lugar
+        TEXT tipo_evento
         INTEGER activo
     }
 
@@ -30,4 +33,4 @@ erDiagram
 
     SOCIOS ||--o{ RESERVAS : "agenda"
     ACTIVIDADES ||--o{ RESERVAS : "recibe"
-```
+'''

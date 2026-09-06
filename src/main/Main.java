@@ -1,4 +1,5 @@
 package main;
+
 import vista.MenuConsola;
 import vista.MenuVentana;
 import controlador.SistemaClub;
@@ -13,6 +14,7 @@ public class Main {
 	public static void main(String[] args) {
 		
 		SistemaClub controlador = new SistemaClub();
+		
 		BufferedReader lector = new BufferedReader(new InputStreamReader(System.in));
 		
 		boolean opcionValida = false;
