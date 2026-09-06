@@ -33,4 +33,4 @@ erDiagram
 
     SOCIOS ||--o{ RESERVAS : "agenda"
     ACTIVIDADES ||--o{ RESERVAS : "recibe"
-'''
+```
