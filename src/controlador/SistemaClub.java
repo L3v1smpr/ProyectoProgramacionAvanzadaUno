@@ -1,16 +1,19 @@
 package controlador;
+import controlador.DBConnection;
+
 import modelo.Socio;
 import modelo.Evento;
-import java.util.Date;
 import modelo.Actividad;
 import modelo.Reserva;
-import controlador.DBConnection;
+import modelo.ConexionBDException;
+import modelo.PersistenciaDatosException;
 import modelo.CupoMaximoException;
 import modelo.MorosidadException;
 import modelo.EstadoReserva;
 import modelo.ClaseGrupal;
 import modelo.EntrenamientoLibre;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.ArrayList;
 
@@ -407,11 +410,24 @@ public class SistemaClub {
 	
 	//Relacionado a la base de datos
 
-	public void cargarDatosBatch() {
-		
+	public void cargarDatosBatch() throws ConexionBDException, PersistenciaDatosException {
+
+	    connection.crearTablas();
+
+	    ArrayList<Socio> sociosCargados = connection.cargarSocios();
+
+	    mapaSocios.clear();
+
+	    for (Socio socio : sociosCargados) {
+	        mapaSocios.put(socio.getRut(), socio);
+	    }
 	}
 	
-	public void guardarDatosBatch() {
-		
+	public void guardarDatosBatch() throws ConexionBDException, PersistenciaDatosException{
+		connection.crearTablas();
+
+	    for (Socio socio : mapaSocios.values()) {
+	        connection.guardarSocio(socio);
+	    }		
 	}
 }

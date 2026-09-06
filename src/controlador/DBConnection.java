@@ -65,10 +65,16 @@ public class DBConnection {
     public void guardarSocio(Socio socio)
             throws ConexionBDException, PersistenciaDatosException {
 
-        String sql =
-            "INSERT INTO SOCIOS "
-            + "(rut, nombre, edad, deuda, es_moroso, activo) "
-            + "VALUES (?, ?, ?, ?, ?, ?);";
+    	String sql =
+    		    "INSERT INTO SOCIOS "
+    		    + "(rut, nombre, edad, deuda, es_moroso, activo) "
+    		    + "VALUES (?, ?, ?, ?, ?, ?) "
+    		    + "ON CONFLICT(rut) DO UPDATE SET "
+    		    + "nombre = excluded.nombre, "
+    		    + "edad = excluded.edad, "
+    		    + "deuda = excluded.deuda, "
+    		    + "es_moroso = excluded.es_moroso, "
+    		    + "activo = excluded.activo;";
 
         try (PreparedStatement statement =
                 getConnection().prepareStatement(sql)) {

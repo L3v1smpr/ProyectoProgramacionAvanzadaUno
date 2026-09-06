@@ -3,9 +3,13 @@ package main;
 import vista.MenuConsola;
 import vista.MenuVentana;
 import controlador.SistemaClub;
+import modelo.ConexionBDException;
+import modelo.PersistenciaDatosException;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
+
 
 
 //Clase encargada de darle la decisión al usuario para ejecutar consola o ventana (GUI).
@@ -14,6 +18,16 @@ public class Main {
 	public static void main(String[] args) {
 		
 		SistemaClub controlador = new SistemaClub();
+		
+		try {
+		    controlador.cargarDatosBatch();
+
+		} catch (ConexionBDException | PersistenciaDatosException e) {
+		    System.out.println(
+		        "Error al cargar los datos del sistema: " + e.getMessage()
+		    );
+		    return;
+		}
 		
 		BufferedReader lector = new BufferedReader(new InputStreamReader(System.in));
 		

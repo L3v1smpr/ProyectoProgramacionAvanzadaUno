@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import modelo.Socio;
+import modelo.ConexionBDException;
+import modelo.PersistenciaDatosException;
 
 public class MenuConsola {
 	private Scanner scanner;
@@ -44,8 +46,8 @@ public class MenuConsola {
                     case 3: submenuReservas(); break;
                     case 4: submenuPagarFacturacion(); break;
                     case 5: ejecutarCobroMensual(); break;
-                    case 6: System.out.println("Exportando datos de socios (En construcción)..."); break;
-                    case 7: System.out.println("Guardando en base de datos (En construcción)..."); break;
+                    case 6: System.out.println("En construcción");; break;
+                    case 7: guardarCambios(); break;
                     case 8: System.out.println("Cerrando el programa..."); break;
                     default: System.out.println("Opción no válida.");
                 }
@@ -651,5 +653,17 @@ public class MenuConsola {
     }
 	
 	
+    private void guardarCambios() {
+    	try {
+            controlador.guardarDatosBatch();
+            System.out.println("Datos guardados correctamente.");
+
+        } catch (ConexionBDException | PersistenciaDatosException e) {
+            System.out.println(
+                "Error al guardar los datos: " + e.getMessage()
+            );
+        }
+  
+    }
 	
 }
