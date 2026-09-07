@@ -242,6 +242,59 @@ public class MenuVentana {
 
         //Placeholder temporal para la tabla de actividades
         panelActividades.add(new JLabel("Tabla de actividades en construccion", JLabel.CENTER), BorderLayout.CENTER);
+
+        //Configuracion de eventos de actividades
+        configurarEventosActividades();
+
+        //Estado visual inicial segun la seleccion por defecto
+        actualizarCamposSegunTipoActividad();
+    }
+
+    private void configurarEventosActividades() {
+        //Evento de cambio de tipo en el selector
+        cmbTipoActividad.addActionListener(e -> actualizarCamposSegunTipoActividad());
+
+        //Evento para limpiar campos de actividad
+        btnLimpiarCamposActividad.addActionListener(e -> limpiarCamposActividad());
+    }
+
+    private void actualizarCamposSegunTipoActividad() {
+        String tipoSeleccionado = (String) cmbTipoActividad.getSelectedItem();
+        if (tipoSeleccionado == null) {
+            return;
+        }
+
+        boolean esClase = tipoSeleccionado.equals("Clase Grupal");
+        boolean esEntrenamiento = tipoSeleccionado.equals("Entrenamiento Libre");
+        boolean esEvento = tipoSeleccionado.equals("Evento");
+
+        txtProfesorActividad.setEnabled(esClase);
+        chkRequiereAsistencia.setEnabled(esEntrenamiento);
+        txtFechaEvento.setEnabled(esEvento);
+        txtLugarEvento.setEnabled(esEvento);
+        txtTipoEvento.setEnabled(esEvento);
+
+        //Limpieza de valores en los campos que quedan deshabilitados
+        if (!esClase) {
+            txtProfesorActividad.setText("");
+        }
+        if (!esEntrenamiento) {
+            chkRequiereAsistencia.setSelected(false);
+        }
+        if (!esEvento) {
+            txtFechaEvento.setText("");
+            txtLugarEvento.setText("");
+            txtTipoEvento.setText("");
+        }
+    }
+
+    private void limpiarCamposActividad() {
+        txtIdActividad.setText("");
+        txtNombreActividad.setText("");
+        txtCupoActividad.setText("");
+        txtEdadMinActividad.setText("");
+        cmbTipoActividad.setSelectedIndex(0);
+        actualizarCamposSegunTipoActividad();
     }
 
     private void configurarEventosSocios() {
