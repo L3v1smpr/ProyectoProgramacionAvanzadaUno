@@ -4,6 +4,8 @@ import controlador.SistemaClub;
 import modelo.Socio;
 import modelo.Actividad;
 import modelo.Reserva;
+import modelo.MorosidadException;
+import modelo.CupoMaximoException;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -361,7 +363,7 @@ public class MenuVentana {
         //Evento para limpiar campos de reserva
         btnLimpiarCamposReserva.addActionListener(e -> limpiarCamposReserva());
 
-        //Evento para agendar reserva
+        //Evento para agendar reserva con captura especifica de excepciones
         btnAgendarReserva.addActionListener(e -> {
             String rut = txtRutReserva.getText().trim();
             String idActividad = txtIdActividadReserva.getText().trim();
@@ -412,10 +414,24 @@ public class MenuVentana {
                         JOptionPane.ERROR_MESSAGE
                     );
                 }
+            } catch (MorosidadException ex) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    ex.getMessage(),
+                    "Socio Moroso",
+                    JOptionPane.WARNING_MESSAGE
+                );
+            } catch (CupoMaximoException ex) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    ex.getMessage(),
+                    "Cupo Maximo Excedido",
+                    JOptionPane.WARNING_MESSAGE
+                );
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(
                     ventana,
-                    "Error al procesar la reserva: " + ex.getMessage(),
+                    "Error inesperado al procesar la reserva: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 );
