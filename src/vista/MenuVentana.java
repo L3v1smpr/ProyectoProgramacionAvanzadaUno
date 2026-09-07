@@ -4,6 +4,7 @@ import controlador.SistemaClub;
 import modelo.Socio;
 import modelo.Actividad;
 import modelo.Reserva;
+import modelo.EstadoReserva;
 import modelo.MorosidadException;
 import modelo.CupoMaximoException;
 
@@ -83,9 +84,11 @@ public class MenuVentana {
     private JButton btnAgendarReserva;
     private JButton btnLimpiarCamposReserva;
 
-    //Componentes de la tabla de Reservas
+    //Componentes de la tabla y acciones de Reservas
     private JTable tablaReservas;
     private DefaultTableModel modeloTablaReservas;
+    private JButton btnModificarReserva;
+    private JButton btnCancelarReserva;
 
     public MenuVentana(SistemaClub controlador) {
         this.controlador = controlador;
@@ -352,6 +355,15 @@ public class MenuVentana {
 
         panelReservas.add(scrollTablaRes, BorderLayout.CENTER);
 
+        //Panel inferior con botones de accion sobre reservas
+        JPanel panelSurRes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnModificarReserva = new JButton("Modificar Reserva Seleccionada");
+        btnCancelarReserva = new JButton("Cancelar Reserva Seleccionada");
+        panelSurRes.add(btnModificarReserva);
+        panelSurRes.add(btnCancelarReserva);
+
+        panelReservas.add(panelSurRes, BorderLayout.SOUTH);
+
         //Configuracion de eventos de reservas
         configurarEventosReservas();
 
@@ -435,6 +447,155 @@ public class MenuVentana {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 );
+            }
+        });
+
+        //Evento para modificar reserva seleccionada
+        btnModificarReserva.addActionListener(e -> {
+            int fila = tablaReservas.getSelectedRow();
+            if (fila == -1) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Seleccione una reserva de la tabla para modificar.",
+                    "Seleccion requerida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            int idReserva = (int) modeloTablaReservas.getValueAt(fila, 0);
+            String rutSocio = (String) modeloTablaReservas.getValueAt(fila, 1);
+            String idActActual = (String) modeloTablaReservas.getValueAt(fila, 2);
+            String fechaActual = (String) modeloTablaReservas.getValueAt(fila, 3);
+            String estadoActualStr = (String) modeloTablaReservas.getValueAt(fila, 4);
+
+            //Formulario modal de edicion de reserva
+            JTextField txtModFecha = new JTextField(fechaActual);
+            JTextField txtModIdAct = new JTextField(idActActual);
+            JComboBox<EstadoReserva> cmbModEstado = new JComboBox<>(EstadoReserva.values());
+            try {
+                cmbModEstado.setSelectedItem(EstadoReserva.valueOf(estadoActualStr));
+            } catch (Exception ex) {
+                cmbModEstado.setSelectedIndex(0);
+            }
+
+            JPanel panelModal = new JPanel(new GridLayout(3, 2, 6, 6));
+            panelModal.add(new JLabel("Fecha (dd-MM-yyyy):"));
+            panelModal.add(txtModFecha);
+            panelModal.add(new JLabel("ID Actividad:"));
+            panelModal.add(txtModIdAct);
+            panelModal.add(new JLabel("Estado:"));
+            panelModal.add(cmbModEstado);
+
+            int opcion = JOptionPane.showConfirmDialog(
+                ventana,
+                panelModal,
+                "Modificar Reserva ID: " + idReserva,
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (opcion == JOptionPane.OK_OPTION) {
+                String nuevaFechaTxt = txtModFecha.getText().trim();
+                String nuevaAct = txtModIdAct.getText().trim();
+                EstadoReserva nuevoEstado = (EstadoReserva) cmbModEstado.getSelectedItem();
+
+                if (nuevaFechaTxt.isEmpty() || nuevaAct.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Todos los campos deben contener datos.",
+                        "Campos vacios",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                sdf.setLenient(false);
+                Date nuevaFecha;
+
+                try {
+                    nuevaFecha = sdf.parse(nuevaFechaTxt);
+                } catch (ParseException ex) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Formato de fecha invalido. Use dd-MM-yyyy.",
+                        "Fecha invalida",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                try {
+                    boolean modificada = controlador.modificarReserva(idReserva, nuevaFecha, nuevoEstado, rutSocio, nuevaAct);
+                    if (modificada) {
+                        JOptionPane.showMessageDialog(
+                            ventana,
+                            "Reserva modificada correctamente.",
+                            "Operacion exitosa",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                        refrescarTablaReservas();
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            ventana,
+                            "No fue posible modificar la reserva. Compruebe los datos ingresados.",
+                            "Error de modificacion",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                } catch (MorosidadException ex) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        ex.getMessage(),
+                        "Socio Moroso",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                }
+            }
+        });
+
+        //Evento para cancelar o eliminar reserva seleccionada
+        btnCancelarReserva.addActionListener(e -> {
+            int fila = tablaReservas.getSelectedRow();
+            if (fila == -1) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Seleccione una reserva de la tabla para cancelar.",
+                    "Seleccion requerida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            int idReserva = (int) modeloTablaReservas.getValueAt(fila, 0);
+
+            int confirmacion = JOptionPane.showConfirmDialog(
+                ventana,
+                "Esta seguro de que desea cancelar la reserva con ID: " + idReserva + "?",
+                "Confirmar cancelacion",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                boolean eliminada = controlador.eliminarReserva(idReserva);
+                if (eliminada) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Reserva eliminada exitosamente del sistema.",
+                        "Operacion exitosa",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    refrescarTablaReservas();
+                } else {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "No se encontro la reserva seleccionada.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
             }
         });
     }
