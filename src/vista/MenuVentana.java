@@ -2,6 +2,7 @@ package vista;
 
 import controlador.SistemaClub;
 import modelo.Socio;
+import modelo.Actividad;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -19,6 +20,10 @@ import javax.swing.BorderFactory;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.ArrayList;
 
 public class MenuVentana {
 
@@ -61,6 +66,12 @@ public class MenuVentana {
     private JTextField txtTipoEvento;
     private JButton btnAgregarActividad;
     private JButton btnLimpiarCamposActividad;
+
+    //Componentes de la tabla y controles de Actividades
+    private JTable tablaActividades;
+    private DefaultTableModel modeloTablaActividades;
+    private JCheckBox chkSoloEventos;
+    private JButton btnDesactivarActividad;
 
     public MenuVentana(SistemaClub controlador) {
         this.controlador = controlador;
@@ -240,14 +251,44 @@ public class MenuVentana {
 
         panelActividades.add(panelNorteActividades, BorderLayout.NORTH);
 
-        //Placeholder temporal para la tabla de actividades
-        panelActividades.add(new JLabel("Tabla de actividades en construccion", JLabel.CENTER), BorderLayout.CENTER);
+        //Configuracion de tabla y modelo de datos para actividades
+        String[] columnasAct = {"ID", "Nombre", "Tipo", "Cupo", "Edad Min", "Detalles"};
+        modeloTablaActividades = new DefaultTableModel(columnasAct, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tablaActividades = new JTable(modeloTablaActividades);
+        JScrollPane scrollTablaAct = new JScrollPane(tablaActividades);
+        scrollTablaAct.setBorder(BorderFactory.createTitledBorder("Listado de Actividades Activas"));
+
+        panelActividades.add(scrollTablaAct, BorderLayout.CENTER);
+
+        //Panel inferior con filtro de eventos y boton de desactivacion
+        JPanel panelSurAct = new JPanel(new BorderLayout());
+
+        JPanel panelFiltroAct = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        chkSoloEventos = new JCheckBox("Mostrar solo eventos");
+        panelFiltroAct.add(chkSoloEventos);
+
+        JPanel panelAccionesAct = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnDesactivarActividad = new JButton("Desactivar Actividad Seleccionada");
+        panelAccionesAct.add(btnDesactivarActividad);
+
+        panelSurAct.add(panelFiltroAct, BorderLayout.WEST);
+        panelSurAct.add(panelAccionesAct, BorderLayout.EAST);
+        panelActividades.add(panelSurAct, BorderLayout.SOUTH);
 
         //Configuracion de eventos de actividades
         configurarEventosActividades();
 
         //Estado visual inicial segun la seleccion por defecto
         actualizarCamposSegunTipoActividad();
+
+        //Carga inicial de datos en la tabla de actividades
+        refrescarTablaActividades();
     }
 
     private void configurarEventosActividades() {
@@ -256,6 +297,170 @@ public class MenuVentana {
 
         //Evento para limpiar campos de actividad
         btnLimpiarCamposActividad.addActionListener(e -> limpiarCamposActividad());
+
+        //Evento para filtrar solo eventos en la tabla
+        chkSoloEventos.addActionListener(e -> refrescarTablaActividades());
+
+        //Evento para registrar actividad segun polimorfismo
+        btnAgregarActividad.addActionListener(e -> {
+            String id = txtIdActividad.getText().trim();
+            String nombre = txtNombreActividad.getText().trim();
+            String cupoTxt = txtCupoActividad.getText().trim();
+            String edadMinTxt = txtEdadMinActividad.getText().trim();
+
+            if (id.isEmpty() || nombre.isEmpty() || cupoTxt.isEmpty() || edadMinTxt.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Complete todos los campos generales de la actividad.",
+                    "Campos vacios",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            int cupo;
+            int edadMin;
+            try {
+                cupo = Integer.parseInt(cupoTxt);
+                edadMin = Integer.parseInt(edadMinTxt);
+
+                if (cupo <= 0 || edadMin < 0) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "El cupo debe ser mayor a cero y la edad minima no puede ser negativa.",
+                        "Valores invalidos",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Cupo y Edad Minima deben ser valores numericos enteros.",
+                    "Formato invalido",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            String tipo = (String) cmbTipoActividad.getSelectedItem();
+            boolean exito = false;
+
+            if (tipo.equals("Clase Grupal")) {
+                String profesor = txtProfesorActividad.getText().trim();
+                if (profesor.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Debe ingresar el nombre del profesor para la clase grupal.",
+                        "Profesor requerido",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+                exito = controlador.agregarActividad(id, nombre, cupo, edadMin, profesor);
+
+            } else if (tipo.equals("Entrenamiento Libre")) {
+                boolean requiereAsistencia = chkRequiereAsistencia.isSelected();
+                exito = controlador.agregarActividad(id, nombre, cupo, edadMin, requiereAsistencia);
+
+            } else if (tipo.equals("Evento")) {
+                String fechaTxt = txtFechaEvento.getText().trim();
+                String lugar = txtLugarEvento.getText().trim();
+                String tipoEvt = txtTipoEvento.getText().trim();
+
+                if (fechaTxt.isEmpty() || lugar.isEmpty() || tipoEvt.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Complete fecha, lugar y tipo de evento para registrar el evento.",
+                        "Campos requeridos",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                sdf.setLenient(false);
+                Date fechaEvento;
+
+                try {
+                    fechaEvento = sdf.parse(fechaTxt);
+                } catch (ParseException ex) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Formato de fecha invalido. Utilice el formato dd-MM-yyyy.",
+                        "Fecha invalida",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                exito = controlador.agregarActividad(id, nombre, cupo, edadMin, fechaEvento, lugar, tipoEvt);
+            }
+
+            if (exito) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Actividad registrada exitosamente.",
+                    "Operacion exitosa",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                limpiarCamposActividad();
+                refrescarTablaActividades();
+            } else {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Error: Ya existe una actividad registrada con ese ID.",
+                    "ID duplicado",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
+        //Evento para desactivar actividad seleccionada (baja logica)
+        btnDesactivarActividad.addActionListener(e -> {
+            int filaSeleccionada = tablaActividades.getSelectedRow();
+
+            if (filaSeleccionada == -1) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Seleccione una actividad de la tabla para desactivar.",
+                    "Seleccion requerida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            String id = (String) modeloTablaActividades.getValueAt(filaSeleccionada, 0);
+            String nombre = (String) modeloTablaActividades.getValueAt(filaSeleccionada, 1);
+
+            int confirmacion = JOptionPane.showConfirmDialog(
+                ventana,
+                "Esta seguro de que desea desactivar la actividad " + nombre + " (ID: " + id + ")?",
+                "Confirmar desactivacion",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                boolean desactivada = controlador.desactivarActividad(id);
+                if (desactivada) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Actividad desactivada exitosamente del catalogo activo.",
+                        "Operacion exitosa",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    refrescarTablaActividades();
+                } else {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Error al desactivar la actividad seleccionada.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        });
     }
 
     private void actualizarCamposSegunTipoActividad() {
@@ -295,6 +500,39 @@ public class MenuVentana {
         txtEdadMinActividad.setText("");
         cmbTipoActividad.setSelectedIndex(0);
         actualizarCamposSegunTipoActividad();
+    }
+
+    private void refrescarTablaActividades() {
+        modeloTablaActividades.setRowCount(0);
+        if (controlador != null) {
+            ArrayList<Actividad> lista = (chkSoloEventos != null && chkSoloEventos.isSelected())
+                ? controlador.obtenerEventos()
+                : controlador.obtenerActividades();
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
+            for (Actividad a : lista) {
+                String detalles = "";
+                if (a.getProfesor() != null) {
+                    detalles = "Profesor: " + a.getProfesor();
+                } else if (a.getRequiereAsistencia() != null) {
+                    detalles = "Asistencia: " + (a.getRequiereAsistencia() ? "Obligatoria" : "Opcional");
+                } else if (a.esEvento()) {
+                    String fechaFmt = (a.getFecha() != null) ? sdf.format(a.getFecha()) : "N/A";
+                    detalles = "Tipo: " + a.getTipoEvento() + " | Lugar: " + a.getLugar() + " | Fecha: " + fechaFmt;
+                }
+
+                Object[] fila = {
+                    a.getIdActividad(),
+                    a.getNombre(),
+                    a.getTipoActividad(),
+                    a.getCupoMaximo(),
+                    a.getEdadMinima(),
+                    detalles
+                };
+                modeloTablaActividades.addRow(fila);
+            }
+        }
     }
 
     private void configurarEventosSocios() {
@@ -533,7 +771,7 @@ public class MenuVentana {
     private void refrescarTablaSocios() {
         modeloTablaSocios.setRowCount(0);
         if (controlador != null) {
-            java.util.ArrayList<Socio> lista = chkSoloDeudores != null && chkSoloDeudores.isSelected()
+            ArrayList<Socio> lista = chkSoloDeudores != null && chkSoloDeudores.isSelected()
                 ? controlador.obtenerListaSociosDeudores()
                 : controlador.obtenerListaSocios();
 
