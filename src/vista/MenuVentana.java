@@ -445,13 +445,15 @@ public class MenuVentana {
 
     private void configurarEventosFacturacion() {
         //Evento de consulta de socio por RUT
-        btnBuscarFacturacion.addActionListener(e -> {
-            String rut = txtRutFacturacion.getText().trim();
+        btnBuscarFacturacion.addActionListener(e -> consultarSocioFacturacion());
 
+        //Evento para pagar la deuda total
+        btnPagarTotal.addActionListener(e -> {
+            String rut = txtRutFacturacion.getText().trim();
             if (rut.isEmpty()) {
                 JOptionPane.showMessageDialog(
                     ventana,
-                    "Ingrese un RUT para consultar el estado de cuenta.",
+                    "Consulte primero el socio ingresando su RUT.",
                     "RUT requerido",
                     JOptionPane.WARNING_MESSAGE
                 );
@@ -459,20 +461,177 @@ public class MenuVentana {
             }
 
             Socio socio = controlador.buscarSocio(rut);
-            if (socio != null) {
-                lblNombreFacturacion.setText("Nombre Socio: " + socio.getNombre());
-                lblDeudaFacturacion.setText("Deuda Pendiente: $" + socio.getDeuda());
-                lblEstadoFacturacion.setText("Condicion de Pago: " + (socio.getEsMoroso() ? "MOROSO" : "AL DIA"));
-            } else {
+            if (socio == null) {
                 JOptionPane.showMessageDialog(
                     ventana,
-                    "No se encontro un socio registrado con el RUT ingresado.",
+                    "No se encontro el socio para procesar el pago.",
                     "Socio no encontrado",
                     JOptionPane.ERROR_MESSAGE
                 );
-                limpiarInformacionFacturacion();
+                return;
+            }
+
+            if (socio.getDeuda() <= 0) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "El socio no mantiene deuda pendiente.",
+                    "Sin saldo pendiente",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                return;
+            }
+
+            int confirmacion = JOptionPane.showConfirmDialog(
+                ventana,
+                "Desea cancelar el monto total de $" + socio.getDeuda() + " para " + socio.getNombre() + "?",
+                "Confirmar pago total",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                boolean pagado = controlador.pagarFacturacion(rut);
+                if (pagado) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Pago total registrado exitosamente. Deuda saldada.",
+                        "Operacion exitosa",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    consultarSocioFacturacion();
+                    refrescarTablaSocios();
+                } else {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Error al registrar el pago en el sistema.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
             }
         });
+
+        //Evento para realizar abono parcial
+        btnAbonar.addActionListener(e -> {
+            String rut = txtRutFacturacion.getText().trim();
+            String montoTxt = txtMontoAbono.getText().trim();
+
+            if (rut.isEmpty() || montoTxt.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Consulte un socio e ingrese el monto a abonar.",
+                    "Campos requeridos",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            Socio socio = controlador.buscarSocio(rut);
+            if (socio == null) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "No se encontro el socio para procesar el abono.",
+                    "Socio no encontrado",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            int monto;
+            try {
+                monto = Integer.parseInt(montoTxt);
+                if (monto <= 0) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "El abono debe ser mayor a cero.",
+                        "Monto invalido",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "El monto debe ser un valor numerico entero.",
+                    "Formato invalido",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            boolean abonado = controlador.pagarFacturacion(rut, monto);
+            if (abonado) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Abono de $" + monto + " registrado correctamente.",
+                    "Operacion exitosa",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                txtMontoAbono.setText("");
+                consultarSocioFacturacion();
+                refrescarTablaSocios();
+            } else {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "No fue posible procesar el abono. Verifique el saldo adeudado.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
+        //Evento para cobro mensual general
+        btnCobroMensual.addActionListener(e -> {
+            int confirmacion = JOptionPane.showConfirmDialog(
+                ventana,
+                "Esta accion aplicara el cobro de la cuota mensual a todos los socios registrados.\nDesea continuar?",
+                "Confirmar cobro general",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            );
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                controlador.generarCobroMensual();
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Cobro mensual aplicado correctamente a la totalidad del padron.",
+                    "Cobro completado",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                if (!txtRutFacturacion.getText().trim().isEmpty()) {
+                    consultarSocioFacturacion();
+                }
+                refrescarTablaSocios();
+            }
+        });
+    }
+
+    private void consultarSocioFacturacion() {
+        String rut = txtRutFacturacion.getText().trim();
+        if (rut.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                ventana,
+                "Ingrese un RUT para consultar el estado de cuenta.",
+                "RUT requerido",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        Socio socio = controlador.buscarSocio(rut);
+        if (socio != null) {
+            lblNombreFacturacion.setText("Nombre Socio: " + socio.getNombre());
+            lblDeudaFacturacion.setText("Deuda Pendiente: $" + socio.getDeuda());
+            lblEstadoFacturacion.setText("Condicion de Pago: " + (socio.getEsMoroso() ? "MOROSO" : "AL DIA"));
+        } else {
+            JOptionPane.showMessageDialog(
+                ventana,
+                "No se encontro un socio registrado con el RUT ingresado.",
+                "Socio no encontrado",
+                JOptionPane.ERROR_MESSAGE
+            );
+            limpiarInformacionFacturacion();
+        }
     }
 
     private void limpiarInformacionFacturacion() {
