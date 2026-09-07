@@ -350,7 +350,7 @@ public class MenuVentana {
 
         panelReservas.add(scrollTablaRes, BorderLayout.CENTER);
 
-        //Configuracion de eventos base de reservas
+        //Configuracion de eventos de reservas
         configurarEventosReservas();
 
         //Carga inicial de datos en la tabla de reservas
@@ -360,6 +360,67 @@ public class MenuVentana {
     private void configurarEventosReservas() {
         //Evento para limpiar campos de reserva
         btnLimpiarCamposReserva.addActionListener(e -> limpiarCamposReserva());
+
+        //Evento para agendar reserva
+        btnAgendarReserva.addActionListener(e -> {
+            String rut = txtRutReserva.getText().trim();
+            String idActividad = txtIdActividadReserva.getText().trim();
+            String fechaTexto = txtFechaReserva.getText().trim();
+
+            if (rut.isEmpty() || idActividad.isEmpty() || fechaTexto.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Complete todos los campos para agendar la reserva.",
+                    "Campos vacios",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            sdf.setLenient(false);
+            Date fechaReserva;
+
+            try {
+                fechaReserva = sdf.parse(fechaTexto);
+            } catch (ParseException ex) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Formato de fecha invalido. Utilice el formato dd-MM-yyyy.",
+                    "Fecha invalida",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            try {
+                boolean agendada = controlador.agendarReserva(rut, idActividad, fechaReserva);
+                if (agendada) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Reserva agendada exitosamente.",
+                        "Operacion exitosa",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    limpiarCamposReserva();
+                    refrescarTablaReservas();
+                } else {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "No se pudo agendar. Verifique que el socio y la actividad existan.",
+                        "Datos no encontrados",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Error al procesar la reserva: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
     }
 
     private void limpiarCamposReserva() {
