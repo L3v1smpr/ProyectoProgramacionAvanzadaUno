@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JOptionPane;
@@ -29,25 +30,27 @@ public class MenuVentana {
     private JPanel panelActividades;
     private JPanel panelReservas;
     private JPanel panelFacturacion;
-    
+
     //Componentes del formulario de Socios
     private JTextField txtRutSocio;
     private JTextField txtNombreSocio;
     private JTextField txtEdadSocio;
     private JButton btnAgregarSocio;
     private JButton btnLimpiarCamposSocio;
-    
-    //Componentes de la tabla de Socios
+
+    //Componentes de la tabla y controles de Socios
     private JTable tablaSocios;
     private DefaultTableModel modeloTablaSocios;
+    private JButton btnModificarSocio;
     private JButton btnDesactivarSocio;
+    private JCheckBox chkSoloDeudores;
 
     public MenuVentana(SistemaClub controlador) {
         this.controlador = controlador;
     }
 
     public void iniciarVentana() {
-    	ventana = new JFrame("Sistema de Gestion: Club Deportivo");
+        ventana = new JFrame("Sistema de Gestion: Club Deportivo");
         ventana.setSize(950, 650);
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ventana.setLocationRelativeTo(null);
@@ -60,7 +63,7 @@ public class MenuVentana {
         panelActividades = new JPanel(new BorderLayout());
         panelReservas = new JPanel(new BorderLayout());
         panelFacturacion = new JPanel(new BorderLayout());
-        
+
         //Construccion del modulo Socios
         iniciarModuloSocios();
 
@@ -68,17 +71,17 @@ public class MenuVentana {
         panelActividades.add(new JLabel("Modulo Actividades en construccion", JLabel.CENTER));
         panelReservas.add(new JLabel("Modulo Reservas en construccion", JLabel.CENTER));
         panelFacturacion.add(new JLabel("Modulo Facturacion en construccion", JLabel.CENTER));
-        
+
         //Incorporacion de pestanas al contenedor principal
         pestanas.addTab("Socios", panelSocios);
         pestanas.addTab("Actividades", panelActividades);
         pestanas.addTab("Reservas", panelReservas);
-        pestanas.addTab("Facturación", panelFacturacion);
+        pestanas.addTab("Facturacion", panelFacturacion);
 
         ventana.add(pestanas, BorderLayout.CENTER);
         ventana.setVisible(true);
     }
-    
+
     private void iniciarModuloSocios() {
         //Formulario de ingreso de datos
         JPanel panelFormulario = new JPanel(new GridLayout(3, 2, 8, 8));
@@ -124,11 +127,22 @@ public class MenuVentana {
         scrollTabla.setBorder(BorderFactory.createTitledBorder("Listado de Socios Activos"));
 
         panelSocios.add(scrollTabla, BorderLayout.CENTER);
-        
-        //Panel inferior para acciones sobre la seleccion de la tabla
-        JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        //Panel inferior con filtro y acciones sobre la seleccion
+        JPanel panelSur = new JPanel(new BorderLayout());
+
+        JPanel panelFiltro = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        chkSoloDeudores = new JCheckBox("Mostrar solo socios con deuda");
+        panelFiltro.add(chkSoloDeudores);
+
+        JPanel panelAccionesTabla = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnModificarSocio = new JButton("Modificar Socio Seleccionado");
         btnDesactivarSocio = new JButton("Desactivar Socio Seleccionado");
-        panelSur.add(btnDesactivarSocio);
+        panelAccionesTabla.add(btnModificarSocio);
+        panelAccionesTabla.add(btnDesactivarSocio);
+
+        panelSur.add(panelFiltro, BorderLayout.WEST);
+        panelSur.add(panelAccionesTabla, BorderLayout.EAST);
         panelSocios.add(panelSur, BorderLayout.SOUTH);
 
         //Configuracion de eventos para socios
@@ -137,10 +151,13 @@ public class MenuVentana {
         //Carga inicial de datos en la tabla
         refrescarTablaSocios();
     }
-    
+
     private void configurarEventosSocios() {
         //Evento para limpiar campos
         btnLimpiarCamposSocio.addActionListener(e -> limpiarCamposSocio());
+
+        //Evento para alternar filtro de socios morosos
+        chkSoloDeudores.addActionListener(e -> refrescarTablaSocios());
 
         //Evento para agregar socio
         btnAgregarSocio.addActionListener(e -> {
@@ -201,6 +218,120 @@ public class MenuVentana {
             }
         });
 
+        //Evento para modificar socio seleccionado
+        btnModificarSocio.addActionListener(e -> {
+            int filaSeleccionada = tablaSocios.getSelectedRow();
+
+            if (filaSeleccionada == -1) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Seleccione un socio de la tabla para modificar.",
+                    "Seleccion requerida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            String rut = (String) modeloTablaSocios.getValueAt(filaSeleccionada, 0);
+            Socio socioActual = controlador.buscarSocio(rut);
+
+            if (socioActual == null) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Error: No se encontro el socio seleccionado.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            //Formulario modal de edicion
+            JTextField txtModNombre = new JTextField(socioActual.getNombre());
+            JTextField txtModEdad = new JTextField(String.valueOf(socioActual.getEdad()));
+            JTextField txtModDeuda = new JTextField(String.valueOf(socioActual.getDeuda()));
+            JCheckBox chkModMoroso = new JCheckBox("Es Moroso", socioActual.getEsMoroso());
+
+            JPanel panelEdicion = new JPanel(new GridLayout(4, 2, 6, 6));
+            panelEdicion.add(new JLabel("Nombre:"));
+            panelEdicion.add(txtModNombre);
+            panelEdicion.add(new JLabel("Edad:"));
+            panelEdicion.add(txtModEdad);
+            panelEdicion.add(new JLabel("Deuda:"));
+            panelEdicion.add(txtModDeuda);
+            panelEdicion.add(new JLabel("Estado:"));
+            panelEdicion.add(chkModMoroso);
+
+            int resultado = JOptionPane.showConfirmDialog(
+                ventana,
+                panelEdicion,
+                "Modificar Socio: " + rut,
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (resultado == JOptionPane.OK_OPTION) {
+                String nuevoNombre = txtModNombre.getText().trim();
+                String nuevaEdadTxt = txtModEdad.getText().trim();
+                String nuevaDeudaTxt = txtModDeuda.getText().trim();
+                boolean nuevoMoroso = chkModMoroso.isSelected();
+
+                if (nuevoNombre.isEmpty() || nuevaEdadTxt.isEmpty() || nuevaDeudaTxt.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Todos los campos deben contener datos validos.",
+                        "Campos vacios",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+
+                int nuevaEdad;
+                int nuevaDeuda;
+
+                try {
+                    nuevaEdad = Integer.parseInt(nuevaEdadTxt);
+                    nuevaDeuda = Integer.parseInt(nuevaDeudaTxt);
+
+                    if (nuevaEdad <= 0 || nuevaDeuda < 0) {
+                        JOptionPane.showMessageDialog(
+                            ventana,
+                            "La edad debe ser mayor a 0 y la deuda no puede ser negativa.",
+                            "Valores invalidos",
+                            JOptionPane.WARNING_MESSAGE
+                        );
+                        return;
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Edad y Deuda deben ser valores numericos enteros.",
+                        "Formato invalido",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                boolean modificado = controlador.modificarSocio(rut, nuevoNombre, nuevaEdad, nuevaDeuda, nuevoMoroso);
+
+                if (modificado) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Socio modificado correctamente.",
+                        "Operacion exitosa",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    refrescarTablaSocios();
+                } else {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Error al intentar modificar el socio.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        });
+
         //Evento para desactivar socio seleccionado (baja logica)
         btnDesactivarSocio.addActionListener(e -> {
             int filaSeleccionada = tablaSocios.getSelectedRow();
@@ -257,7 +388,11 @@ public class MenuVentana {
     private void refrescarTablaSocios() {
         modeloTablaSocios.setRowCount(0);
         if (controlador != null) {
-            for (Socio socio : controlador.obtenerListaSocios()) {
+            java.util.ArrayList<Socio> lista = chkSoloDeudores != null && chkSoloDeudores.isSelected()
+                ? controlador.obtenerListaSociosDeudores()
+                : controlador.obtenerListaSocios();
+
+            for (Socio socio : lista) {
                 Object[] fila = {
                     socio.getRut(),
                     socio.getNombre(),
