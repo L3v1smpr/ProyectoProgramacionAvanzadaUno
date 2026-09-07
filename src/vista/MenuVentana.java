@@ -1,5 +1,7 @@
 package vista;
+
 import controlador.SistemaClub;
+import modelo.Socio;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -7,6 +9,9 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.BorderFactory;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -30,6 +35,10 @@ public class MenuVentana {
     private JTextField txtEdadSocio;
     private JButton btnAgregarSocio;
     private JButton btnLimpiarCamposSocio;
+    
+    //Componentes de la tabla de Socios
+    private JTable tablaSocios;
+    private DefaultTableModel modeloTablaSocios;
 
     public MenuVentana(SistemaClub controlador) {
         this.controlador = controlador;
@@ -99,8 +108,38 @@ public class MenuVentana {
 
         panelSocios.add(panelNorte, BorderLayout.NORTH);
 
-        //Placeholder temporal para la tabla
-        panelSocios.add(new JLabel("Tabla de socios en construccion", JLabel.CENTER), BorderLayout.CENTER);
+        //Configuracion de tabla y modelo de datos
+        String[] columnas = {"RUT", "Nombre", "Edad", "Deuda", "Moroso"};
+        modeloTablaSocios = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tablaSocios = new JTable(modeloTablaSocios);
+        JScrollPane scrollTabla = new JScrollPane(tablaSocios);
+        scrollTabla.setBorder(BorderFactory.createTitledBorder("Listado de Socios Activos"));
+
+        panelSocios.add(scrollTabla, BorderLayout.CENTER);
+
+        //Carga inicial de datos en la tabla
+        refrescarTablaSocios();
     }
-    
+
+    private void refrescarTablaSocios() {
+        modeloTablaSocios.setRowCount(0);
+        if (controlador != null) {
+            for (Socio socio : controlador.obtenerListaSocios()) {
+                Object[] fila = {
+                    socio.getRut(),
+                    socio.getNombre(),
+                    socio.getEdad(),
+                    "$" + socio.getDeuda(),
+                    socio.getEsMoroso() ? "Si" : "No"
+                };
+                modeloTablaSocios.addRow(fila);
+            }
+        }
+    }
 }
