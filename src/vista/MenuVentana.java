@@ -90,6 +90,17 @@ public class MenuVentana {
     private JButton btnModificarReserva;
     private JButton btnCancelarReserva;
 
+    //Componentes del modulo de Facturacion
+    private JTextField txtRutFacturacion;
+    private JButton btnBuscarFacturacion;
+    private JLabel lblNombreFacturacion;
+    private JLabel lblDeudaFacturacion;
+    private JLabel lblEstadoFacturacion;
+    private JTextField txtMontoAbono;
+    private JButton btnPagarTotal;
+    private JButton btnAbonar;
+    private JButton btnCobroMensual;
+
     public MenuVentana(SistemaClub controlador) {
         this.controlador = controlador;
     }
@@ -113,9 +124,7 @@ public class MenuVentana {
         iniciarModuloSocios();
         iniciarModuloActividades();
         iniciarModuloReservas();
-
-        //Placeholder temporal para el siguiente modulo
-        panelFacturacion.add(new JLabel("Modulo Facturacion en construccion", JLabel.CENTER));
+        iniciarModuloFacturacion();
 
         //Incorporacion de pestanas al contenedor principal
         pestanas.addTab("Socios", panelSocios);
@@ -369,6 +378,108 @@ public class MenuVentana {
 
         //Carga inicial de datos en la tabla de reservas
         refrescarTablaReservas();
+    }
+
+    private void iniciarModuloFacturacion() {
+        //Panel central contenedor de las secciones de facturacion
+        JPanel panelContenedorFacturacion = new JPanel(new GridLayout(3, 1, 10, 10));
+        panelContenedorFacturacion.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        //1. Seccion de busqueda y estado de cuenta del socio
+        JPanel panelConsulta = new JPanel(new BorderLayout(8, 8));
+        panelConsulta.setBorder(BorderFactory.createTitledBorder("Consulta de Estado de Cuenta"));
+
+        JPanel panelBusquedaRut = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelBusquedaRut.add(new JLabel("RUT Socio:"));
+        txtRutFacturacion = new JTextField(12);
+        panelBusquedaRut.add(txtRutFacturacion);
+        btnBuscarFacturacion = new JButton("Consultar Deuda");
+        panelBusquedaRut.add(btnBuscarFacturacion);
+
+        JPanel panelDatosCuenta = new JPanel(new GridLayout(3, 1, 4, 4));
+        panelDatosCuenta.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 5));
+        lblNombreFacturacion = new JLabel("Nombre Socio: -");
+        lblDeudaFacturacion = new JLabel("Deuda Pendiente: -");
+        lblEstadoFacturacion = new JLabel("Condicion de Pago: -");
+
+        panelDatosCuenta.add(lblNombreFacturacion);
+        panelDatosCuenta.add(lblDeudaFacturacion);
+        panelDatosCuenta.add(lblEstadoFacturacion);
+
+        panelConsulta.add(panelBusquedaRut, BorderLayout.NORTH);
+        panelConsulta.add(panelDatosCuenta, BorderLayout.CENTER);
+
+        //2. Seccion de gestion de pagos
+        JPanel panelPagos = new JPanel(new BorderLayout(8, 8));
+        panelPagos.setBorder(BorderFactory.createTitledBorder("Procesar Pagos y Abonos"));
+
+        JPanel panelFormPago = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelFormPago.add(new JLabel("Monto a Abonar ($):"));
+        txtMontoAbono = new JTextField(10);
+        panelFormPago.add(txtMontoAbono);
+        btnAbonar = new JButton("Realizar Abono Parcial");
+        panelFormPago.add(btnAbonar);
+
+        JPanel panelPagoTotal = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        btnPagarTotal = new JButton("Pagar Deuda Total");
+        panelPagoTotal.add(btnPagarTotal);
+
+        panelPagos.add(panelFormPago, BorderLayout.NORTH);
+        panelPagos.add(panelPagoTotal, BorderLayout.CENTER);
+
+        //3. Seccion de cobro mensual administrativo
+        JPanel panelCobroMensual = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelCobroMensual.setBorder(BorderFactory.createTitledBorder("Cobro Mensual del Club"));
+        btnCobroMensual = new JButton("Generar Cobro Mensual a Todos los Socios");
+        panelCobroMensual.add(btnCobroMensual);
+
+        panelContenedorFacturacion.add(panelConsulta);
+        panelContenedorFacturacion.add(panelPagos);
+        panelContenedorFacturacion.add(panelCobroMensual);
+
+        panelFacturacion.add(panelContenedorFacturacion, BorderLayout.NORTH);
+
+        //Configuracion inicial de eventos de facturacion
+        configurarEventosFacturacion();
+    }
+
+    private void configurarEventosFacturacion() {
+        //Evento de consulta de socio por RUT
+        btnBuscarFacturacion.addActionListener(e -> {
+            String rut = txtRutFacturacion.getText().trim();
+
+            if (rut.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Ingrese un RUT para consultar el estado de cuenta.",
+                    "RUT requerido",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            Socio socio = controlador.buscarSocio(rut);
+            if (socio != null) {
+                lblNombreFacturacion.setText("Nombre Socio: " + socio.getNombre());
+                lblDeudaFacturacion.setText("Deuda Pendiente: $" + socio.getDeuda());
+                lblEstadoFacturacion.setText("Condicion de Pago: " + (socio.getEsMoroso() ? "MOROSO" : "AL DIA"));
+            } else {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "No se encontro un socio registrado con el RUT ingresado.",
+                    "Socio no encontrado",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                limpiarInformacionFacturacion();
+            }
+        });
+    }
+
+    private void limpiarInformacionFacturacion() {
+        lblNombreFacturacion.setText("Nombre Socio: -");
+        lblDeudaFacturacion.setText("Deuda Pendiente: -");
+        lblEstadoFacturacion.setText("Condicion de Pago: -");
+        txtMontoAbono.setText("");
     }
 
     private void configurarEventosReservas() {
