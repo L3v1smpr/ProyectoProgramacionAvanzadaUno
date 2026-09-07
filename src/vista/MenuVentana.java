@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JOptionPane;
@@ -45,6 +46,22 @@ public class MenuVentana {
     private JButton btnDesactivarSocio;
     private JCheckBox chkSoloDeudores;
 
+    //Componentes del formulario de Actividades
+    private JTextField txtIdActividad;
+    private JTextField txtNombreActividad;
+    private JTextField txtCupoActividad;
+    private JTextField txtEdadMinActividad;
+    private JComboBox<String> cmbTipoActividad;
+
+    //Campos especificos de subclases de Actividad
+    private JTextField txtProfesorActividad;
+    private JCheckBox chkRequiereAsistencia;
+    private JTextField txtFechaEvento;
+    private JTextField txtLugarEvento;
+    private JTextField txtTipoEvento;
+    private JButton btnAgregarActividad;
+    private JButton btnLimpiarCamposActividad;
+
     public MenuVentana(SistemaClub controlador) {
         this.controlador = controlador;
     }
@@ -64,11 +81,11 @@ public class MenuVentana {
         panelReservas = new JPanel(new BorderLayout());
         panelFacturacion = new JPanel(new BorderLayout());
 
-        //Construccion del modulo Socios
+        //Construccion de modulos
         iniciarModuloSocios();
+        iniciarModuloActividades();
 
         //Placeholders temporales para los siguientes modulos
-        panelActividades.add(new JLabel("Modulo Actividades en construccion", JLabel.CENTER));
         panelReservas.add(new JLabel("Modulo Reservas en construccion", JLabel.CENTER));
         panelFacturacion.add(new JLabel("Modulo Facturacion en construccion", JLabel.CENTER));
 
@@ -150,6 +167,81 @@ public class MenuVentana {
 
         //Carga inicial de datos en la tabla
         refrescarTablaSocios();
+    }
+
+    private void iniciarModuloActividades() {
+        //Panel superior que contiene los formularios de actividades
+        JPanel panelNorteActividades = new JPanel(new BorderLayout(8, 8));
+
+        //Formulario de atributos comunes
+        JPanel panelComun = new JPanel(new GridLayout(5, 2, 6, 6));
+        panelComun.setBorder(BorderFactory.createTitledBorder("Datos Generales"));
+
+        panelComun.add(new JLabel("ID Actividad:"));
+        txtIdActividad = new JTextField();
+        panelComun.add(txtIdActividad);
+
+        panelComun.add(new JLabel("Nombre:"));
+        txtNombreActividad = new JTextField();
+        panelComun.add(txtNombreActividad);
+
+        panelComun.add(new JLabel("Cupo Maximo:"));
+        txtCupoActividad = new JTextField();
+        panelComun.add(txtCupoActividad);
+
+        panelComun.add(new JLabel("Edad Minima:"));
+        txtEdadMinActividad = new JTextField();
+        panelComun.add(txtEdadMinActividad);
+
+        panelComun.add(new JLabel("Tipo de Actividad:"));
+        String[] tipos = {"Clase Grupal", "Entrenamiento Libre", "Evento"};
+        cmbTipoActividad = new JComboBox<>(tipos);
+        panelComun.add(cmbTipoActividad);
+
+        //Formulario de atributos especificos
+        JPanel panelEspecifico = new JPanel(new GridLayout(5, 2, 6, 6));
+        panelEspecifico.setBorder(BorderFactory.createTitledBorder("Detalles Segun Tipo"));
+
+        panelEspecifico.add(new JLabel("Profesor:"));
+        txtProfesorActividad = new JTextField();
+        panelEspecifico.add(txtProfesorActividad);
+
+        panelEspecifico.add(new JLabel("Asistencia Obligatoria:"));
+        chkRequiereAsistencia = new JCheckBox("Requiere asistencia");
+        panelEspecifico.add(chkRequiereAsistencia);
+
+        panelEspecifico.add(new JLabel("Fecha Evento (dd-MM-yyyy):"));
+        txtFechaEvento = new JTextField();
+        panelEspecifico.add(txtFechaEvento);
+
+        panelEspecifico.add(new JLabel("Lugar Evento:"));
+        txtLugarEvento = new JTextField();
+        panelEspecifico.add(txtLugarEvento);
+
+        panelEspecifico.add(new JLabel("Tipo de Evento:"));
+        txtTipoEvento = new JTextField();
+        panelEspecifico.add(txtTipoEvento);
+
+        //Contenedor horizontal para ambos subformularios
+        JPanel panelFormularios = new JPanel(new GridLayout(1, 2, 8, 8));
+        panelFormularios.add(panelComun);
+        panelFormularios.add(panelEspecifico);
+
+        //Barra de botones del formulario de actividades
+        btnAgregarActividad = new JButton("Registrar Actividad");
+        btnLimpiarCamposActividad = new JButton("Limpiar Campos");
+
+        JPanel panelBotonesAct = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panelBotonesAct.add(btnLimpiarCamposActividad);
+        panelBotonesAct.add(btnAgregarActividad);
+
+        panelNorteActividades.add(panelFormularios, BorderLayout.CENTER);
+        panelNorteActividades.add(panelBotonesAct, BorderLayout.SOUTH);
+
+        panelActividades.add(panelNorteActividades, BorderLayout.NORTH);
+
+        //Placeholder temporal para la tabla de actividades
+        panelActividades.add(new JLabel("Tabla de actividades en construccion", JLabel.CENTER), BorderLayout.CENTER);
     }
 
     private void configurarEventosSocios() {
