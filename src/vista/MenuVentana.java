@@ -7,6 +7,8 @@ import modelo.Reserva;
 import modelo.EstadoReserva;
 import modelo.MorosidadException;
 import modelo.CupoMaximoException;
+import modelo.ConexionBDException;
+import modelo.PersistenciaDatosException;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -24,6 +26,8 @@ import javax.swing.BorderFactory;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -108,9 +112,17 @@ public class MenuVentana {
     public void iniciarVentana() {
         ventana = new JFrame("Sistema de Gestion: Club Deportivo");
         ventana.setSize(950, 650);
-        ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ventana.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ventana.setLocationRelativeTo(null);
         ventana.setLayout(new BorderLayout());
+
+        //Control de cierre con guardado automatico en BD
+        ventana.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                confirmarSalidaYGuardar();
+            }
+        });
 
         pestanas = new JTabbedPane();
 
@@ -134,6 +146,49 @@ public class MenuVentana {
 
         ventana.add(pestanas, BorderLayout.CENTER);
         ventana.setVisible(true);
+    }
+
+    private void confirmarSalidaYGuardar() {
+        int confirmacion = JOptionPane.showConfirmDialog(
+            ventana,
+            "Desea guardar los cambios en la base de datos y salir?",
+            "Confirmar salida",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            try {
+                if (controlador != null) {
+                    controlador.guardarDatosBatch();
+                }
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Datos guardados exitosamente en SQLite.",
+                    "Guardado exitoso",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                ventana.dispose();
+                System.exit(0);
+            } catch (ConexionBDException | PersistenciaDatosException ex) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Error de base de datos al guardar: " + ex.getMessage(),
+                    "Error de persistencia",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Error inesperado al guardar: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        } else if (confirmacion == JOptionPane.NO_OPTION) {
+            ventana.dispose();
+            System.exit(0);
+        }
     }
 
     private void iniciarModuloSocios() {
