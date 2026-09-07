@@ -3,6 +3,7 @@ package vista;
 import controlador.SistemaClub;
 import modelo.Socio;
 import modelo.Actividad;
+import modelo.Reserva;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -73,6 +74,17 @@ public class MenuVentana {
     private JCheckBox chkSoloEventos;
     private JButton btnDesactivarActividad;
 
+    //Componentes del formulario de Reservas
+    private JTextField txtRutReserva;
+    private JTextField txtIdActividadReserva;
+    private JTextField txtFechaReserva;
+    private JButton btnAgendarReserva;
+    private JButton btnLimpiarCamposReserva;
+
+    //Componentes de la tabla de Reservas
+    private JTable tablaReservas;
+    private DefaultTableModel modeloTablaReservas;
+
     public MenuVentana(SistemaClub controlador) {
         this.controlador = controlador;
     }
@@ -95,9 +107,9 @@ public class MenuVentana {
         //Construccion de modulos
         iniciarModuloSocios();
         iniciarModuloActividades();
+        iniciarModuloReservas();
 
-        //Placeholders temporales para los siguientes modulos
-        panelReservas.add(new JLabel("Modulo Reservas en construccion", JLabel.CENTER));
+        //Placeholder temporal para el siguiente modulo
         panelFacturacion.add(new JLabel("Modulo Facturacion en construccion", JLabel.CENTER));
 
         //Incorporacion de pestanas al contenedor principal
@@ -289,6 +301,91 @@ public class MenuVentana {
 
         //Carga inicial de datos en la tabla de actividades
         refrescarTablaActividades();
+    }
+
+    private void iniciarModuloReservas() {
+        //Panel superior para formulario de agendar reserva
+        JPanel panelNorteReservas = new JPanel(new BorderLayout(8, 8));
+
+        JPanel panelFormulario = new JPanel(new GridLayout(3, 2, 6, 6));
+        panelFormulario.setBorder(BorderFactory.createTitledBorder("Agendar Nueva Reserva"));
+
+        panelFormulario.add(new JLabel("RUT Socio:"));
+        txtRutReserva = new JTextField();
+        panelFormulario.add(txtRutReserva);
+
+        panelFormulario.add(new JLabel("ID Actividad:"));
+        txtIdActividadReserva = new JTextField();
+        panelFormulario.add(txtIdActividadReserva);
+
+        panelFormulario.add(new JLabel("Fecha (dd-MM-yyyy):"));
+        txtFechaReserva = new JTextField();
+        panelFormulario.add(txtFechaReserva);
+
+        //Botones de accion del formulario de reservas
+        btnAgendarReserva = new JButton("Agendar Reserva");
+        btnLimpiarCamposReserva = new JButton("Limpiar Campos");
+
+        JPanel panelBotonesRes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panelBotonesRes.add(btnLimpiarCamposReserva);
+        panelBotonesRes.add(btnAgendarReserva);
+
+        panelNorteReservas.add(panelFormulario, BorderLayout.CENTER);
+        panelNorteReservas.add(panelBotonesRes, BorderLayout.SOUTH);
+
+        panelReservas.add(panelNorteReservas, BorderLayout.NORTH);
+
+        //Configuracion de tabla y modelo de datos para reservas
+        String[] columnasRes = {"ID Reserva", "RUT Socio", "ID Actividad", "Fecha", "Estado"};
+        modeloTablaReservas = new DefaultTableModel(columnasRes, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tablaReservas = new JTable(modeloTablaReservas);
+        JScrollPane scrollTablaRes = new JScrollPane(tablaReservas);
+        scrollTablaRes.setBorder(BorderFactory.createTitledBorder("Listado Global de Reservas (Orden Cronologico)"));
+
+        panelReservas.add(scrollTablaRes, BorderLayout.CENTER);
+
+        //Configuracion de eventos base de reservas
+        configurarEventosReservas();
+
+        //Carga inicial de datos en la tabla de reservas
+        refrescarTablaReservas();
+    }
+
+    private void configurarEventosReservas() {
+        //Evento para limpiar campos de reserva
+        btnLimpiarCamposReserva.addActionListener(e -> limpiarCamposReserva());
+    }
+
+    private void limpiarCamposReserva() {
+        txtRutReserva.setText("");
+        txtIdActividadReserva.setText("");
+        txtFechaReserva.setText("");
+    }
+
+    private void refrescarTablaReservas() {
+        modeloTablaReservas.setRowCount(0);
+        if (controlador != null) {
+            ArrayList<Reserva> lista = controlador.listarReservasGlobales();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
+            for (Reserva r : lista) {
+                String fechaFmt = (r.getFecha() != null) ? sdf.format(r.getFecha()) : "N/A";
+                Object[] fila = {
+                    r.getIdReserva(),
+                    r.getRutSocio(),
+                    r.getIdActividadEnReserva(),
+                    fechaFmt,
+                    r.getEstado() != null ? r.getEstado().name() : "N/A"
+                };
+                modeloTablaReservas.addRow(fila);
+            }
+        }
     }
 
     private void configurarEventosActividades() {
