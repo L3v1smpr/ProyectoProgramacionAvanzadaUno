@@ -41,7 +41,7 @@ public class MenuVentana {
 
     //Paneles contenedores para cada modulo
     private JPanel panelSocios;
-    private JPanel panelActividades;
+    panel panelActividades;
     private JPanel panelReservas;
     private JPanel panelFacturacion;
 
@@ -82,6 +82,7 @@ public class MenuVentana {
     private JCheckBox chkSoloEventos;
     private JButton btnModificarActividad;
     private JButton btnDesactivarActividad;
+    private JButton btnReactivarActividad;
 
     //Componentes del formulario de Reservas
     private JTextField txtRutReserva;
@@ -373,8 +374,11 @@ public class MenuVentana {
         JPanel panelAccionesAct = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnModificarActividad = new JButton("Modificar Actividad Seleccionada");
         btnDesactivarActividad = new JButton("Desactivar Actividad Seleccionada");
+        btnReactivarActividad = new JButton("Reactivar Actividad");
+
         panelAccionesAct.add(btnModificarActividad);
         panelAccionesAct.add(btnDesactivarActividad);
+        panelAccionesAct.add(btnReactivarActividad);
 
         panelSurAct.add(panelFiltroAct, BorderLayout.WEST);
         panelSurAct.add(panelAccionesAct, BorderLayout.EAST);
@@ -1256,6 +1260,61 @@ public class MenuVentana {
                         JOptionPane.ERROR_MESSAGE
                     );
                 }
+            }
+        });
+
+        //Evento para reactivar actividad inactiva por ID
+        btnReactivarActividad.addActionListener(e -> {
+            String id = JOptionPane.showInputDialog(
+                ventana,
+                "Ingrese el ID de la actividad inactiva a reactivar:",
+                "Reactivar Actividad",
+                JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (id == null || id.trim().isEmpty()) {
+                return;
+            }
+
+            id = id.trim();
+            Actividad act = controlador.buscarActividad(id);
+
+            if (act == null) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "No se encontro ninguna actividad registrada con el ID: " + id,
+                    "Actividad no encontrada",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            if (act.getActivo()) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "La actividad \"" + act.getNombre() + "\" ya se encuentra activa en el sistema.",
+                    "Actividad ya activa",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                return;
+            }
+
+            boolean reactivada = controlador.activarActividad(id);
+            if (reactivada) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Actividad \"" + act.getNombre() + "\" reactivada exitosamente.",
+                    "Operacion exitosa",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                refrescarTablaActividades();
+            } else {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Error al intentar reactivar la actividad.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
             }
         });
     }
