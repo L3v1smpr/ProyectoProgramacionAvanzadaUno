@@ -41,7 +41,7 @@ public class MenuVentana {
 
     //Paneles contenedores para cada modulo
     private JPanel panelSocios;
-    panel panelActividades;
+    private JPanel panelActividades;
     private JPanel panelReservas;
     private JPanel panelFacturacion;
 
@@ -1236,10 +1236,11 @@ public class MenuVentana {
 
             int confirmacion = JOptionPane.showConfirmDialog(
                 ventana,
-                "Esta seguro de que desea desactivar la actividad " + nombre + " (ID: " + id + ")?",
+                "Esta seguro de que desea desactivar la actividad " + nombre + " (ID: " + id + ")?\n"
+                + "La actividad no admitira nuevas reservas ni figurara en los catalogos activos.",
                 "Confirmar desactivacion",
                 JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
+                JOptionPane.WARNING_MESSAGE
             );
 
             if (confirmacion == JOptionPane.YES_OPTION) {
@@ -1247,7 +1248,7 @@ public class MenuVentana {
                 if (desactivada) {
                     JOptionPane.showMessageDialog(
                         ventana,
-                        "Actividad desactivada exitosamente del catalogo activo.",
+                        "Actividad \"" + nombre + "\" desactivada exitosamente del catalogo activo.",
                         "Operacion exitosa",
                         JOptionPane.INFORMATION_MESSAGE
                     );
@@ -1263,7 +1264,7 @@ public class MenuVentana {
             }
         });
 
-        //Evento para reactivar actividad inactiva por ID
+        //Evento para reactivar actividad inactiva por ID con confirmacion detallada
         btnReactivarActividad.addActionListener(e -> {
             String id = JOptionPane.showInputDialog(
                 ventana,
@@ -1296,6 +1297,25 @@ public class MenuVentana {
                     "Actividad ya activa",
                     JOptionPane.INFORMATION_MESSAGE
                 );
+                return;
+            }
+
+            //Dialogo de confirmacion con resumen de datos de la actividad encontrada
+            int confirmacion = JOptionPane.showConfirmDialog(
+                ventana,
+                "Se encontro la actividad inactiva:\n"
+                + "• ID: " + act.getIdActividad() + "\n"
+                + "• Nombre: " + act.getNombre() + "\n"
+                + "• Tipo: " + act.getTipoActividad() + "\n"
+                + "• Cupo Maximo: " + act.getCupoMaximo() + "\n"
+                + "• Edad Minima: " + act.getEdadMinima() + "\n\n"
+                + "Desea reactivar esta actividad en el sistema?",
+                "Confirmar Reactivacion de Actividad",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (confirmacion != JOptionPane.YES_OPTION) {
                 return;
             }
 
@@ -1590,10 +1610,11 @@ public class MenuVentana {
 
             int confirmacion = JOptionPane.showConfirmDialog(
                 ventana,
-                "Esta seguro de que desea desactivar al socio " + nombre + " (RUT: " + rut + ")?",
+                "Esta seguro de que desea desactivar al socio " + nombre + " (RUT: " + rut + ")?\n"
+                + "El socio no podra realizar nuevas reservas ni figurara en los catalogos activos.",
                 "Confirmar desactivacion",
                 JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
+                JOptionPane.WARNING_MESSAGE
             );
 
             if (confirmacion == JOptionPane.YES_OPTION) {
@@ -1601,7 +1622,7 @@ public class MenuVentana {
                 if (desactivado) {
                     JOptionPane.showMessageDialog(
                         ventana,
-                        "Socio desactivado exitosamente del catalogo activo.",
+                        "Socio \"" + nombre + "\" desactivado exitosamente del catalogo activo.",
                         "Operacion exitosa",
                         JOptionPane.INFORMATION_MESSAGE
                     );
@@ -1617,7 +1638,7 @@ public class MenuVentana {
             }
         });
 
-        //Evento para reactivar socio inactivo por RUT
+        //Evento para reactivar socio inactivo por RUT con confirmacion detallada
         btnReactivarSocio.addActionListener(e -> {
             String rut = JOptionPane.showInputDialog(
                 ventana,
@@ -1650,6 +1671,25 @@ public class MenuVentana {
                     "Socio ya activo",
                     JOptionPane.INFORMATION_MESSAGE
                 );
+                return;
+            }
+
+            //Dialogo de confirmacion con resumen de datos del socio encontrado
+            int confirmacion = JOptionPane.showConfirmDialog(
+                ventana,
+                "Se encontro el socio inactivo:\n"
+                + "• RUT: " + socio.getRut() + "\n"
+                + "• Nombre: " + socio.getNombre() + "\n"
+                + "• Edad: " + socio.getEdad() + "\n"
+                + "• Deuda Pendiente: $" + socio.getDeuda() + "\n"
+                + "• Condicion: " + (socio.getEsMoroso() ? "MOROSO" : "AL DIA") + "\n\n"
+                + "Desea reactivar a este socio en el sistema?",
+                "Confirmar Reactivacion de Socio",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (confirmacion != JOptionPane.YES_OPTION) {
                 return;
             }
 
