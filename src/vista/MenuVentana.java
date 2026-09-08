@@ -21,6 +21,8 @@ import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JOptionPane;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.BorderFactory;
 import java.awt.BorderLayout;
@@ -28,6 +30,10 @@ import java.awt.GridLayout;
 import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -58,6 +64,7 @@ public class MenuVentana {
     private JButton btnModificarSocio;
     private JButton btnDesactivarSocio;
     private JButton btnReactivarSocio;
+    private JButton btnExportarSocios;
     private JCheckBox chkSoloDeudores;
 
     //Componentes del formulario de Actividades
@@ -125,7 +132,7 @@ public class MenuVentana {
         }
 
         ventana = new JFrame("Sistema de Gestion: Club Deportivo");
-        ventana.setSize(950, 650);
+        ventana.setSize(980, 650);
         ventana.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ventana.setLocationRelativeTo(null);
         ventana.setLayout(new BorderLayout());
@@ -268,10 +275,12 @@ public class MenuVentana {
         btnModificarSocio = new JButton("Modificar Socio Seleccionado");
         btnDesactivarSocio = new JButton("Desactivar Socio Seleccionado");
         btnReactivarSocio = new JButton("Reactivar Socio");
+        btnExportarSocios = new JButton("Exportar a Planilla (CSV/Excel)");
 
         panelAccionesTabla.add(btnModificarSocio);
         panelAccionesTabla.add(btnDesactivarSocio);
         panelAccionesTabla.add(btnReactivarSocio);
+        panelAccionesTabla.add(btnExportarSocios);
 
         panelSur.add(panelFiltro, BorderLayout.WEST);
         panelSur.add(panelAccionesTabla, BorderLayout.EAST);
@@ -282,6 +291,71 @@ public class MenuVentana {
 
         //Carga inicial de datos en la tabla
         refrescarTablaSocios();
+    }
+
+    private void exportarSociosCSV() {
+        if (controlador == null) {
+            return;
+        }
+
+        ArrayList<Socio> lista = (chkSoloDeudores != null && chkSoloDeudores.isSelected())
+            ? controlador.obtenerListaSociosDeudores()
+            : controlador.obtenerListaSocios();
+
+        if (lista.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                ventana,
+                "No hay registros de socios para exportar en este momento.",
+                "Sin datos",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        JFileChooser selectorArchivos = new JFileChooser();
+        selectorArchivos.setDialogTitle("Guardar Planilla de Cálculo (CSV)");
+        selectorArchivos.setSelectedFile(new File("reporte_socios.csv"));
+        selectorArchivos.setFileFilter(new FileNameExtensionFilter("Archivos CSV para Excel (*.csv)", "csv"));
+
+        int resultado = selectorArchivos.showSaveDialog(ventana);
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+            File archivo = selectorArchivos.getSelectedFile();
+            if (!archivo.getName().toLowerCase().endsWith(".csv")) {
+                archivo = new File(archivo.getParentFile(), archivo.getName() + ".csv");
+            }
+
+            try (BufferedWriter escritor = new BufferedWriter(new FileWriter(archivo))) {
+                //Encabezado estándar con punto y coma para apertura nativa en Excel
+                escritor.write("RUT;Nombre;Edad;Deuda;Moroso");
+                escritor.newLine();
+
+                for (Socio s : lista) {
+                    String linea = String.format("%s;%s;%d;%d;%s",
+                        s.getRut(),
+                        s.getNombre(),
+                        s.getEdad(),
+                        s.getDeuda(),
+                        s.getEsMoroso() ? "SI" : "NO"
+                    );
+                    escritor.write(linea);
+                    escritor.newLine();
+                }
+
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Planilla de cálculo exportada con éxito en:\n" + archivo.getAbsolutePath(),
+                    "Exportación completada",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Error al generar el archivo de planilla: " + ex.getMessage(),
+                    "Error de Entrada/Salida",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
     }
 
     private void iniciarModuloActividades() {
@@ -1438,6 +1512,9 @@ public class MenuVentana {
 
         //Evento para alternar filtro de socios morosos
         chkSoloDeudores.addActionListener(e -> refrescarTablaSocios());
+
+        //Evento para exportar a planilla de calculo (SIA-O2)
+        btnExportarSocios.addActionListener(e -> exportarSociosCSV());
 
         //Evento para agregar socio
         btnAgregarSocio.addActionListener(e -> {
