@@ -110,6 +110,16 @@ public class MenuVentana {
     }
 
     public void iniciarVentana() {
+    	try {
+    	    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+    	        if ("Nimbus".equals(info.getName())) {
+    	            javax.swing.UIManager.setLookAndFeel(info.getClassName());
+    	            break;
+    	        }
+    	    }
+    	} catch (Exception e) {
+    	    // Si falla, mantiene el tema por defecto
+    	}
         ventana = new JFrame("Sistema de Gestion: Club Deportivo");
         ventana.setSize(950, 650);
         ventana.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
