@@ -15,6 +15,11 @@ import modelo.EntrenamientoLibre;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class SistemaClub {
 
@@ -127,6 +132,68 @@ public class SistemaClub {
 	
 	public Socio buscarSocio(String rut) {
 		return mapaSocios.get(rut);
+	}
+	
+	public int exportarSociosCSV(String rutaArchivo) throws IOException {
+
+	    ArrayList<Socio> sociosExportar =
+	            new ArrayList<>(mapaSocios.values());
+
+	    // HashMap no garantiza orden.
+	    // Para que el archivo siempre sea legible y consistente,
+	    // los socios se ordenan por RUT antes de exportar.
+	    sociosExportar.sort((s1, s2) ->
+	        s1.getRut().compareToIgnoreCase(s2.getRut())
+	    );
+
+	    try (PrintWriter escritor = new PrintWriter(
+	            Files.newBufferedWriter(
+	                Paths.get(rutaArchivo),
+	                StandardCharsets.UTF_8
+	            )
+	    )) {
+
+	        // BOM UTF-8 para mejorar compatibilidad con Excel
+	        // y preservar correctamente tildes y caracteres especiales.
+	        escritor.print('\uFEFF');
+
+	        escritor.println(
+	            "RUT;Nombre;Edad;Deuda;Moroso;Estado;CantidadReservas"
+	        );
+
+	        for (Socio socio : sociosExportar) {
+
+	            String estadoMorosidad =
+	                    socio.getEsMoroso() ? "SI" : "NO";
+
+	            String estadoSocio =
+	                    socio.getActivo() ? "ACTIVO" : "INACTIVO";
+
+	            escritor.println(
+	                escaparCSV(socio.getRut()) + ";"
+	                + escaparCSV(socio.getNombre()) + ";"
+	                + socio.getEdad() + ";"
+	                + socio.getDeuda() + ";"
+	                + estadoMorosidad + ";"
+	                + estadoSocio + ";"
+	                + socio.getListaReservas().size()
+	            );
+	        }
+	    }
+
+	    return sociosExportar.size();
+	}
+	
+	private String escaparCSV(String valor) {
+
+	    if (valor == null) {
+	        return "\"\"";
+	    }
+
+	    String valorEscapado =
+	            valor.replace("\"", "\"\"");
+
+	    return "\"" + valorEscapado + "\"";
 	}
 	
 	

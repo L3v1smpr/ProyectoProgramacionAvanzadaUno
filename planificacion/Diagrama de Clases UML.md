@@ -1,8 +1,10 @@
+# Diagrama de Clases UML
+
 ```mermaid
 classDiagram
 
     %% ==========================================
-    %% CAPA VISTA Y MAIN
+    %% CAPA MAIN Y VISTA
     %% ==========================================
 
     class Main {
@@ -12,14 +14,55 @@ classDiagram
     class MenuConsola {
         -scanner : Scanner
         -controlador : SistemaClub
+
         +MenuConsola(controlador: SistemaClub)
         +iniciarConsola() void
+
+        -submenuActividades() void
+        -submenuSocios() void
+        -submenuReservas() void
+        -submenuPagarFacturacion() void
+
+        -ejecutarCobroMensual() void
+        -exportarSociosCSV() void
         -guardarCambios() boolean
     }
 
     class MenuVentana {
         -controlador : SistemaClub
+        -ventana : JFrame
+        -pestanas : JTabbedPane
+
+        -panelSocios : JPanel
+        -panelActividades : JPanel
+        -panelReservas : JPanel
+        -panelFacturacion : JPanel
+
+        +MenuVentana(controlador: SistemaClub)
         +iniciarVentana() void
+
+        -confirmarSalidaYGuardar() void
+
+        -iniciarModuloSocios() void
+        -iniciarModuloActividades() void
+        -iniciarModuloReservas() void
+        -iniciarModuloFacturacion() void
+
+        -configurarEventosSocios() void
+        -configurarEventosActividades() void
+        -configurarEventosReservas() void
+        -configurarEventosFacturacion() void
+
+        -refrescarTablaSocios() void
+        -refrescarTablaActividades() void
+        -refrescarTablaReservas() void
+
+        -limpiarCamposSocio() void
+        -limpiarCamposActividad() void
+        -limpiarCamposReserva() void
+        -limpiarInformacionFacturacion() void
+
+        -actualizarCamposSegunTipoActividad() void
     }
 
 
@@ -34,6 +77,7 @@ classDiagram
 
         +SistemaClub()
 
+        %% Socios
         +agregarSocio(rut: String, nombre: String, edad: int) boolean
         +modificarSocio(rut: String, nombre: String, edad: int, deuda: int, esMoroso: boolean) boolean
         +eliminarSocio(rut: String) boolean
@@ -43,27 +87,38 @@ classDiagram
         +obtenerListaSociosDeudores() ArrayList~Socio~
         +buscarSocio(rut: String) Socio
 
+        %% Exportacion CSV
+        +exportarSociosCSV(rutaArchivo: String) int
+        -escaparCSV(valor: String) String
+
+        %% Actividades
         +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, profesor: String) boolean
         +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, requiereAsistencia: boolean) boolean
         +agregarActividad(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, fecha: Date, lugar: String, tipoEvento: String) boolean
+
         +modificarActividad(idActividad: String, nuevoNombre: String, nuevoCupoMaximo: int, nuevaEdadMinima: int) boolean
         +eliminarActividad(idActividad: String) boolean
         +desactivarActividad(idActividad: String) boolean
         +activarActividad(idActividad: String) boolean
+
         +buscarActividad(idActividad: String) Actividad
         +buscarActividad(idReserva: int) Actividad
+
         +obtenerActividades() ArrayList~Actividad~
         +obtenerEventos() ArrayList~Actividad~
 
+        %% Reservas
         +agendarReserva(rut: String, idActividad: String, fecha: Date) boolean
         +modificarReserva(idReserva: int, fecha: Date, estado: EstadoReserva, rutSocio: String, idActividad: String) boolean
         +eliminarReserva(idReserva: int) boolean
         +listarReservasGlobales() ArrayList~Reserva~
 
+        %% Facturacion
         +pagarFacturacion(rut: String) boolean
         +pagarFacturacion(rut: String, abono: int) boolean
         +generarCobroMensual() boolean
 
+        %% Persistencia
         +cargarDatosBatch() void
         +guardarDatosBatch() void
     }
@@ -120,13 +175,14 @@ classDiagram
         +getLugar() String
         +getTipoEvento() String
 
-        +setIdActividad(id: String) void
+        +setIdActividad(idActividad: String) void
         +setNombre(nombre: String) void
         +setCupoMaximo(cupoMaximo: int) void
         +setEdadMinima(edadMinima: int) void
         +setActivo(activo: boolean) void
 
         +esEvento() boolean
+
         +mostrarDetalles() String
         +mostrarDetalles(formatoCorto: boolean) String
 
@@ -153,7 +209,7 @@ classDiagram
         +EntrenamientoLibre(idActividad: String, nombre: String, cupoMaximo: int, edadMinima: int, requiereAsistencia: boolean)
 
         +getRequiereAsistencia() Boolean
-        +setRequiereAsistencia(requiere: boolean) void
+        +setRequiereAsistencia(requiereAsistencia: boolean) void
 
         +mostrarDetalles() String
         +getTipoActividad() String
@@ -255,22 +311,26 @@ classDiagram
 
     class MorosidadException {
         <<exception>>
+
         +MorosidadException(mensaje: String)
     }
 
     class CupoMaximoException {
         <<exception>>
+
         +CupoMaximoException(mensaje: String)
     }
 
     class ConexionBDException {
         <<exception>>
+
         +ConexionBDException(mensaje: String)
         +ConexionBDException(mensaje: String, causa: Throwable)
     }
 
     class PersistenciaDatosException {
         <<exception>>
+
         +PersistenciaDatosException(mensaje: String)
         +PersistenciaDatosException(mensaje: String, causa: Throwable)
     }
@@ -325,6 +385,13 @@ classDiagram
 
 
     %% ==========================================
+    %% EXPORTACION CSV
+    %% ==========================================
+
+    MenuConsola ..> SistemaClub : solicita exportacion CSV
+
+
+    %% ==========================================
     %% EXCEPCIONES UTILIZADAS
     %% ==========================================
 
@@ -341,3 +408,7 @@ classDiagram
 
     MenuConsola ..> ConexionBDException : captura
     MenuConsola ..> PersistenciaDatosException : captura
+
+    MenuVentana ..> ConexionBDException : captura
+    MenuVentana ..> PersistenciaDatosException : captura
+```  

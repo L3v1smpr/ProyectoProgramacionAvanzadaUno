@@ -1,14 +1,16 @@
 package vista;
-import java.util.Scanner;
-import java.util.InputMismatchException;
-import modelo.CupoMaximoException;
 import controlador.SistemaClub;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
-import java.util.Date;
+import modelo.CupoMaximoException;
 import modelo.Socio;
 import modelo.ConexionBDException;
 import modelo.PersistenciaDatosException;
+
+import java.util.Scanner;
+import java.util.InputMismatchException;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.Date;
+import java.io.IOException;
 
 public class MenuConsola {
 	private Scanner scanner;
@@ -46,7 +48,7 @@ public class MenuConsola {
                     case 3: submenuReservas(); break;
                     case 4: submenuPagarFacturacion(); break;
                     case 5: ejecutarCobroMensual(); break;
-                    case 6: System.out.println("En construcción"); break;
+                    case 6: exportarSociosCSV(); break;
                     case 7: guardarCambios(); break;
                     //Al cerrar el programa realizamos el guardado de cambios automaticamente, en caso de que guardar los cambios falle, no se cerrará el programa hasta que sea manualmente guardado.
                     case 8:
@@ -690,4 +692,52 @@ public class MenuConsola {
             return false;
         }
     }
+    
+    private void exportarSociosCSV() {
+
+        System.out.println("\n--- EXPORTAR SOCIOS A CSV ---");
+
+        System.out.print(
+            "Ingrese el nombre del archivo "
+            + "(Enter para usar socios.csv): "
+        );
+
+        String nombreArchivo = scanner.nextLine().trim();
+
+        if (nombreArchivo.isEmpty()) {
+            nombreArchivo = "socios.csv";
+        }
+
+        if (!nombreArchivo.toLowerCase().endsWith(".csv")) {
+            nombreArchivo += ".csv";
+        }
+
+        try {
+
+            int cantidad =
+                    controlador.exportarSociosCSV(nombreArchivo);
+
+            System.out.println(
+                "Exportación completada correctamente."
+            );
+
+            System.out.println(
+                "Socios exportados: " + cantidad
+            );
+
+            System.out.println(
+                "Archivo generado: " + nombreArchivo
+            );
+
+        } catch (IOException e) {
+
+            System.out.println(
+                "Error al exportar los socios: "
+                + e.getMessage()
+            );
+        }
+    }
 }
+
+
+
