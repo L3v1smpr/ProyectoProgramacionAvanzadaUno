@@ -57,6 +57,7 @@ public class MenuVentana {
     private DefaultTableModel modeloTablaSocios;
     private JButton btnModificarSocio;
     private JButton btnDesactivarSocio;
+    private JButton btnReactivarSocio;
     private JCheckBox chkSoloDeudores;
 
     //Componentes del formulario de Actividades
@@ -110,16 +111,17 @@ public class MenuVentana {
     }
 
     public void iniciarVentana() {
-    	try {
-    	    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-    	        if ("Nimbus".equals(info.getName())) {
-    	            javax.swing.UIManager.setLookAndFeel(info.getClassName());
-    	            break;
-    	        }
-    	    }
-    	} catch (Exception e) {
-    	    // Si falla, mantiene el tema por defecto
-    	}
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // Si falla, mantiene el tema por defecto
+        }
+
         ventana = new JFrame("Sistema de Gestion: Club Deportivo");
         ventana.setSize(950, 650);
         ventana.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -257,8 +259,11 @@ public class MenuVentana {
         JPanel panelAccionesTabla = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnModificarSocio = new JButton("Modificar Socio Seleccionado");
         btnDesactivarSocio = new JButton("Desactivar Socio Seleccionado");
+        btnReactivarSocio = new JButton("Reactivar Socio");
+
         panelAccionesTabla.add(btnModificarSocio);
         panelAccionesTabla.add(btnDesactivarSocio);
+        panelAccionesTabla.add(btnReactivarSocio);
 
         panelSur.add(panelFiltro, BorderLayout.WEST);
         panelSur.add(panelAccionesTabla, BorderLayout.EAST);
@@ -1428,6 +1433,61 @@ public class MenuVentana {
                         JOptionPane.ERROR_MESSAGE
                     );
                 }
+            }
+        });
+
+        //Evento para reactivar socio inactivo por RUT
+        btnReactivarSocio.addActionListener(e -> {
+            String rut = JOptionPane.showInputDialog(
+                ventana,
+                "Ingrese el RUT del socio inactivo a reactivar:",
+                "Reactivar Socio",
+                JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (rut == null || rut.trim().isEmpty()) {
+                return;
+            }
+
+            rut = rut.trim();
+            Socio socio = controlador.buscarSocio(rut);
+
+            if (socio == null) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "No se encontro ningun socio registrado con el RUT: " + rut,
+                    "Socio no encontrado",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            if (socio.getActivo()) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "El socio " + socio.getNombre() + " ya se encuentra activo en el sistema.",
+                    "Socio ya activo",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                return;
+            }
+
+            boolean reactivado = controlador.activarSocio(rut);
+            if (reactivado) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Socio " + socio.getNombre() + " reactivado exitosamente.",
+                    "Operacion exitosa",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                refrescarTablaSocios();
+            } else {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Error al intentar reactivar al socio.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
             }
         });
     }
