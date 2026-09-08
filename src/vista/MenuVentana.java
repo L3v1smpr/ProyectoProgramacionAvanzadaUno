@@ -206,6 +206,8 @@ public class MenuVentana {
     }
 
     private void iniciarModuloSocios() {
+        panelSocios.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+
         //Formulario de ingreso de datos
         JPanel panelFormulario = new JPanel(new GridLayout(3, 2, 8, 8));
         panelFormulario.setBorder(BorderFactory.createTitledBorder("Registrar Nuevo Socio"));
@@ -226,7 +228,7 @@ public class MenuVentana {
         btnAgregarSocio = new JButton("Registrar Socio");
         btnLimpiarCamposSocio = new JButton("Limpiar Campos");
 
-        JPanel panelBotonesForm = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel panelBotonesForm = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 6));
         panelBotonesForm.add(btnLimpiarCamposSocio);
         panelBotonesForm.add(btnAgregarSocio);
 
@@ -246,6 +248,9 @@ public class MenuVentana {
         };
 
         tablaSocios = new JTable(modeloTablaSocios);
+        tablaSocios.setRowHeight(22);
+        tablaSocios.setShowGrid(true);
+
         JScrollPane scrollTabla = new JScrollPane(tablaSocios);
         scrollTabla.setBorder(BorderFactory.createTitledBorder("Listado de Socios Activos"));
 
@@ -253,12 +258,13 @@ public class MenuVentana {
 
         //Panel inferior con filtro y acciones sobre la seleccion
         JPanel panelSur = new JPanel(new BorderLayout());
+        panelSur.setBorder(BorderFactory.createEmptyBorder(6, 4, 4, 4));
 
-        JPanel panelFiltro = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelFiltro = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 4));
         chkSoloDeudores = new JCheckBox("Mostrar solo socios con deuda");
         panelFiltro.add(chkSoloDeudores);
 
-        JPanel panelAccionesTabla = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel panelAccionesTabla = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 4));
         btnModificarSocio = new JButton("Modificar Socio Seleccionado");
         btnDesactivarSocio = new JButton("Desactivar Socio Seleccionado");
         btnReactivarSocio = new JButton("Reactivar Socio");
@@ -279,6 +285,8 @@ public class MenuVentana {
     }
 
     private void iniciarModuloActividades() {
+        panelActividades.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+
         //Panel superior que contiene los formularios de actividades
         JPanel panelNorteActividades = new JPanel(new BorderLayout(8, 8));
 
@@ -340,7 +348,7 @@ public class MenuVentana {
         btnAgregarActividad = new JButton("Registrar Actividad");
         btnLimpiarCamposActividad = new JButton("Limpiar Campos");
 
-        JPanel panelBotonesAct = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel panelBotonesAct = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 6));
         panelBotonesAct.add(btnLimpiarCamposActividad);
         panelBotonesAct.add(btnAgregarActividad);
 
@@ -359,6 +367,9 @@ public class MenuVentana {
         };
 
         tablaActividades = new JTable(modeloTablaActividades);
+        tablaActividades.setRowHeight(22);
+        tablaActividades.setShowGrid(true);
+
         JScrollPane scrollTablaAct = new JScrollPane(tablaActividades);
         scrollTablaAct.setBorder(BorderFactory.createTitledBorder("Listado de Actividades Activas"));
 
@@ -366,12 +377,13 @@ public class MenuVentana {
 
         //Panel inferior con filtro de eventos y botones de accion
         JPanel panelSurAct = new JPanel(new BorderLayout());
+        panelSurAct.setBorder(BorderFactory.createEmptyBorder(6, 4, 4, 4));
 
-        JPanel panelFiltroAct = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelFiltroAct = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 4));
         chkSoloEventos = new JCheckBox("Mostrar solo eventos");
         panelFiltroAct.add(chkSoloEventos);
 
-        JPanel panelAccionesAct = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel panelAccionesAct = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 4));
         btnModificarActividad = new JButton("Modificar Actividad Seleccionada");
         btnDesactivarActividad = new JButton("Desactivar Actividad Seleccionada");
         btnReactivarActividad = new JButton("Reactivar Actividad");
@@ -395,6 +407,8 @@ public class MenuVentana {
     }
 
     private void iniciarModuloReservas() {
+        panelReservas.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+
         //Panel superior para formulario de agendar reserva
         JPanel panelNorteReservas = new JPanel(new BorderLayout(8, 8));
 
@@ -417,7 +431,7 @@ public class MenuVentana {
         btnAgendarReserva = new JButton("Agendar Reserva");
         btnLimpiarCamposReserva = new JButton("Limpiar Campos");
 
-        JPanel panelBotonesRes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel panelBotonesRes = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 6));
         panelBotonesRes.add(btnLimpiarCamposReserva);
         panelBotonesRes.add(btnAgendarReserva);
 
@@ -436,13 +450,18 @@ public class MenuVentana {
         };
 
         tablaReservas = new JTable(modeloTablaReservas);
+        tablaReservas.setRowHeight(22);
+        tablaReservas.setShowGrid(true);
+
         JScrollPane scrollTablaRes = new JScrollPane(tablaReservas);
         scrollTablaRes.setBorder(BorderFactory.createTitledBorder("Listado Global de Reservas (Orden Cronologico)"));
 
         panelReservas.add(scrollTablaRes, BorderLayout.CENTER);
 
         //Panel inferior con botones de accion sobre reservas
-        JPanel panelSurRes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel panelSurRes = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 6));
+        panelSurRes.setBorder(BorderFactory.createEmptyBorder(6, 4, 4, 4));
+
         btnModificarReserva = new JButton("Modificar Reserva Seleccionada");
         btnCancelarReserva = new JButton("Cancelar Reserva Seleccionada");
         panelSurRes.add(btnModificarReserva);
@@ -458,15 +477,17 @@ public class MenuVentana {
     }
 
     private void iniciarModuloFacturacion() {
+        panelFacturacion.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+
         //Panel central contenedor de las secciones de facturacion
         JPanel panelContenedorFacturacion = new JPanel(new GridLayout(3, 1, 10, 10));
-        panelContenedorFacturacion.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        panelContenedorFacturacion.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         //1. Seccion de busqueda y estado de cuenta del socio
         JPanel panelConsulta = new JPanel(new BorderLayout(8, 8));
         panelConsulta.setBorder(BorderFactory.createTitledBorder("Consulta de Estado de Cuenta"));
 
-        JPanel panelBusquedaRut = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelBusquedaRut = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 6));
         panelBusquedaRut.add(new JLabel("RUT Socio:"));
         txtRutFacturacion = new JTextField(12);
         panelBusquedaRut.add(txtRutFacturacion);
@@ -490,14 +511,14 @@ public class MenuVentana {
         JPanel panelPagos = new JPanel(new BorderLayout(8, 8));
         panelPagos.setBorder(BorderFactory.createTitledBorder("Procesar Pagos y Abonos"));
 
-        JPanel panelFormPago = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelFormPago = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 6));
         panelFormPago.add(new JLabel("Monto a Abonar ($):"));
         txtMontoAbono = new JTextField(10);
         panelFormPago.add(txtMontoAbono);
         btnAbonar = new JButton("Realizar Abono Parcial");
         panelFormPago.add(btnAbonar);
 
-        JPanel panelPagoTotal = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelPagoTotal = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 6));
         btnPagarTotal = new JButton("Pagar Deuda Total");
         panelPagoTotal.add(btnPagarTotal);
 
@@ -505,7 +526,7 @@ public class MenuVentana {
         panelPagos.add(panelPagoTotal, BorderLayout.CENTER);
 
         //3. Seccion de cobro mensual administrativo
-        JPanel panelCobroMensual = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel panelCobroMensual = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 6));
         panelCobroMensual.setBorder(BorderFactory.createTitledBorder("Cobro Mensual del Club"));
         btnCobroMensual = new JButton("Generar Cobro Mensual a Todos los Socios");
         panelCobroMensual.add(btnCobroMensual);
