@@ -80,6 +80,7 @@ public class MenuVentana {
     private JTable tablaActividades;
     private DefaultTableModel modeloTablaActividades;
     private JCheckBox chkSoloEventos;
+    private JButton btnModificarActividad;
     private JButton btnDesactivarActividad;
 
     //Componentes del formulario de Reservas
@@ -362,7 +363,7 @@ public class MenuVentana {
 
         panelActividades.add(scrollTablaAct, BorderLayout.CENTER);
 
-        //Panel inferior con filtro de eventos y boton de desactivacion
+        //Panel inferior con filtro de eventos y botones de accion
         JPanel panelSurAct = new JPanel(new BorderLayout());
 
         JPanel panelFiltroAct = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -370,7 +371,9 @@ public class MenuVentana {
         panelFiltroAct.add(chkSoloEventos);
 
         JPanel panelAccionesAct = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnModificarActividad = new JButton("Modificar Actividad Seleccionada");
         btnDesactivarActividad = new JButton("Desactivar Actividad Seleccionada");
+        panelAccionesAct.add(btnModificarActividad);
         panelAccionesAct.add(btnDesactivarActividad);
 
         panelSurAct.add(panelFiltroAct, BorderLayout.WEST);
@@ -1088,6 +1091,125 @@ public class MenuVentana {
                     "ID duplicado",
                     JOptionPane.ERROR_MESSAGE
                 );
+            }
+        });
+
+        //Evento para modificar actividad seleccionada
+        btnModificarActividad.addActionListener(e -> {
+            int filaSeleccionada = tablaActividades.getSelectedRow();
+
+            if (filaSeleccionada == -1) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Seleccione una actividad de la tabla para modificar.",
+                    "Seleccion requerida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            String id = (String) modeloTablaActividades.getValueAt(filaSeleccionada, 0);
+            Actividad actActual = controlador.buscarActividad(id);
+
+            if (actActual == null) {
+                JOptionPane.showMessageDialog(
+                    ventana,
+                    "Error: No se encontro la actividad seleccionada.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            //Formulario modal de edicion de actividad
+            JTextField txtModNombre = new JTextField(actActual.getNombre());
+            JTextField txtModCupo = new JTextField(String.valueOf(actActual.getCupoMaximo()));
+            JTextField txtModEdadMin = new JTextField(String.valueOf(actActual.getEdadMinima()));
+
+            JPanel panelEdicion = new JPanel(new GridLayout(3, 2, 6, 6));
+            panelEdicion.add(new JLabel("Nombre:"));
+            panelEdicion.add(txtModNombre);
+            panelEdicion.add(new JLabel("Cupo Maximo:"));
+            panelEdicion.add(txtModCupo);
+            panelEdicion.add(new JLabel("Edad Minima:"));
+            panelEdicion.add(txtModEdadMin);
+
+            int resultado = JOptionPane.showConfirmDialog(
+                ventana,
+                panelEdicion,
+                "Modificar Actividad: " + id,
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (resultado == JOptionPane.OK_OPTION) {
+                String nuevoNombre = txtModNombre.getText().trim();
+                String nuevoCupoTxt = txtModCupo.getText().trim();
+                String nuevaEdadMinTxt = txtModEdadMin.getText().trim();
+
+                if (nuevoNombre.isEmpty() || nuevoCupoTxt.isEmpty() || nuevaEdadMinTxt.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Todos los campos deben contener datos validos.",
+                        "Campos vacios",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+
+                int nuevoCupo;
+                int nuevaEdadMin;
+
+                try {
+                    nuevoCupo = Integer.parseInt(nuevoCupoTxt);
+                    nuevaEdadMin = Integer.parseInt(nuevaEdadMinTxt);
+
+                    if (nuevoCupo <= 0 || nuevaEdadMin < 0) {
+                        JOptionPane.showMessageDialog(
+                            ventana,
+                            "El cupo debe ser mayor a 0 y la edad minima no puede ser negativa.",
+                            "Valores invalidos",
+                            JOptionPane.WARNING_MESSAGE
+                        );
+                        return;
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        "Cupo y Edad Minima deben ser valores numericos enteros.",
+                        "Formato invalido",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                try {
+                    boolean modificada = controlador.modificarActividad(id, nuevoNombre, nuevoCupo, nuevaEdadMin);
+
+                    if (modificada) {
+                        JOptionPane.showMessageDialog(
+                            ventana,
+                            "Actividad modificada correctamente.",
+                            "Operacion exitosa",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                        refrescarTablaActividades();
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            ventana,
+                            "Error al intentar modificar la actividad.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                } catch (CupoMaximoException ex) {
+                    JOptionPane.showMessageDialog(
+                        ventana,
+                        ex.getMessage(),
+                        "Cupo Invalido",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                }
             }
         });
 
