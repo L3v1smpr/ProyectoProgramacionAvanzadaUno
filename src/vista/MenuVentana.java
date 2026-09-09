@@ -61,9 +61,11 @@ public class MenuVentana {
     //Componentes de la tabla y controles de Socios
     private JTable tablaSocios;
     private DefaultTableModel modeloTablaSocios;
+    private JButton btnBuscarSocio;
     private JButton btnModificarSocio;
     private JButton btnDesactivarSocio;
     private JButton btnReactivarSocio;
+    private JButton btnEliminarSocio;
     private JButton btnExportarSocios;
     private JCheckBox chkSoloDeudores;
 
@@ -87,6 +89,7 @@ public class MenuVentana {
     private JTable tablaActividades;
     private DefaultTableModel modeloTablaActividades;
     private JCheckBox chkSoloEventos;
+    private JButton btnBuscarActividad;
     private JButton btnModificarActividad;
     private JButton btnDesactivarActividad;
     private JButton btnReactivarActividad;
@@ -114,6 +117,8 @@ public class MenuVentana {
     private JButton btnPagarTotal;
     private JButton btnAbonar;
     private JButton btnCobroMensual;
+
+    private JButton btnGuardarManual;
 
     public MenuVentana(SistemaClub controlador) {
         this.controlador = controlador;
@@ -166,6 +171,23 @@ public class MenuVentana {
         pestanas.addTab("Facturacion", panelFacturacion);
 
         ventana.add(pestanas, BorderLayout.CENTER);
+
+        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnGuardarManual = new JButton("Guardar modificaciones");
+        panelInferior.add(btnGuardarManual);
+        ventana.add(panelInferior, BorderLayout.SOUTH);
+
+        btnGuardarManual.addActionListener(e -> {
+            try {
+                if (controlador != null) {
+                    controlador.guardarDatosBatch();
+                    JOptionPane.showMessageDialog(ventana, "Datos guardados exitosamente.", "Guardado", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch (ConexionBDException | PersistenciaDatosException ex) {
+                JOptionPane.showMessageDialog(ventana, "Error al guardar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         ventana.setVisible(true);
     }
 
@@ -271,15 +293,19 @@ public class MenuVentana {
         chkSoloDeudores = new JCheckBox("Mostrar solo socios con deuda");
         panelFiltro.add(chkSoloDeudores);
 
-        JPanel panelAccionesTabla = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 4));
-        btnModificarSocio = new JButton("Modificar Socio Seleccionado");
-        btnDesactivarSocio = new JButton("Desactivar Socio Seleccionado");
+        JPanel panelAccionesTabla = new JPanel(new GridLayout(2, 3, 6, 4));
+        btnBuscarSocio = new JButton("Buscar Socio");
+        btnModificarSocio = new JButton("Modificar Seleccionado");
+        btnDesactivarSocio = new JButton("Desactivar Seleccionado");
         btnReactivarSocio = new JButton("Reactivar Socio");
-        btnExportarSocios = new JButton("Exportar a Planilla (CSV/Excel)");
+        btnEliminarSocio = new JButton("Eliminar (Admin)");
+        btnExportarSocios = new JButton("Exportar (CSV/Excel)");
 
+        panelAccionesTabla.add(btnBuscarSocio);
         panelAccionesTabla.add(btnModificarSocio);
         panelAccionesTabla.add(btnDesactivarSocio);
         panelAccionesTabla.add(btnReactivarSocio);
+        panelAccionesTabla.add(btnEliminarSocio);
         panelAccionesTabla.add(btnExportarSocios);
 
         panelSur.add(panelFiltro, BorderLayout.WEST);
@@ -298,20 +324,6 @@ public class MenuVentana {
             return;
         }
 
-        ArrayList<Socio> lista = (chkSoloDeudores != null && chkSoloDeudores.isSelected())
-            ? controlador.obtenerListaSociosDeudores()
-            : controlador.obtenerListaSocios();
-
-        if (lista.isEmpty()) {
-            JOptionPane.showMessageDialog(
-                ventana,
-                "No hay registros de socios para exportar en este momento.",
-                "Sin datos",
-                JOptionPane.WARNING_MESSAGE
-            );
-            return;
-        }
-
         JFileChooser selectorArchivos = new JFileChooser();
         selectorArchivos.setDialogTitle("Guardar Planilla de Cálculo (CSV)");
         selectorArchivos.setSelectedFile(new File("reporte_socios.csv"));
@@ -324,26 +336,11 @@ public class MenuVentana {
                 archivo = new File(archivo.getParentFile(), archivo.getName() + ".csv");
             }
 
-            try (BufferedWriter escritor = new BufferedWriter(new FileWriter(archivo))) {
-                //Encabezado estándar con punto y coma para apertura nativa en Excel
-                escritor.write("RUT;Nombre;Edad;Deuda;Moroso");
-                escritor.newLine();
-
-                for (Socio s : lista) {
-                    String linea = String.format("%s;%s;%d;%d;%s",
-                        s.getRut(),
-                        s.getNombre(),
-                        s.getEdad(),
-                        s.getDeuda(),
-                        s.getEsMoroso() ? "SI" : "NO"
-                    );
-                    escritor.write(linea);
-                    escritor.newLine();
-                }
-
+            try {
+                int cantidad = controlador.exportarSociosCSV(archivo.getAbsolutePath());
                 JOptionPane.showMessageDialog(
                     ventana,
-                    "Planilla de cálculo exportada con éxito en:\n" + archivo.getAbsolutePath(),
+                    "Planilla de cálculo exportada con éxito en:\n" + archivo.getAbsolutePath() + "\nSocios exportados: " + cantidad,
                     "Exportación completada",
                     JOptionPane.INFORMATION_MESSAGE
                 );
@@ -458,10 +455,12 @@ public class MenuVentana {
         panelFiltroAct.add(chkSoloEventos);
 
         JPanel panelAccionesAct = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 4));
-        btnModificarActividad = new JButton("Modificar Actividad Seleccionada");
-        btnDesactivarActividad = new JButton("Desactivar Actividad Seleccionada");
+        btnBuscarActividad = new JButton("Buscar Actividad");
+        btnModificarActividad = new JButton("Modificar Seleccionada");
+        btnDesactivarActividad = new JButton("Desactivar Seleccionada");
         btnReactivarActividad = new JButton("Reactivar Actividad");
 
+        panelAccionesAct.add(btnBuscarActividad);
         panelAccionesAct.add(btnModificarActividad);
         panelAccionesAct.add(btnDesactivarActividad);
         panelAccionesAct.add(btnReactivarActividad);
@@ -1078,6 +1077,46 @@ public class MenuVentana {
         //Evento para filtrar solo eventos en la tabla
         chkSoloEventos.addActionListener(e -> refrescarTablaActividades());
 
+        //Evento para buscar actividad
+        btnBuscarActividad.addActionListener(e -> {
+            String[] opciones = {"Por ID de Actividad", "Por ID de Reserva"};
+            int seleccion = JOptionPane.showOptionDialog(
+                ventana, 
+                "Seleccione el método de búsqueda:", 
+                "Buscar Actividad", 
+                JOptionPane.DEFAULT_OPTION, 
+                JOptionPane.QUESTION_MESSAGE, 
+                null, 
+                opciones, 
+                opciones[0]
+            );
+
+            Actividad actEncontrada = null;
+            if (seleccion == 0) {
+                String id = JOptionPane.showInputDialog(ventana, "Ingrese el ID de la Actividad:", "Buscar Actividad", JOptionPane.QUESTION_MESSAGE);
+                if (id != null && !id.trim().isEmpty()) {
+                    actEncontrada = controlador.buscarActividad(id.trim());
+                }
+            } else if (seleccion == 1) {
+                String idResTxt = JOptionPane.showInputDialog(ventana, "Ingrese el ID de la Reserva:", "Buscar por Reserva", JOptionPane.QUESTION_MESSAGE);
+                if (idResTxt != null && !idResTxt.trim().isEmpty()) {
+                    try {
+                        int idRes = Integer.parseInt(idResTxt.trim());
+                        actEncontrada = controlador.buscarActividad(idRes);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(ventana, "El ID de reserva debe ser un número entero.", "Formato inválido", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+            }
+
+            if (actEncontrada != null) {
+                JOptionPane.showMessageDialog(ventana, actEncontrada.mostrarDetalles(), "Detalles de la Actividad", JOptionPane.INFORMATION_MESSAGE);
+            } else if (seleccion == 0 || seleccion == 1) {
+                JOptionPane.showMessageDialog(ventana, "No se encontró ninguna actividad con los datos proporcionados.", "Actividad no encontrada", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         //Evento para registrar actividad segun polimorfismo
         btnAgregarActividad.addActionListener(e -> {
             String id = txtIdActividad.getText().trim();
@@ -1507,6 +1546,63 @@ public class MenuVentana {
     }
 
     private void configurarEventosSocios() {
+        //Evento para buscar socio y sus reservas
+        btnBuscarSocio.addActionListener(e -> {
+            String rut = JOptionPane.showInputDialog(ventana, "Ingrese RUT del socio a buscar:", "Buscar Socio", JOptionPane.QUESTION_MESSAGE);
+            if (rut != null && !rut.trim().isEmpty()) {
+                Socio socio = controlador.buscarSocio(rut.trim());
+                if (socio != null) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("RUT: ").append(socio.getRut()).append("\n");
+                    sb.append("Nombre: ").append(socio.getNombre()).append("\n");
+                    sb.append("Edad: ").append(socio.getEdad()).append("\n");
+                    sb.append("Deuda: $").append(socio.getDeuda()).append("\n");
+                    sb.append("Moroso: ").append(socio.getEsMoroso() ? "Sí" : "No").append("\n\n");
+                    sb.append("--- Reservas del Socio ---\n");
+                    
+                    if (socio.getListaReservas() == null || socio.getListaReservas().isEmpty()) {
+                        sb.append("No tiene reservas registradas.");
+                    } else {
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                        for (Reserva r : socio.getListaReservas()) {
+                            String fechaStr = r.getFecha() != null ? sdf.format(r.getFecha()) : "N/A";
+                            sb.append("ID Reserva: ").append(r.getIdReserva())
+                              .append(" | Actividad: ").append(r.getIdActividadEnReserva())
+                              .append(" | Estado: ").append(r.getEstado())
+                              .append(" | Fecha: ").append(fechaStr).append("\n");
+                        }
+                    }
+                    JOptionPane.showMessageDialog(ventana, sb.toString(), "Información del Socio", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(ventana, "No se encontró ningún socio registrado con el RUT: " + rut, "Socio no encontrado", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        //Evento administrativo para eliminar socio de la base de datos permanentemente
+        btnEliminarSocio.addActionListener(e -> {
+            String rut = JOptionPane.showInputDialog(ventana, "Ingrese el RUT del socio a eliminar permanentemente (Administrativo):", "Eliminar Socio", JOptionPane.WARNING_MESSAGE);
+            if (rut != null && !rut.trim().isEmpty()) {
+                int confirmacion = JOptionPane.showConfirmDialog(
+                    ventana,
+                    "¿Está completamente seguro de eliminar el socio con RUT " + rut + " de la base de datos?\nEsta acción es irreversible.",
+                    "Confirmar eliminación",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.ERROR_MESSAGE
+                );
+                
+                if (confirmacion == JOptionPane.YES_OPTION) {
+                    boolean eliminado = controlador.eliminarSocio(rut.trim());
+                    if (eliminado) {
+                        JOptionPane.showMessageDialog(ventana, "Socio eliminado permanentemente del sistema.", "Operación exitosa", JOptionPane.INFORMATION_MESSAGE);
+                        refrescarTablaSocios();
+                    } else {
+                        JOptionPane.showMessageDialog(ventana, "Error: No se pudo eliminar el socio. Verifique el RUT.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+
         //Evento para limpiar campos
         btnLimpiarCamposSocio.addActionListener(e -> limpiarCamposSocio());
 
