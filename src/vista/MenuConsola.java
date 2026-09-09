@@ -78,7 +78,8 @@ public class MenuConsola {
 		System.out.println("3. Listar Actividades");
 		System.out.println("4. Buscar Actividad");
 		System.out.println("5. Listar Eventos");
-		System.out.println("6. Eliminar Actividad");
+		System.out.println("6. Desactivar Actividad");
+		System.out.println("7. Reactivar Actividad");
 		System.out.print("Opción: ");
 		int opt = scanner.nextInt();
 		scanner.nextLine();
@@ -273,17 +274,35 @@ public class MenuConsola {
 
 			    break;
 				
-			case 6: // Eliminar Actividad
-				System.out.println("--- ELIMINAR ACTIVIDAD ---");
-				System.out.print("Ingrese el ID de la actividad a eliminar (desactivar): ");
-				String idEliminar = scanner.nextLine();
+			case 6: // Desactivar Actividad
+			    System.out.println("--- DESACTIVAR ACTIVIDAD ---");
+			    System.out.print("Ingrese el ID de la actividad a desactivar: ");
+			    String idDesactivar = scanner.nextLine();
 
-				if (controlador.desactivarActividad(idEliminar)) {
-					System.out.println("Actividad eliminada exitosamente del catálogo activo.");
-				} else {
-					System.out.println("Error: No se encontró una actividad con ese ID.");
-				}
-				break;
+			    if (controlador.desactivarActividad(idDesactivar)) {
+			        System.out.println(
+			            "Actividad desactivada exitosamente del catálogo activo."
+			        );
+			    } else {
+			        System.out.println(
+			            "Error: No se encontró una actividad con ese ID."
+			        );
+			    }
+			    break;
+
+			case 7: // Reactivar Actividad
+			    System.out.println("--- REACTIVAR ACTIVIDAD ---");
+			    System.out.print("Ingrese el ID de la actividad a reactivar: ");
+			    String idActivar = scanner.nextLine();
+
+			    if (controlador.activarActividad(idActivar)) {
+			        System.out.println("Actividad reactivada correctamente.");
+			    } else {
+			        System.out.println(
+			            "Error: No se encontró una actividad con ese ID."
+			        );
+			    }
+			    break;
 				
 			default:
 				System.out.println("Opción no válida.");
