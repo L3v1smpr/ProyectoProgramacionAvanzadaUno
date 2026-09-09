@@ -31,8 +31,6 @@ import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -65,7 +63,6 @@ public class MenuVentana {
     private JButton btnModificarSocio;
     private JButton btnDesactivarSocio;
     private JButton btnReactivarSocio;
-    private JButton btnEliminarSocio;
     private JButton btnExportarSocios;
     private JCheckBox chkSoloDeudores;
 
@@ -298,14 +295,12 @@ public class MenuVentana {
         btnModificarSocio = new JButton("Modificar Seleccionado");
         btnDesactivarSocio = new JButton("Desactivar Seleccionado");
         btnReactivarSocio = new JButton("Reactivar Socio");
-        btnEliminarSocio = new JButton("Eliminar (Admin)");
-        btnExportarSocios = new JButton("Exportar (CSV/Excel)");
+        btnExportarSocios = new JButton("Exportar Socios CSV");
 
         panelAccionesTabla.add(btnBuscarSocio);
         panelAccionesTabla.add(btnModificarSocio);
         panelAccionesTabla.add(btnDesactivarSocio);
         panelAccionesTabla.add(btnReactivarSocio);
-        panelAccionesTabla.add(btnEliminarSocio);
         panelAccionesTabla.add(btnExportarSocios);
 
         panelSur.add(panelFiltro, BorderLayout.WEST);
@@ -1575,30 +1570,6 @@ public class MenuVentana {
                     JOptionPane.showMessageDialog(ventana, sb.toString(), "Información del Socio", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(ventana, "No se encontró ningún socio registrado con el RUT: " + rut, "Socio no encontrado", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-
-        //Evento administrativo para eliminar socio de la base de datos permanentemente
-        btnEliminarSocio.addActionListener(e -> {
-            String rut = JOptionPane.showInputDialog(ventana, "Ingrese el RUT del socio a eliminar permanentemente (Administrativo):", "Eliminar Socio", JOptionPane.WARNING_MESSAGE);
-            if (rut != null && !rut.trim().isEmpty()) {
-                int confirmacion = JOptionPane.showConfirmDialog(
-                    ventana,
-                    "¿Está completamente seguro de eliminar el socio con RUT " + rut + " de la base de datos?\nEsta acción es irreversible.",
-                    "Confirmar eliminación",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.ERROR_MESSAGE
-                );
-                
-                if (confirmacion == JOptionPane.YES_OPTION) {
-                    boolean eliminado = controlador.eliminarSocio(rut.trim());
-                    if (eliminado) {
-                        JOptionPane.showMessageDialog(ventana, "Socio eliminado permanentemente del sistema.", "Operación exitosa", JOptionPane.INFORMATION_MESSAGE);
-                        refrescarTablaSocios();
-                    } else {
-                        JOptionPane.showMessageDialog(ventana, "Error: No se pudo eliminar el socio. Verifique el RUT.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
                 }
             }
         });
