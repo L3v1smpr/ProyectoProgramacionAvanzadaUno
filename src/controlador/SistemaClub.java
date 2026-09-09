@@ -15,11 +15,13 @@ import modelo.EntrenamientoLibre;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 
 public class SistemaClub {
 
@@ -37,6 +39,131 @@ public class SistemaClub {
 		this.mapaSocios = new HashMap<>();
 		this.listaActividades = new ArrayList<>();
 		this.connection = new DBConnection();
+	}
+	
+	
+	// Datos iniciales requeridos por SIA-3.
+	// Solo se cargan cuando no existen socios ni actividades previamente cargados.
+	public boolean cargarDatosIniciales() {
+
+	    if (!mapaSocios.isEmpty() || !listaActividades.isEmpty()) {
+	        return false;
+	    }
+
+	    // ---------------- SOCIOS ----------------
+
+	    agregarSocio(
+	        "11.111.111-1",
+	        "Ana Torres",
+	        24
+	    );
+
+	    agregarSocio(
+	        "22.222.222-2",
+	        "Bruno Diaz",
+	        31
+	    );
+
+	    agregarSocio(
+	        "33.333.333-3",
+	        "Camila Soto",
+	        19
+	    );
+
+	    agregarSocio(
+	        "44.444.444-4",
+	        "Diego Rojas",
+	        28
+	    );
+
+	    // Socio moroso para probar facturacion y MorosidadException.
+	    modificarSocio(
+	        "22.222.222-2",
+	        "Bruno Diaz",
+	        31,
+	        20000,
+	        true
+	    );
+
+	    // Socio inactivo para probar reactivacion.
+	    desactivarSocio("44.444.444-4");
+
+
+	    // ---------------- ACTIVIDADES ----------------
+
+	    agregarActividad(
+	        "CG001",
+	        "Entrenamiento Funcional",
+	        20,
+	        16,
+	        "Laura Perez"
+	    );
+
+	    agregarActividad(
+	        "EL001",
+	        "Sala de Musculacion",
+	        30,
+	        18,
+	        true
+	    );
+
+	    Calendar fechaEvento = Calendar.getInstance();
+	    fechaEvento.add(Calendar.DAY_OF_MONTH, 30);
+
+	    agregarActividad(
+	        "EV001",
+	        "Torneo Interno",
+	        50,
+	        16,
+	        fechaEvento.getTime(),
+	        "Cancha Central",
+	        "Competencia"
+	    );
+
+	    // Actividad inactiva para probar reactivacion.
+	    agregarActividad(
+	        "CG002",
+	        "Yoga Inicial",
+	        15,
+	        14,
+	        "Marcela Soto"
+	    );
+
+	    desactivarActividad("CG002");
+
+
+	    // ---------------- RESERVAS ----------------
+
+	    Calendar fechaReservaPendiente = Calendar.getInstance();
+	    fechaReservaPendiente.add(Calendar.DAY_OF_MONTH, 7);
+
+	    Reserva reservaPendiente = new Reserva(
+	        1001,
+	        fechaReservaPendiente.getTime(),
+	        EstadoReserva.PENDIENTE,
+	        "11.111.111-1",
+	        "CG001"
+	    );
+
+	    buscarSocio("11.111.111-1")
+	        .agregarReserva(reservaPendiente);
+
+
+	    Calendar fechaReservaCompletada = Calendar.getInstance();
+	    fechaReservaCompletada.add(Calendar.DAY_OF_MONTH, -3);
+
+	    Reserva reservaCompletada = new Reserva(
+	        1002,
+	        fechaReservaCompletada.getTime(),
+	        EstadoReserva.COMPLETADA,
+	        "33.333.333-3",
+	        "EL001"
+	    );
+
+	    buscarSocio("33.333.333-3")
+	        .agregarReserva(reservaCompletada);
+
+	    return true;
 	}
 	
 	

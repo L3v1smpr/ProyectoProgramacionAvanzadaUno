@@ -19,9 +19,22 @@ public class Main {
         SistemaClub controlador = new SistemaClub();
         
         try {
+
             controlador.cargarDatosBatch();
+
+            // Si la base de datos esta vacia, carga los datos iniciales
+            // requeridos para demostrar las funcionalidades del sistema.
+            if (controlador.cargarDatosIniciales()) {
+
+                controlador.guardarDatosBatch();
+
+                System.out.println("Datos iniciales del sistema cargados correctamente.");
+            }
+
         } catch (ConexionBDException | PersistenciaDatosException e) {
+
             System.out.println("Error al cargar los datos del sistema: " + e.getMessage());
+
             return;
         }
         

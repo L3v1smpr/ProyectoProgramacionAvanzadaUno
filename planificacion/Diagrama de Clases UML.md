@@ -1,15 +1,17 @@
-# Diagrama de Clases UML
-
-```mermaid
 classDiagram
 
-    %% ==========================================
-    %% CAPA MAIN Y VISTA
-    %% ==========================================
+    %% =====================================================
+    %% MAIN
+    %% =====================================================
 
     class Main {
         +main(args: String[]) void
     }
+
+
+    %% =====================================================
+    %% VISTAS
+    %% =====================================================
 
     class MenuConsola {
         -scanner : Scanner
@@ -27,6 +29,7 @@ classDiagram
         -exportarSociosCSV() void
         -guardarCambios() boolean
     }
+
 
     class MenuVentana {
         -controlador : SistemaClub
@@ -63,12 +66,13 @@ classDiagram
         -limpiarInformacionFacturacion() void
 
         -actualizarCamposSegunTipoActividad() void
+        -exportarSociosCSV() void
     }
 
 
-    %% ==========================================
-    %% CAPA CONTROLADOR
-    %% ==========================================
+    %% =====================================================
+    %% CONTROLADOR
+    %% =====================================================
 
     class SistemaClub {
         -mapaSocios : HashMap~String, Socio~
@@ -76,6 +80,8 @@ classDiagram
         -connection : DBConnection
 
         +SistemaClub()
+
+        +cargarDatosIniciales() boolean
 
         %% Socios
         +agregarSocio(rut: String, nombre: String, edad: int) boolean
@@ -87,7 +93,7 @@ classDiagram
         +obtenerListaSociosDeudores() ArrayList~Socio~
         +buscarSocio(rut: String) Socio
 
-        %% Exportacion CSV
+        %% Exportacion
         +exportarSociosCSV(rutaArchivo: String) int
         -escaparCSV(valor: String) String
 
@@ -124,6 +130,10 @@ classDiagram
     }
 
 
+    %% =====================================================
+    %% PERSISTENCIA
+    %% =====================================================
+
     class DBConnection {
         -url : String
         -connection : Connection
@@ -144,13 +154,14 @@ classDiagram
 
         +guardarReserva(reserva: Reserva) void
         +cargarReservas() ArrayList~Reserva~
+
         +limpiarReservas() void
     }
 
 
-    %% ==========================================
-    %% CAPA MODELO
-    %% ==========================================
+    %% =====================================================
+    %% MODELO
+    %% =====================================================
 
     class Actividad {
         <<abstract>>
@@ -305,9 +316,9 @@ classDiagram
     }
 
 
-    %% ==========================================
+    %% =====================================================
     %% EXCEPCIONES
-    %% ==========================================
+    %% =====================================================
 
     class MorosidadException {
         <<exception>>
@@ -315,11 +326,13 @@ classDiagram
         +MorosidadException(mensaje: String)
     }
 
+
     class CupoMaximoException {
         <<exception>>
 
         +CupoMaximoException(mensaje: String)
     }
+
 
     class ConexionBDException {
         <<exception>>
@@ -327,6 +340,7 @@ classDiagram
         +ConexionBDException(mensaje: String)
         +ConexionBDException(mensaje: String, causa: Throwable)
     }
+
 
     class PersistenciaDatosException {
         <<exception>>
@@ -336,20 +350,18 @@ classDiagram
     }
 
 
-    %% ==========================================
-    %% HERENCIA
-    %% ==========================================
+    %% =====================================================
+    %% GENERALIZACION / HERENCIA
+    %% =====================================================
 
     Actividad <|-- ClaseGrupal
     Actividad <|-- EntrenamientoLibre
     Actividad <|-- Evento
 
 
-    %% ==========================================
-    %% RELACIONES DEL MODELO
-    %% ==========================================
-
-    Reserva ..> EstadoReserva : usa
+    %% =====================================================
+    %% RELACIONES ESTRUCTURALES
+    %% =====================================================
 
     Socio "1" *-- "0..*" Reserva : contiene
 
@@ -358,9 +370,17 @@ classDiagram
     SistemaClub "1" --> "1" DBConnection : persistencia
 
 
-    %% ==========================================
+    %% =====================================================
+    %% DEPENDENCIAS DEL MODELO
+    %% =====================================================
+
+    Reserva ..> EstadoReserva : usa
+    SistemaClub ..> EstadoReserva : usa
+
+
+    %% =====================================================
     %% DEPENDENCIAS DE PERSISTENCIA
-    %% ==========================================
+    %% =====================================================
 
     DBConnection ..> Socio : persiste
     DBConnection ..> Actividad : persiste
@@ -372,28 +392,26 @@ classDiagram
     DBConnection ..> EstadoReserva : reconstruye
 
 
-    %% ==========================================
+    %% =====================================================
     %% VISTA / CONTROLADOR
-    %% ==========================================
+    %% =====================================================
 
     MenuConsola "1" --> "1" SistemaClub : usa
     MenuVentana "1" --> "1" SistemaClub : usa
 
-    Main ..> SistemaClub : instancia
-    Main ..> MenuConsola : instancia
-    Main ..> MenuVentana : instancia
+
+    %% =====================================================
+    %% RELACIONES DE CREACION
+    %% =====================================================
+
+    Main ..> SistemaClub : «create»
+    Main ..> MenuConsola : «create»
+    Main ..> MenuVentana : «create»
 
 
-    %% ==========================================
-    %% EXPORTACION CSV
-    %% ==========================================
-
-    MenuConsola ..> SistemaClub : solicita exportacion CSV
-
-
-    %% ==========================================
+    %% =====================================================
     %% EXCEPCIONES UTILIZADAS
-    %% ==========================================
+    %% =====================================================
 
     SistemaClub ..> MorosidadException : lanza
     SistemaClub ..> CupoMaximoException : lanza
@@ -411,4 +429,3 @@ classDiagram
 
     MenuVentana ..> ConexionBDException : captura
     MenuVentana ..> PersistenciaDatosException : captura
-```  
