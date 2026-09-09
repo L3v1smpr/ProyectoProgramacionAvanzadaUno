@@ -1,3 +1,6 @@
+# Diagrama de Clases UML
+
+```mermaid
 classDiagram
 
     %% =====================================================
@@ -429,3 +432,4 @@ classDiagram
 
     MenuVentana ..> ConexionBDException : captura
     MenuVentana ..> PersistenciaDatosException : captura
+```
