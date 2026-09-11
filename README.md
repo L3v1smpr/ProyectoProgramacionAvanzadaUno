@@ -796,9 +796,7 @@ El sistema guarda la información en:
 club_deportivo.db
 ```
 
-como separador si la aplicación solicita configurarlo manualmente.
-
-El archivo utiliza UTF-8.
+Si desea reiniciar los datos a su estado original de demostración, cierre la aplicación, elimine dicho archivo y ejecute nuevamente `Main.java`.
 
 ---
 
