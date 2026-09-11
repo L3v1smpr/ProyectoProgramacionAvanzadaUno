@@ -37,6 +37,13 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.ArrayList;
 
+/**
+ * Interfaz de usuario gráfica (GUI) mediante Swing para la gestión integral del club.
+ * Contiene módulos en pestañas para administrar socios, actividades, reservas y facturación.
+ * 
+ * @author Avalos Cristian
+ * @version 1.0
+ */
 public class MenuVentana {
 
     private SistemaClub controlador;
@@ -117,10 +124,18 @@ public class MenuVentana {
 
     private JButton btnGuardarManual;
 
+    /**
+     * Constructor de la vista por ventanas.
+     * 
+     * @param controlador El controlador general del negocio.
+     */
     public MenuVentana(SistemaClub controlador) {
         this.controlador = controlador;
     }
 
+    /**
+     * Levanta e inicializa los componentes visuales de la interfaz gráfica.
+     */
     public void iniciarVentana() {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -231,6 +246,7 @@ public class MenuVentana {
         }
     }
 
+    /** Prepara la vista gráfica y formularios del registro de Socios. */
     private void iniciarModuloSocios() {
         panelSocios.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
@@ -314,6 +330,7 @@ public class MenuVentana {
         refrescarTablaSocios();
     }
 
+    /** Interfaz de diálogo y ejecución para la exportación CSV. */
     private void exportarSociosCSV() {
         if (controlador == null) {
             return;
@@ -350,6 +367,7 @@ public class MenuVentana {
         }
     }
 
+    /** Prepara la vista gráfica y formularios del catálogo de Actividades. */
     private void iniciarModuloActividades() {
         panelActividades.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
@@ -474,6 +492,7 @@ public class MenuVentana {
         refrescarTablaActividades();
     }
 
+    /** Prepara la vista gráfica y la tabla de agendamiento de Reservas. */
     private void iniciarModuloReservas() {
         panelReservas.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
@@ -544,6 +563,7 @@ public class MenuVentana {
         refrescarTablaReservas();
     }
 
+    /** Prepara la vista gráfica para consultar deuda y realizar pagos. */
     private void iniciarModuloFacturacion() {
         panelFacturacion.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 

@@ -21,17 +21,29 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-
-
+/**
+ * Maneja la conexión y las operaciones CRUD directamente con la base de datos SQLite.
+ * 
+ * @author Peñaloza Elvis
+ * @version 1.0
+ */
 public class DBConnection {
 
     private String url;
     private Connection connection;
 
+    /**
+     * Constructor por defecto que establece la ruta de la base de datos.
+     */
     public DBConnection() {
         this.url = "jdbc:sqlite:club_deportivo.db";
     }
 
+    /**
+     * Establece la conexión con la base de datos y habilita las llaves foráneas.
+     * 
+     * @throws ConexionBDException Si ocurre un error al conectar.
+     */
     public void conectar() throws ConexionBDException {
         try {
             connection = DriverManager.getConnection(url);
@@ -46,6 +58,12 @@ public class DBConnection {
         }
     }
 
+    /**
+     * Obtiene la conexión activa a la base de datos, abriéndola si está cerrada.
+     * 
+     * @return Objeto Connection activo.
+     * @throws ConexionBDException Si hay un problema verificando o estableciendo la conexión.
+     */
     public Connection getConnection() throws ConexionBDException {
         try {
             if (connection == null || connection.isClosed()) {
@@ -59,6 +77,11 @@ public class DBConnection {
         }
     }
 
+    /**
+     * Cierra la conexión activa con la base de datos.
+     * 
+     * @throws ConexionBDException Si ocurre un error al intentar cerrar la conexión.
+     */
     public void cerrarConexion() throws ConexionBDException {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -71,6 +94,13 @@ public class DBConnection {
         }
     }
     
+    /**
+     * Guarda o actualiza los datos de un socio en la tabla SOCIOS.
+     * 
+     * @param socio Objeto Socio a persistir.
+     * @throws ConexionBDException Si hay problemas de red o conexión.
+     * @throws PersistenciaDatosException Si la consulta SQL falla.
+     */
     public void guardarSocio(Socio socio)
             throws ConexionBDException, PersistenciaDatosException {
 
@@ -105,6 +135,13 @@ public class DBConnection {
         }
     }
     
+    /**
+     * Carga todos los socios registrados en la base de datos.
+     * 
+     * @return Lista de objetos Socio extraídos de la BD.
+     * @throws ConexionBDException Si falla la conexión.
+     * @throws PersistenciaDatosException Si la consulta SQL falla.
+     */
     public ArrayList<Socio> cargarSocios()
             throws ConexionBDException, PersistenciaDatosException {
 
@@ -146,6 +183,9 @@ public class DBConnection {
         }
     }
     
+    /**
+     * Crea las tablas base del sistema en SQLite si estas no existen.
+     */
     public void crearTablas()
             throws ConexionBDException, PersistenciaDatosException {
 
@@ -200,7 +240,9 @@ public class DBConnection {
         }
     }
     
-    
+    /**
+     * Guarda o actualiza los datos de una actividad en la tabla ACTIVIDADES.
+     */
     public void guardarActividad(Actividad actividad)
             throws ConexionBDException, PersistenciaDatosException {
 
@@ -271,6 +313,9 @@ public class DBConnection {
         }
     }
     
+    /**
+     * Reconstruye polimórficamente la lista de actividades desde la base de datos.
+     */
     public ArrayList<Actividad> cargarActividades()
             throws ConexionBDException, PersistenciaDatosException {
 
@@ -358,6 +403,9 @@ public class DBConnection {
         }
     }
     
+    /**
+     * Almacena o actualiza una reserva en la base de datos.
+     */
     public void guardarReserva(Reserva reserva)
             throws ConexionBDException, PersistenciaDatosException {
 
@@ -418,6 +466,9 @@ public class DBConnection {
         }
     }
     
+    /**
+     * Carga el listado completo de reservas registradas.
+     */
     public ArrayList<Reserva> cargarReservas()
             throws ConexionBDException, PersistenciaDatosException {
 
@@ -459,6 +510,9 @@ public class DBConnection {
         }
     }
     
+    /**
+     * Elimina todos los registros de la tabla RESERVAS.
+     */
     public void limpiarReservas()
             throws ConexionBDException, PersistenciaDatosException {
 

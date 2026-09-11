@@ -22,7 +22,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-
+/**
+ * Controlador principal que gestiona toda la lógica de negocio del club.
+ * Coordina el mapa de socios, lista de actividades y las llamadas a la base de datos.
+ * 
+ * @author Peñaloza Elvis
+ * @version 1.0
+ */
 public class SistemaClub {
 
 	//Atributos
@@ -32,8 +38,9 @@ public class SistemaClub {
 	
 	
 	
-	//Constructor
-	
+	/**
+	 * Constructor principal del sistema. Inicializa las colecciones y la conexión a BD.
+	 */
 	public SistemaClub(){
 	
 		this.mapaSocios = new HashMap<>();
@@ -42,8 +49,12 @@ public class SistemaClub {
 	}
 	
 	
-	// Datos iniciales requeridos por SIA-3.
-	// Solo se cargan cuando no existen socios ni actividades previamente cargados.
+	/**
+	 * Carga datos iniciales estáticos (mock) requeridos para demostrar las funcionalidades.
+	 * Solo se ejecuta si el sistema está completamente vacío.
+	 * 
+	 * @return true si se insertaron datos iniciales, false si ya existían datos previos.
+	 */
 	public boolean cargarDatosIniciales() {
 
 	    if (!mapaSocios.isEmpty() || !listaActividades.isEmpty()) {
@@ -168,6 +179,10 @@ public class SistemaClub {
 	
 	
 	//Metodos relacionados a Socio
+	
+	/**
+	 * Agrega un nuevo socio al sistema si el RUT no está duplicado.
+	 */
 	public boolean agregarSocio(String rut, String nombre, int edad) {
 		if (mapaSocios.containsKey(rut)) {
 			return false;
@@ -180,6 +195,9 @@ public class SistemaClub {
 		return true;
 	}
 	
+	/**
+	 * Modifica los datos principales y de facturación de un socio existente.
+	 */
 	public boolean modificarSocio(String rut, String nombre, int edad, int deuda, boolean esMoroso) {
 		if (!mapaSocios.containsKey(rut)) {
 			return false;
@@ -211,6 +229,9 @@ public class SistemaClub {
 		return true;
 	}
 	
+	/**
+	 * Desactiva un socio en el sistema (baja lógica).
+	 */
 	public boolean desactivarSocio(String rut) {
 		Socio socioBuscado = buscarSocio(rut); // Reutilizas tu propio método
 	    
@@ -223,6 +244,9 @@ public class SistemaClub {
 
 	}
 	
+	/**
+	 * Reactiva un socio previamente desactivado.
+	 */
 	public boolean activarSocio(String rut) {
 		Socio socioBuscado = buscarSocio(rut); // Reutilizas tu propio método
 	    
@@ -234,7 +258,9 @@ public class SistemaClub {
 	    return true;
 	}
 	
-	
+	/**
+	 * Obtiene una lista con todos los socios marcados como activos.
+	 */
 	public ArrayList<Socio> obtenerListaSocios(){
 		ArrayList<Socio> listaSocios = new ArrayList<>();
 		
@@ -246,6 +272,9 @@ public class SistemaClub {
 		return listaSocios;
 	}
 	
+	/**
+	 * Obtiene la lista exclusiva de socios que presentan deudas activas.
+	 */
 	public ArrayList<Socio> obtenerListaSociosDeudores(){
 		ArrayList<Socio> listaSociosDeudores = new ArrayList<>();
 		
@@ -257,10 +286,20 @@ public class SistemaClub {
 		return listaSociosDeudores;
 	}
 	
+	/**
+	 * Busca a un socio por su RUT específico.
+	 */
 	public Socio buscarSocio(String rut) {
 		return mapaSocios.get(rut);
 	}
 	
+	/**
+	 * Exporta la lista actual de socios a un archivo CSV.
+	 * 
+	 * @param rutaArchivo Destino del archivo.
+	 * @return Cantidad de socios exportados.
+	 * @throws IOException Si existe un problema al crear o escribir el archivo.
+	 */
 	public int exportarSociosCSV(String rutaArchivo) throws IOException {
 
 	    ArrayList<Socio> sociosExportar =
@@ -327,6 +366,10 @@ public class SistemaClub {
 	//Métodos relacionados a Actividad
 	
 	//------------------Sobrecarga de agregar actividad para la herencia----------------------------
+	
+	/**
+	 * Agrega una actividad de tipo Clase Grupal al sistema.
+	 */
 	public boolean agregarActividad(String idActividad, String nombre, int cupoMaximo, int edadMinima, String profesor) {
 		if (buscarActividad(idActividad) != null) {
 			return false; //Ya existe la actividad con ese ID
@@ -338,6 +381,9 @@ public class SistemaClub {
 		return true; //La clase se añadió correctamente
 	}
 	
+	/**
+	 * Agrega una actividad de tipo Entrenamiento Libre al sistema.
+	 */
 	public boolean agregarActividad(String idActividad, String nombre, int cupoMaximo, int edadMinima, boolean requiereAsistencia) {
 		if (buscarActividad(idActividad) != null) {
 			return false; //Ya existe la actividad con ese ID
@@ -350,6 +396,9 @@ public class SistemaClub {
 	
 	}
 	
+	/**
+	 * Agrega una actividad de tipo Evento al sistema.
+	 */
 	public boolean agregarActividad(String idActividad, String nombre, int cupoMaximo, int edadMinima, Date fecha, String lugar, String tipoEvento) {
 		if (buscarActividad(idActividad) != null) {
 			return false;
@@ -363,6 +412,11 @@ public class SistemaClub {
 	
 	//-------------------------------------------FIN SOBRECARGA--------------------------------------
 	
+	/**
+	 * Modifica los atributos base de una actividad ya existente.
+	 * 
+	 * @throws CupoMaximoException Si se intenta definir un cupo igual o menor a cero.
+	 */
 	public boolean modificarActividad(String idActividad, String nuevoNombre, int nuevoCupoMaximo, int nuevaEdadMinima) throws CupoMaximoException {
 		Actividad actividadBuscada = buscarActividad(idActividad);
 		
@@ -381,7 +435,7 @@ public class SistemaClub {
 		return true; //La actividad fue modificada correctamente
 	}
 	
-		public boolean eliminarActividad(String idActividad) {
+	public boolean eliminarActividad(String idActividad) {
 		Actividad actividadBuscada = buscarActividad(idActividad);
 		
 		if (actividadBuscada == null) {
@@ -392,7 +446,9 @@ public class SistemaClub {
 		return true;
 	}
 	
-	
+	/**
+	 * Desactiva una actividad (baja lógica).
+	 */
 	public boolean desactivarActividad(String idActividad) {
 		Actividad actividadBuscada = buscarActividad(idActividad);
 		
@@ -404,6 +460,9 @@ public class SistemaClub {
 		return true;		
 	}
 	
+	/**
+	 * Reactiva una actividad inactiva.
+	 */
 	public boolean activarActividad(String idActividad) {
 		Actividad actividadBuscada = buscarActividad(idActividad);
 		
@@ -415,6 +474,9 @@ public class SistemaClub {
 		return true;
 	}
 	
+	/**
+	 * Busca una actividad en base a su ID.
+	 */
 	public Actividad buscarActividad(String idActividad) {
 		for (Actividad a : listaActividades) {
 			if (a.getIdActividad().equals(idActividad)) return a;
@@ -423,6 +485,9 @@ public class SistemaClub {
 		return null;
 	}
 	
+	/**
+	 * Busca la actividad vinculada a un número de reserva específico.
+	 */
 	public Actividad buscarActividad(int idReserva) {
 		for (Socio s : mapaSocios.values()) {
 			for (Reserva r : s.getListaReservas()) {
@@ -436,6 +501,9 @@ public class SistemaClub {
 		return null;
 	}
 
+	/**
+	 * Filtra y devuelve la lista de actividades habilitadas.
+	 */
 	public ArrayList<Actividad> obtenerActividades(){
 		ArrayList<Actividad> listaFiltrada = new ArrayList<>();
 	    
@@ -450,6 +518,12 @@ public class SistemaClub {
 	
 	//Métodos relacionados a Reserva
 	
+	/**
+	 * Intenta agendar una nueva reserva verificando deuda y cupos disponibles.
+	 * 
+	 * @throws MorosidadException Si el socio tiene deudas pendientes.
+	 * @throws CupoMaximoException Si la actividad solicitada ya llenó sus vacantes.
+	 */
 	public boolean agendarReserva(String rut, String idActividad, Date fecha) throws MorosidadException, CupoMaximoException{
 		Socio socioBuscado = buscarSocio(rut);
 		Actividad actividadBuscada = buscarActividad(idActividad);
@@ -484,6 +558,11 @@ public class SistemaClub {
 		
 	}
 	
+	/**
+	 * Actualiza los parámetros de una reserva ya registrada.
+	 * 
+	 * @throws MorosidadException Si el socio está moroso.
+	 */
 	public boolean modificarReserva(int idReserva, Date fecha, EstadoReserva estado, String rutSocio, String idActividad) throws MorosidadException{
 		Socio socioBuscado = buscarSocio(rutSocio);
 		
@@ -508,6 +587,9 @@ public class SistemaClub {
 		return true;
 	}
 		
+	/**
+	 * Localiza y elimina una reserva del registro del respectivo socio.
+	 */
 	public boolean eliminarReserva(int idReserva) {
 		
 		for (Socio s : mapaSocios.values()) { //Recorre los socios del mapa
@@ -519,6 +601,9 @@ public class SistemaClub {
 		return false; //Recorrió todos los socios pero no encontró la reserva
 	}
 	
+	/**
+	 * Extrae y ordena cronológicamente el total de reservas activas del club.
+	 */
 	public ArrayList<Reserva> listarReservasGlobales(){
 		
 		//Recopilación de reservas en un arreglo global
@@ -547,6 +632,9 @@ public class SistemaClub {
 	
 	//Otras opciones del menú
 	
+	/**
+	 * Liquida totalmente la deuda de un socio.
+	 */
 	public boolean pagarFacturacion(String rut) {
 		if (!mapaSocios.containsKey(rut)) {
 			return false; //El socio no existe
@@ -559,6 +647,9 @@ public class SistemaClub {
 		return true;
 	}
 	
+	/**
+	 * Realiza un abono parcial sobre la deuda de un socio.
+	 */
 	public boolean pagarFacturacion(String rut, int abono) {
 		if (!mapaSocios.containsKey(rut)) {
 			return false; //El socio no existe
@@ -570,6 +661,9 @@ public class SistemaClub {
 		return true;
 	}
 	
+	/**
+	 * Efectúa un cargo estándar por cuota mensual a todos los socios activos.
+	 */
 	public boolean generarCobroMensual() { //El precio fijo mensual será de 10.000
 		if (mapaSocios.isEmpty()) {
 			return false; //No hay socios registrados en el sistema
@@ -588,6 +682,9 @@ public class SistemaClub {
 		return true; //Se hizo el cobro correctamente a cada socio del sistema
 	}
 	
+	/**
+	 * Devuelve un listado de actividades que son específicamente de tipo Evento.
+	 */
 	public ArrayList<Actividad> obtenerEventos(){
 		ArrayList<Actividad> listaEventos = new ArrayList<>();
 		
@@ -602,6 +699,10 @@ public class SistemaClub {
 
 	
 	//Relacionado a la base de datos
+	
+	/**
+	 * Carga toda la información desde la base de datos a memoria (socios, actividades y reservas).
+	 */
 	public void cargarDatosBatch() throws ConexionBDException, PersistenciaDatosException {
 
 	    connection.crearTablas();
@@ -646,6 +747,9 @@ public class SistemaClub {
 	    }
 	}
 	
+	/**
+	 * Persiste el estado completo actual del sistema hacia la base de datos.
+	 */
 	public void guardarDatosBatch() throws ConexionBDException, PersistenciaDatosException {
 
 	    connection.crearTablas();

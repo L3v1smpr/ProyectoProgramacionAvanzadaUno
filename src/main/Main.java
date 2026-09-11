@@ -11,9 +11,21 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
-//Clase encargada de darle la decision al usuario para ejecutar consola o ventana (GUI)
+/**
+ * Clase principal que inicializa el sistema del club.
+ * Encargada de dar la decisión al usuario para ejecutar la interfaz por consola o ventana (GUI).
+ * 
+ * @author Peñaloza Elvis
+ * @version 1.0
+ */
 public class Main {
 
+    /**
+     * Punto de entrada principal de la aplicación.
+     * Carga los datos desde la base de datos y lanza el menú seleccionado.
+     * 
+     * @param args Argumentos de la línea de comandos.
+     */
     public static void main(String[] args) {
         
         SistemaClub controlador = new SistemaClub();

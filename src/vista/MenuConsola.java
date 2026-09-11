@@ -12,17 +12,31 @@ import java.text.ParseException;
 import java.util.Date;
 import java.io.IOException;
 
+/**
+ * Interfaz de usuario por consola para interactuar con el sistema del club.
+ * Gestiona los menús de texto y procesa la entrada del usuario.
+ * 
+ * @author Peñaloza Elvis
+ * @version 1.0
+ */
 public class MenuConsola {
 	private Scanner scanner;
 	private SistemaClub controlador;
 	
 	
-	// Recibe el controlador que le envía el Main.java
+	/**
+	 * Constructor del menú por consola.
+	 * 
+	 * @param controlador Instancia de SistemaClub para comunicar con la lógica de negocio.
+	 */
 	public MenuConsola(SistemaClub controlador) { 
 		this.scanner = new Scanner(System.in);
 		this.controlador = controlador; 
 	}
 	
+	/**
+	 * Inicia el bucle principal del menú interactivo en la terminal.
+	 */
 	public void iniciarConsola() {
 		int opcion = -1;
 		
@@ -71,6 +85,7 @@ public class MenuConsola {
 		} while (opcion != 8);		
 	}
 	
+	/** Menú de gestión de Actividades. */
 	private void submenuActividades() {
 		System.out.println("\n--- GESTIONAR ACTIVIDADES ---");
 		System.out.println("1. Agregar Actividad");
@@ -309,6 +324,7 @@ public class MenuConsola {
 		}
 	}
 
+	/** Menú de gestión de Socios. */
 	private void submenuSocios() {
         System.out.println("\n--- GESTIONAR SOCIOS ---");
         System.out.println("1. Agregar Socio");
@@ -500,6 +516,7 @@ public class MenuConsola {
         }
     }
 	
+	/** Menú de gestión de Reservas. */
 	private void submenuReservas() {
         System.out.println("\n--- GESTIONAR RESERVAS ---");
         System.out.println("1. Agendar Reserva");
@@ -637,6 +654,7 @@ public class MenuConsola {
         }
     }
 	
+	/** Menú para operaciones de caja y estado de cuenta. */
 	private void submenuPagarFacturacion() {
         System.out.println("\n--- PAGO DE FACTURACIÓN ---");
         System.out.print("Ingrese el RUT del socio: ");
@@ -685,6 +703,7 @@ public class MenuConsola {
         }
     }
 
+	/** Ejecuta la orden administrativa de facturar cuota mensual. */
     private void ejecutarCobroMensual() {
         System.out.println("\n--- GENERAR COBRO MENSUAL ---");
         
@@ -757,6 +776,3 @@ public class MenuConsola {
         }
     }
 }
-
-
-

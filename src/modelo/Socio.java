@@ -1,6 +1,13 @@
 package modelo;
 import java.util.ArrayList;
 
+/**
+ * Representa a un socio registrado en el club deportivo.
+ * Mantiene su información personal, estado financiero y un historial de sus reservas.
+ * 
+ * @author Avalos Cristian
+ * @version 1.0
+ */
 public class Socio {
 
 	//Atributos
@@ -10,8 +17,15 @@ public class Socio {
 	private ArrayList<Reserva> listaReservas;
 	
 	
-	//Constructor
-	
+	/**
+	 * Constructor de la clase Socio.
+	 * 
+	 * @param rut RUT identificador del socio.
+	 * @param nombre Nombre completo.
+	 * @param edad Edad del socio.
+	 * @param deuda Monto inicial adeudado.
+	 * @param esMoroso Estado de morosidad (true si tiene deudas vencidas).
+	 */
 	public Socio(String rut, String nombre, int edad, int deuda, boolean esMoroso) {
 		this.rut = rut;
 		this.nombre = nombre;
@@ -82,9 +96,12 @@ public class Socio {
 	
 	//Metodos
 	
-	/* Sobrecarga 1: Realiza un abono parcial o total segun el monto indicado.
+	/** 
+	 * Realiza un abono parcial o total según el monto indicado.
 	 * Si el monto cubre o supera la deuda, queda en 0 y se anula la morosidad.
 	 * Si es inferior, se descuenta el monto manteniendo el estado de morosidad.
+	 * 
+	 * @param monto Cantidad de dinero a abonar.
 	 */
 	public void abonarDeuda(int monto) {
 		if (monto <= 0){
@@ -99,18 +116,20 @@ public class Socio {
 		}
 	}
 	
-	/* Sobrecarga 2: Salda la totalidad de la deuda pendiente.
-	 * Fija la deuda en 0 y remueve automaticamente la morosidad del socio.
+	/** 
+	 * Salda la totalidad de la deuda pendiente.
+	 * Fija la deuda en 0 y remueve automáticamente la morosidad del socio.
 	 */
 	public void abonarDeuda() {
 		this.deuda = 0;
 		this.esMoroso = false;
 	}
 	
-	/* Agrega una reserva a la coleccion interna del socio si NO se encuentra repetida.
-	 * Recibe como parametro un objeto Reserva a registrar.
-	 * Retorna true si la reserva se agrego con exito.
-	 * Retorna false si es nula o ya existe su id.
+	/** 
+	 * Agrega una reserva a la colección interna del socio si NO se encuentra repetida.
+	 * 
+	 * @param reserva Objeto Reserva a registrar.
+	 * @return true si la reserva se agregó con éxito, false si es nula o ya existe su ID.
 	 */
 	public boolean agregarReserva(Reserva reserva) {
 		if (reserva == null) {
@@ -124,9 +143,11 @@ public class Socio {
 		return this.listaReservas.add(reserva);
 	}
 	
-	/* Busca una reserva especifica del socio mediante su identificador.
-	 * Recibe como parametro el identificador numerico de la reserva.
-	 * Retorna un objeto Reserva encontrado (si existe) o null (si no existe).
+	/** 
+	 * Busca una reserva específica del socio mediante su identificador.
+	 * 
+	 * @param idReserva Identificador numérico de la reserva.
+	 * @return Objeto Reserva encontrado, o null si no existe.
 	 */
 	public Reserva buscarReserva(int idReserva) {
 		for (Reserva r : this.listaReservas) {
@@ -137,9 +158,11 @@ public class Socio {
 		return null;
 	}
 	
-	/* Elimina una reserva de la coleccion del socio por su identificador.
-	 * Recibe como parametro el identificador numerico de la reserva a remover.
-	 * Retorna true (si se elimino) o false (si no existe).
+	/** 
+	 * Elimina una reserva de la colección del socio por su identificador.
+	 * 
+	 * @param idReserva Identificador numérico de la reserva a remover.
+	 * @return true si se eliminó correctamente, false si no se encontró.
 	 */
 	public boolean eliminarReserva(int idReserva) {
 		Reserva reserva = buscarReserva(idReserva);
