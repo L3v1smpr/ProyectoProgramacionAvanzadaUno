@@ -1,6 +1,13 @@
 package modelo;
 import java.util.Date;
 
+/**
+ * Clase abstracta que representa una actividad base dentro del sistema.
+ * Define los atributos comunes y el comportamiento base para los diferentes tipos de actividades.
+ * 
+ * @author Reyes Alex
+ * @version 1.0
+ */
 public abstract class Actividad {
 
 	private String idActividad, nombre;
@@ -8,7 +15,15 @@ public abstract class Actividad {
 	private int edadMinima; 
 	private boolean activo; 
 	
-	
+	/**
+	 * Constructor principal de Actividad.
+	 * Inicializa una nueva actividad y por defecto la marca como activa.
+	 * 
+	 * @param idActividad Identificador único de la actividad.
+	 * @param nombre Nombre descriptivo de la actividad.
+	 * @param cupoMaximo Cantidad máxima de personas que pueden participar.
+	 * @param edadMinima Edad mínima requerida para la inscripción.
+	 */
 	public Actividad(String idActividad, String nombre, int cupoMaximo, int edadMinima) {
 		this.idActividad = idActividad;
 		this.nombre = nombre;
@@ -85,10 +100,21 @@ public abstract class Actividad {
 	}
 	
 	// Métodos
+	/**
+	 * Genera una cadena de texto con la información detallada de la actividad.
+	 * 
+	 * @return Cadena formateada con el ID, nombre, cupos, edad y estado de la actividad.
+	 */
 	public String mostrarDetalles() {
 		return "ID: " + idActividad + " | Nombre: " + nombre + " | Cupos: " + cupoMaximo + " | Edad Mínima: " + edadMinima + " años | Activa: " + (activo ? "Sí" : "No");
 	}
 	
+	/**
+	 * Muestra los detalles de la actividad permitiendo elegir entre un formato resumido o completo.
+	 * 
+	 * @param formatoCorto true para mostrar solo ID y nombre, false para mostrar todos los detalles.
+	 * @return Cadena de texto con la información solicitada.
+	 */
 	public String mostrarDetalles(boolean formatoCorto) {
 		if (formatoCorto) {
 			return idActividad + " - " + nombre;
@@ -97,5 +123,11 @@ public abstract class Actividad {
 	}
 	
 	//Método Abstracto
+	/**
+	 * Obtiene el tipo específico de la actividad.
+	 * Método abstracto que debe ser implementado por las subclases.
+	 * 
+	 * @return Tipo de actividad en formato de texto.
+	 */
 	public abstract String getTipoActividad();
 }
