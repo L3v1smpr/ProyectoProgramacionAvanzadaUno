@@ -98,7 +98,7 @@ public class DBConnection {
      * Guarda o actualiza los datos de un socio en la tabla SOCIOS.
      * 
      * @param socio Objeto Socio a persistir.
-     * @throws ConexionBDException Si hay problemas de red o conexión.
+     * @throws ConexionBDException si ocurre un problema al acceder a la conexión
      * @throws PersistenciaDatosException Si la consulta SQL falla.
      */
     public void guardarSocio(Socio socio)
@@ -184,7 +184,15 @@ public class DBConnection {
     }
     
     /**
-     * Crea las tablas base del sistema en SQLite si estas no existen.
+     * Crea las tablas necesarias para la persistencia del sistema
+     * si todavía no existen.
+     *
+     * Se crean las tablas SOCIOS, ACTIVIDADES y RESERVAS junto con
+     * las relaciones de claves foráneas correspondientes.
+     *
+     * @throws ConexionBDException si no es posible acceder a la base de datos
+     * @throws PersistenciaDatosException si ocurre un error al ejecutar
+     *         las sentencias de creación de tablas
      */
     public void crearTablas()
             throws ConexionBDException, PersistenciaDatosException {
@@ -241,7 +249,15 @@ public class DBConnection {
     }
     
     /**
-     * Guarda o actualiza los datos de una actividad en la tabla ACTIVIDADES.
+     * Guarda o actualiza una actividad en la tabla ACTIVIDADES.
+     *
+     * Los atributos específicos de cada subtipo se obtienen mediante
+     * métodos polimórficos definidos en {@link Actividad}.
+     *
+     * @param actividad actividad que se desea persistir
+     * @throws ConexionBDException si no es posible acceder a la base de datos
+     * @throws PersistenciaDatosException si ocurre un error durante
+     *         el almacenamiento de la actividad
      */
     public void guardarActividad(Actividad actividad)
             throws ConexionBDException, PersistenciaDatosException {
@@ -314,7 +330,16 @@ public class DBConnection {
     }
     
     /**
-     * Reconstruye polimórficamente la lista de actividades desde la base de datos.
+     * Carga todas las actividades almacenadas y reconstruye
+     * el subtipo correspondiente según el campo de tipo persistido.
+     *
+     * Puede reconstruir instancias de {@link ClaseGrupal},
+     * {@link EntrenamientoLibre} y {@link Evento}.
+     *
+     * @return lista con las actividades reconstruidas desde SQLite
+     * @throws ConexionBDException si no es posible acceder a la base de datos
+     * @throws PersistenciaDatosException si los datos no pueden ser leídos,
+     *         convertidos o contienen un tipo de actividad desconocido
      */
     public ArrayList<Actividad> cargarActividades()
             throws ConexionBDException, PersistenciaDatosException {
@@ -404,7 +429,12 @@ public class DBConnection {
     }
     
     /**
-     * Almacena o actualiza una reserva en la base de datos.
+     * Guarda o actualiza una reserva en la tabla RESERVAS.
+     *
+     * @param reserva reserva que se desea persistir
+     * @throws ConexionBDException si no es posible acceder a la base de datos
+     * @throws PersistenciaDatosException si la reserva contiene datos inválidos
+     *         o se produce un error durante su almacenamiento
      */
     public void guardarReserva(Reserva reserva)
             throws ConexionBDException, PersistenciaDatosException {
@@ -467,7 +497,15 @@ public class DBConnection {
     }
     
     /**
-     * Carga el listado completo de reservas registradas.
+     * Carga todas las reservas almacenadas en la base de datos.
+     *
+     * Los valores persistidos de fecha y estado se convierten nuevamente
+     * a {@link java.util.Date} y {@link EstadoReserva}, respectivamente.
+     *
+     * @return lista de reservas reconstruidas desde la base de datos
+     * @throws ConexionBDException si no es posible acceder a la base de datos
+     * @throws PersistenciaDatosException si los datos almacenados no pueden
+     *         ser interpretados correctamente
      */
     public ArrayList<Reserva> cargarReservas()
             throws ConexionBDException, PersistenciaDatosException {
@@ -511,7 +549,15 @@ public class DBConnection {
     }
     
     /**
-     * Elimina todos los registros de la tabla RESERVAS.
+     * Elimina todos los registros almacenados en la tabla RESERVAS.
+     *
+     * Esta operación se utiliza durante el guardado batch para volver
+     * a insertar únicamente las reservas que existen actualmente
+     * en las colecciones en memoria.
+     *
+     * @throws ConexionBDException si no es posible acceder a la base de datos
+     * @throws PersistenciaDatosException si ocurre un error durante
+     *         la eliminación de los registros
      */
     public void limpiarReservas()
             throws ConexionBDException, PersistenciaDatosException {
