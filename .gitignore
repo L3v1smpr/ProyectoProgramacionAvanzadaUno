@@ -3,3 +3,5 @@
 /club_deportivo.db-wal
 /club_deportivo.db-shm
 /bin/
+
+.~lock.*#
