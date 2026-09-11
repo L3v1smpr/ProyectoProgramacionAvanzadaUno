@@ -4,9 +4,9 @@
 
 Este proyecto corresponde al desarrollo de un sistema de gestión para un club deportivo. Su objetivo principal es centralizar en una sola aplicación la administración de socios, actividades, reservas y procesos básicos de facturación.
 
-El sistema fue desarrollado utilizando Java JDK 11 y programación orientada a objetos, buscando mantener una separación clara entre el modelo del dominio, la lógica del sistema, la persistencia de datos y las interfaces utilizadas por el usuario.
+El sistema fue desarrollado utilizando Java JDK 11 y programación orientada a objetos, manteniendo una separación entre el modelo del dominio, la lógica del sistema, la persistencia de datos y las interfaces de usuario.
 
-La información registrada puede mantenerse entre distintas ejecuciones mediante una base de datos local SQLite conectada a Java mediante JDBC.
+La información registrada se conserva entre distintas ejecuciones mediante una base de datos local SQLite conectada a Java mediante JDBC.
 
 El programa dispone de dos formas de interacción:
 
@@ -15,16 +15,16 @@ El programa dispone de dos formas de interacción:
 
 Ambas interfaces utilizan una misma instancia de `SistemaClub`, de modo que las reglas de negocio no se encuentran duplicadas dentro de las vistas.
 
-Además, el sistema incorpora una funcionalidad para exportar el registro de socios a un archivo CSV, permitiendo utilizar dicha información posteriormente en herramientas externas.
+El sistema también permite exportar el registro de socios a un archivo CSV compatible con aplicaciones de hoja de cálculo.
 
 ---
 
 ## 2. Objetivo del sistema
 
-El sistema busca resolver tareas comunes dentro de la administración de un club deportivo, entre ellas:
+El sistema permite:
 
 - registrar y administrar socios;
-- modificar información de socios existentes;
+- modificar información de socios;
 - activar y desactivar socios;
 - identificar socios con deuda;
 - registrar distintos tipos de actividades;
@@ -36,17 +36,17 @@ El sistema busca resolver tareas comunes dentro de la administración de un club
 - administrar deuda y pagos;
 - generar cobros mensuales;
 - listar eventos;
-- exportar los datos de los socios a formato CSV;
-- almacenar la información en una base de datos local;
-- recuperar los datos automáticamente al iniciar una nueva ejecución.
+- exportar socios a CSV;
+- almacenar la información en SQLite;
+- recuperar automáticamente los datos al iniciar.
 
-La idea central del proyecto consiste en mantener la lógica de negocio separada de la interfaz de usuario, evitando que las clases de vista modifiquen directamente las colecciones internas o accedan directamente a SQLite.
+La lógica de negocio se mantiene separada de la interfaz de usuario. Las vistas no modifican directamente las colecciones internas ni acceden directamente a SQLite.
 
 ---
 
 ## 3. Arquitectura general
 
-El proyecto se divide principalmente en los paquetes:
+El proyecto se organiza principalmente en los paquetes:
 
 ```text
 main
@@ -57,7 +57,7 @@ vista
 
 ### 3.1 Paquete `modelo`
 
-Contiene las clases que representan las entidades y conceptos principales del dominio:
+Contiene las entidades principales:
 
 - `Socio`
 - `Actividad`
@@ -67,62 +67,42 @@ Contiene las clases que representan las entidades y conceptos principales del do
 - `Reserva`
 - `EstadoReserva`
 
-También contiene las excepciones propias utilizadas por el sistema:
+También contiene las excepciones personalizadas:
 
 - `MorosidadException`
 - `CupoMaximoException`
 - `ConexionBDException`
 - `PersistenciaDatosException`
 
----
-
 ### 3.2 Paquete `controlador`
 
-Contiene las clases encargadas de coordinar la lógica principal del sistema y la persistencia:
+Contiene:
 
 - `SistemaClub`
 - `DBConnection`
 
-`SistemaClub` funciona como el punto central mediante el cual las vistas realizan operaciones sobre socios, actividades, reservas, facturación y exportación de información.
+`SistemaClub` coordina la lógica relacionada con socios, actividades, reservas, facturación, persistencia y exportación.
 
-`DBConnection` concentra las operaciones relacionadas con SQLite y JDBC.
-
-De esta forma, la vista no necesita conocer la implementación interna de la base de datos.
-
----
+`DBConnection` concentra las operaciones específicas de SQLite y JDBC.
 
 ### 3.3 Paquete `vista`
 
-Contiene las dos interfaces disponibles para el usuario:
+Contiene:
 
 - `MenuConsola`
 - `MenuVentana`
 
-`MenuConsola` presenta las funcionalidades mediante menús de texto.
-
-`MenuVentana` utiliza Java Swing y organiza el sistema mediante diferentes módulos gráficos relacionados con:
-
-- socios;
-- actividades;
-- reservas;
-- facturación.
-
-Las dos vistas reciben una misma instancia de `SistemaClub`.
-
-Por esta razón, una operación realizada desde cualquiera de ellas trabaja sobre la misma estructura de datos y utiliza las mismas reglas de negocio.
-
----
+Ambas vistas utilizan `SistemaClub` como punto de acceso a la lógica del sistema.
 
 ### 3.4 Paquete `main`
 
-Contiene la clase `Main`, que funciona como punto de entrada de la aplicación.
+Contiene `Main`, encargado de:
 
-Sus principales responsabilidades son:
-
-1. crear una instancia de `SistemaClub`;
-2. cargar los datos almacenados;
-3. permitir al usuario seleccionar la interfaz a utilizar;
-4. iniciar `MenuConsola` o `MenuVentana`.
+1. crear `SistemaClub`;
+2. cargar datos desde SQLite;
+3. cargar datos iniciales si el sistema está vacío;
+4. permitir al usuario seleccionar consola o GUI;
+5. iniciar la interfaz elegida.
 
 ---
 
@@ -130,9 +110,9 @@ Sus principales responsabilidades son:
 
 ### 4.1 Socio
 
-La clase `Socio` representa a una persona registrada en el club.
+`Socio` representa a una persona registrada en el club.
 
-Sus principales atributos son:
+Contiene:
 
 - RUT;
 - nombre;
@@ -140,25 +120,19 @@ Sus principales atributos son:
 - deuda;
 - estado de morosidad;
 - estado activo/inactivo;
-- lista de reservas.
+- colección de reservas.
 
-Cada socio contiene su propia colección:
+Cada socio mantiene:
 
 ```java
 ArrayList<Reserva>
 ```
 
-Esta colección representa las reservas asociadas directamente a dicho socio.
-
-La clase también implementa operaciones relacionadas con la deuda, entre ellas el pago total y el abono parcial.
-
----
+La clase también incluye operaciones para pago total y abono parcial de deuda.
 
 ### 4.2 Actividad
 
-`Actividad` es una clase abstracta que representa los elementos comunes de las actividades administradas por el club.
-
-Contiene:
+`Actividad` es una clase abstracta que contiene:
 
 - identificador;
 - nombre;
@@ -166,87 +140,7 @@ Contiene:
 - edad mínima;
 - estado activo/inactivo.
 
-A partir de esta clase se implementan tres subtipos.
-
----
-
-### 4.3 ClaseGrupal
-
-`ClaseGrupal` representa una actividad dirigida por un profesor.
-
-Su atributo específico es:
-
-```text
-profesor
-```
-
----
-
-### 4.4 EntrenamientoLibre
-
-`EntrenamientoLibre` representa una actividad que puede realizarse con una configuración específica respecto de la asistencia.
-
-Su atributo particular es:
-
-```text
-requiereAsistencia
-```
-
----
-
-### 4.5 Evento
-
-`Evento` representa una actividad especial asociada a una fecha y lugar determinados.
-
-Sus atributos específicos son:
-
-- fecha;
-- lugar;
-- tipo de evento.
-
----
-
-### 4.6 Reserva
-
-`Reserva` representa la asociación entre un socio y una actividad.
-
-Contiene:
-
-- identificador de reserva;
-- fecha;
-- estado;
-- RUT del socio;
-- ID de la actividad.
-
-La reserva almacena los identificadores de socio y actividad en lugar de contener directamente objetos completos de ambas entidades.
-
----
-
-### 4.7 EstadoReserva
-
-Los estados posibles de una reserva se encuentran definidos mediante el enum:
-
-```text
-PENDIENTE
-COMPLETADA
-CANCELADA
-```
-
-Esto evita utilizar cadenas de texto arbitrarias para representar el estado de una reserva.
-
----
-
-## 5. Uso de herencia y polimorfismo
-
-Una de las decisiones principales del diseño consiste en utilizar `Actividad` como tipo general.
-
-`SistemaClub` mantiene las actividades dentro de:
-
-```java
-ArrayList<Actividad>
-```
-
-En la misma colección pueden coexistir instancias de:
+De ella heredan:
 
 ```text
 ClaseGrupal
@@ -254,16 +148,76 @@ EntrenamientoLibre
 Evento
 ```
 
-Las subclases redefinen métodos de acuerdo con su comportamiento específico.
+### 4.3 ClaseGrupal
 
-Entre ellos se encuentran:
+Representa una actividad dirigida por un profesor.
+
+Atributo específico:
+
+```text
+profesor
+```
+
+### 4.4 EntrenamientoLibre
+
+Representa una actividad con configuración específica respecto de asistencia.
+
+Atributo específico:
+
+```text
+requiereAsistencia
+```
+
+### 4.5 Evento
+
+Representa una actividad especial asociada a:
+
+- fecha;
+- lugar;
+- tipo de evento.
+
+### 4.6 Reserva
+
+`Reserva` representa la asociación entre un socio y una actividad.
+
+Contiene:
+
+- identificador;
+- fecha;
+- estado;
+- RUT del socio;
+- ID de la actividad.
+
+### 4.7 EstadoReserva
+
+Los estados posibles son:
+
+```text
+PENDIENTE
+COMPLETADA
+CANCELADA
+```
+
+---
+
+## 5. Herencia y polimorfismo
+
+`SistemaClub` mantiene las actividades dentro de:
+
+```java
+ArrayList<Actividad>
+```
+
+En esta misma colección pueden coexistir objetos `ClaseGrupal`, `EntrenamientoLibre` y `Evento`.
+
+Las subclases sobrescriben métodos como:
 
 ```java
 mostrarDetalles()
 getTipoActividad()
 ```
 
-También se utilizan métodos polimórficos para obtener datos específicos:
+También se utilizan métodos polimórficos como:
 
 ```java
 getProfesor()
@@ -271,91 +225,58 @@ getRequiereAsistencia()
 getFecha()
 getLugar()
 getTipoEvento()
+esEvento()
 ```
 
-Cada subtipo devuelve los valores que le corresponden.
-
-Gracias a este enfoque, el programa puede tratar los distintos tipos de actividad mediante referencias de tipo `Actividad` sin utilizar comprobaciones con:
-
-```java
-instanceof
-```
+Gracias a este diseño, el sistema trabaja con referencias `Actividad` sin utilizar comprobaciones mediante `instanceof`.
 
 ---
 
 ## 6. Gestión de socios
 
-`SistemaClub` administra los socios mediante:
+Los socios se administran mediante:
 
 ```java
 HashMap<String, Socio>
 ```
 
-El RUT se utiliza como clave del mapa.
+El RUT se utiliza como clave.
 
-Las principales operaciones disponibles son:
+Las operaciones principales son:
 
-- registrar un socio;
-- modificar sus datos;
-- buscarlo mediante su RUT;
-- listar socios activos;
-- listar socios deudores;
-- desactivar socios;
-- reactivar socios;
+- registrar;
+- modificar;
+- buscar por RUT;
+- listar;
+- filtrar deudores;
+- desactivar;
+- reactivar;
 - administrar deuda;
-- exportar los registros a CSV.
+- exportar a CSV.
 
----
+### 6.1 Eliminación lógica
 
-### 6.1 Eliminación lógica de socios
-
-La operación utilizada normalmente por el sistema corresponde a una eliminación lógica o **soft-delete**.
-
-En lugar de eliminar el objeto del mapa, se modifica:
+La desactivación modifica:
 
 ```java
 activo = false
 ```
 
-Esto permite mantener el registro tanto en memoria como en SQLite.
-
-Los listados normales pueden filtrar dichos registros sin perder la información histórica del socio.
-
-El socio puede posteriormente volver a activarse.
+El socio permanece almacenado y puede reactivarse posteriormente.
 
 ---
 
 ## 7. Exportación de socios a CSV
 
-Se incorporó una funcionalidad que permite generar un archivo CSV con la información administrativa de todos los socios registrados.
-
-La operación principal se encuentra centralizada en `SistemaClub` mediante:
+La operación se centraliza en:
 
 ```java
 exportarSociosCSV(String rutaArchivo)
 ```
 
-La lógica de exportación no utiliza:
+La exportación considera socios activos e inactivos.
 
-```java
-obtenerListaSocios()
-```
-
-porque dicho método retorna únicamente socios activos.
-
-En su lugar se consideran directamente todos los valores almacenados dentro de:
-
-```java
-mapaSocios
-```
-
-De esta manera el archivo contiene tanto socios activos como inactivos.
-
----
-
-### 7.1 Datos exportados
-
-El archivo contiene las siguientes columnas:
+El archivo contiene:
 
 ```text
 RUT
@@ -367,122 +288,36 @@ Estado
 CantidadReservas
 ```
 
-Un ejemplo conceptual corresponde a:
-
-```text
-RUT;Nombre;Edad;Deuda;Moroso;Estado;CantidadReservas
-"12.345.678-9";"Juan Perez";22;10000;SI;ACTIVO;2
-"19.876.543-2";"Ana Soto";25;0;NO;INACTIVO;0
-```
-
-El separador utilizado es:
+Utiliza:
 
 ```text
 ;
 ```
 
-Esto facilita la apertura del archivo en aplicaciones de hoja de cálculo que utilicen configuraciones regionales donde la coma se reserva como separador decimal.
+como separador y codificación UTF-8.
 
----
+Los socios se ordenan por RUT antes de escribir el archivo.
 
-### 7.2 Orden de los registros
-
-Debido a que `HashMap` no garantiza un orden fijo de recorrido, antes de escribir el archivo se genera una lista auxiliar:
-
-```java
-ArrayList<Socio>
-```
-
-Los socios se ordenan posteriormente según su RUT.
-
-Esto permite obtener un archivo consistente entre diferentes ejecuciones.
-
----
-
-### 7.3 Codificación
-
-El archivo se genera utilizando UTF-8 para conservar correctamente caracteres como:
-
-```text
-á
-é
-í
-ó
-ú
-ñ
-```
-
-También puede utilizarse una marca BOM UTF-8 para mejorar la detección automática de codificación en determinadas aplicaciones de hoja de cálculo.
-
----
-
-### 7.4 Escape de campos
-
-Los campos de texto se procesan mediante un método auxiliar:
+Los campos de texto se procesan mediante:
 
 ```java
 escaparCSV(String valor)
 ```
 
-Este método permite representar correctamente valores que contengan comillas u otros caracteres especiales.
-
-Por ejemplo:
-
-```text
-Juan "Pepe" Perez
-```
-
-puede representarse dentro del archivo como:
-
-```text
-"Juan ""Pepe"" Perez"
-```
-
-evitando alterar la estructura del CSV.
-
----
-
-### 7.5 Separación de responsabilidades
-
-La generación del contenido se encuentra en:
-
-```text
-SistemaClub
-```
-
-mientras que las interfaces se encargan únicamente de interactuar con el usuario.
-
-El flujo es:
+La exportación está disponible desde:
 
 ```text
 MenuConsola
-     |
-     v
-SistemaClub.exportarSociosCSV()
-     |
-     v
-archivo CSV
+MenuVentana
 ```
 
-Actualmente la exportación se conecta desde la interfaz de consola.
-
-La integración gráfica se realizará desde `MenuVentana` reutilizando la misma operación del controlador, evitando implementar una segunda lógica de exportación.
-
-La futura interacción gráfica puede utilizar un selector de archivos como `JFileChooser` para permitir al usuario escoger la ubicación del CSV.
+En la GUI se utiliza `JFileChooser` para seleccionar la ubicación del archivo.
 
 ---
 
 ## 8. Gestión de actividades
 
-El sistema permite registrar tres tipos diferentes de actividades.
-
-Para ello se utiliza sobrecarga del método:
-
-```java
-agregarActividad()
-```
-
-Según los parámetros recibidos se crea una instancia de:
+El sistema permite registrar:
 
 ```text
 ClaseGrupal
@@ -490,185 +325,129 @@ EntrenamientoLibre
 Evento
 ```
 
-Las principales operaciones son:
+Para ello se utiliza sobrecarga de:
 
-- agregar actividad;
-- modificar actividad;
-- buscar actividad;
-- listar actividades activas;
-- listar eventos;
-- desactivar actividad;
-- reactivar actividad.
+```java
+agregarActividad()
+```
 
----
+Las operaciones principales incluyen:
 
-### 8.1 Eliminación lógica de actividades
+- agregar;
+- modificar;
+- buscar;
+- listar;
+- filtrar eventos;
+- desactivar;
+- reactivar.
 
-Las actividades utilizan la misma estrategia de soft-delete aplicada a los socios.
+### 8.1 Eliminación lógica
 
-Al desactivar una actividad se modifica:
+Las actividades se desactivan mediante:
 
 ```java
 activo = false
 ```
 
-en lugar de eliminar definitivamente el objeto de:
-
-```java
-listaActividades
-```
-
-Esto permite conservar su información y restaurarla posteriormente.
+sin eliminarlas definitivamente de `listaActividades`.
 
 ---
 
 ## 9. Gestión de reservas
 
-Las reservas no se almacenan dentro de una colección global permanente en `SistemaClub`.
-
-Cada `Socio` posee internamente:
+Cada socio contiene:
 
 ```java
 ArrayList<Reserva>
 ```
 
-De esta manera las reservas permanecen asociadas al socio propietario.
+Las reservas se administran mediante operaciones para:
 
-Las principales operaciones implementadas son:
+- agendar;
+- modificar;
+- eliminar o cancelar;
+- listar globalmente.
 
-- agendar una reserva;
-- buscar información asociada;
-- modificar una reserva;
-- eliminar una reserva;
-- listar globalmente las reservas.
-
-Para generar el listado global, `SistemaClub` recorre todos los socios y reúne temporalmente sus reservas.
-
-Posteriormente se ordenan cronológicamente según su fecha.
+`SistemaClub` puede reunir temporalmente las reservas de todos los socios y ordenarlas cronológicamente.
 
 ---
 
-## 10. Reglas de negocio de las reservas
+## 10. Reglas de negocio
 
 ### 10.1 Morosidad
 
-Un socio que se encuentra en estado moroso no puede crear una nueva reserva.
+Un socio moroso no puede registrar una nueva reserva.
 
-Si se intenta realizar la operación se lanza:
+En este caso se utiliza:
 
 ```java
 MorosidadException
 ```
 
-La misma regla se aplica en operaciones de modificación que requieran que el socio se encuentre habilitado para reservar.
-
----
-
 ### 10.2 Cupo máximo
 
-Antes de registrar una reserva se cuentan las reservas activas asociadas a la actividad.
+Antes de registrar una reserva se verifica el cupo disponible.
 
-Las reservas cuyo estado sea:
+Las reservas `CANCELADA` no ocupan cupo.
 
-```text
-CANCELADA
-```
-
-no ocupan cupo.
-
-Si el número de participantes alcanza el máximo definido para la actividad se lanza:
+Si se alcanza el máximo se utiliza:
 
 ```java
 CupoMaximoException
 ```
 
----
-
 ### 10.3 Existencia del socio y actividad
 
-Para agendar una reserva deben existir:
-
-- el socio;
-- la actividad.
-
-Si alguno no se encuentra registrado, la operación no continúa.
+Para agendar una reserva deben existir tanto el socio como la actividad.
 
 ---
 
-## 11. Facturación y morosidad
+## 11. Facturación
 
-El sistema incorpora una funcionalidad básica de facturación.
+El sistema permite generar un cobro mensual para los socios activos.
 
-`SistemaClub` permite generar un cobro mensual para todos los socios activos.
-
-La tarifa utilizada actualmente es:
+El valor utilizado actualmente es:
 
 ```text
 $10.000 CLP
 ```
 
-Al realizar el cobro:
+También permite:
 
-1. se obtiene la deuda actual;
-2. se agregan $10.000;
-3. el socio queda marcado como moroso.
+- consultar deuda;
+- pagar completamente;
+- realizar abonos parciales.
 
----
-
-### 11.1 Pago total
-
-El sistema puede saldar completamente una deuda.
-
-Cuando la deuda llega a:
-
-```text
-0
-```
-
-el estado de morosidad se elimina.
-
----
-
-### 11.2 Abono parcial
-
-También es posible realizar un abono inferior a la deuda total.
-
-Si todavía existe deuda después del pago, el socio continúa en estado moroso.
-
-Si el monto cubre completamente la deuda, el saldo queda en cero.
+Cuando la deuda llega a cero, el socio deja de estar marcado como moroso.
 
 ---
 
 ## 12. Persistencia de datos
 
-La persistencia se implementa utilizando:
+La persistencia utiliza:
 
 ```text
 SQLite
 JDBC
 ```
 
-La comunicación con la base de datos se encuentra concentrada en:
+La clase responsable es:
 
 ```java
 DBConnection
 ```
 
-La base utilizada es:
+La base local utilizada es:
 
 ```text
 club_deportivo.db
 ```
 
-Este archivo es generado localmente durante la ejecución.
-
-No se almacena normalmente dentro del repositorio Git.
-
 ---
 
 ## 13. Estructura de la base de datos
 
-La base contiene tres tablas principales:
+Las tablas principales son:
 
 ```text
 SOCIOS
@@ -676,11 +455,7 @@ ACTIVIDADES
 RESERVAS
 ```
 
----
-
-### 13.1 Tabla SOCIOS
-
-Almacena:
+### 13.1 SOCIOS
 
 ```text
 rut
@@ -691,19 +466,9 @@ es_moroso
 activo
 ```
 
-El campo:
+`rut` es la clave primaria.
 
-```text
-rut
-```
-
-corresponde a la clave primaria.
-
----
-
-### 13.2 Tabla ACTIVIDADES
-
-Almacena:
+### 13.2 ACTIVIDADES
 
 ```text
 id_actividad
@@ -719,21 +484,7 @@ tipo_evento
 activo
 ```
 
-La tabla permite representar los tres subtipos de `Actividad`.
-
-Los atributos que no correspondan al tipo almacenado quedan como:
-
-```sql
-NULL
-```
-
-Por ejemplo, una `ClaseGrupal` puede contener `profesor`, mientras que los atributos exclusivos de `Evento` permanecen nulos.
-
----
-
-### 13.3 Tabla RESERVAS
-
-Almacena:
+### 13.3 RESERVAS
 
 ```text
 id_reserva
@@ -743,43 +494,25 @@ rut_socio
 id_actividad
 ```
 
-`rut_socio` corresponde a una clave foránea hacia:
+`rut_socio` referencia `SOCIOS`.
 
-```text
-SOCIOS
-```
-
-`id_actividad` corresponde a una clave foránea hacia:
-
-```text
-ACTIVIDADES
-```
-
----
+`id_actividad` referencia `ACTIVIDADES`.
 
 ### 13.4 Claves foráneas
 
-SQLite requiere habilitar explícitamente la validación de claves foráneas.
-
-Al establecer la conexión se ejecuta:
+Al establecer conexión se ejecuta:
 
 ```sql
 PRAGMA foreign_keys = ON;
 ```
 
-Esto permite verificar las relaciones entre reservas, socios y actividades.
-
 ---
 
 ## 14. Guardado de datos
 
-El sistema utiliza un esquema de guardado por lotes coordinado por:
+El guardado por lotes se coordina desde `SistemaClub`.
 
-```java
-SistemaClub
-```
-
-El orden utilizado es:
+Orden:
 
 ```text
 1. Socios
@@ -787,71 +520,27 @@ El orden utilizado es:
 3. Reservas
 ```
 
----
-
-### 14.1 Socios
-
-Cada socio se envía a:
+Los socios se guardan mediante:
 
 ```java
 DBConnection.guardarSocio()
 ```
 
-La operación de SQLite utiliza una estrategia equivalente a UPSERT.
-
-Si el registro no existe se crea.
-
-Si ya existe se actualiza.
-
----
-
-### 14.2 Actividades
-
-Las actividades se guardan mediante:
+Las actividades mediante:
 
 ```java
 DBConnection.guardarActividad()
 ```
 
-La operación trabaja polimórficamente con objetos de tipo `Actividad`.
+Antes de guardar reservas se limpia su tabla y luego se insertan las reservas que existen actualmente en memoria.
 
-Los getters específicos permiten recuperar los atributos particulares de cada subtipo.
-
----
-
-### 14.3 Reservas
-
-Antes de guardar las reservas se limpia su tabla.
-
-Posteriormente se recorren nuevamente las reservas que existen dentro de cada socio.
-
-El proceso conceptual es:
-
-```text
-DELETE reservas anteriores
-
-        ↓
-
-recorrer socios
-
-        ↓
-
-recorrer reservas de cada socio
-
-        ↓
-
-guardar reservas actuales
-```
-
-Esta estrategia evita que una reserva eliminada de las colecciones Java vuelva a aparecer después de reiniciar la aplicación.
+Esto evita que una reserva eliminada reaparezca al reiniciar.
 
 ---
 
 ## 15. Carga de datos
 
-La carga se realiza antes de iniciar la interfaz del programa.
-
-El orden utilizado es:
+La carga utiliza el orden:
 
 ```text
 1. Socios
@@ -865,199 +554,122 @@ Primero se reconstruye:
 HashMap<String, Socio>
 ```
 
-Después:
+Luego:
 
 ```java
 ArrayList<Actividad>
 ```
 
-Finalmente se cargan las reservas.
-
-Cada reserva es asociada nuevamente al socio correspondiente mediante su RUT.
-
-Durante este proceso se comprueba también que las referencias almacenadas sean válidas.
-
-Una inconsistencia puede generar:
-
-```java
-PersistenciaDatosException
-```
+Finalmente las reservas se vuelven a asociar al socio correspondiente.
 
 ---
 
-## 16. Guardado automático al salir
+## 16. Datos iniciales
 
-Desde la interfaz de consola existe una opción para guardar manualmente.
+Cuando el sistema se ejecuta sin socios ni actividades almacenados, `Main` utiliza:
 
-También se realiza un intento de guardado al seleccionar la opción de salida.
+```java
+cargarDatosIniciales()
+```
 
-Si el guardado falla, la consola no finaliza inmediatamente.
-
-El usuario recibe información del error y puede continuar trabajando o volver a intentar el guardado.
-
-La interfaz gráfica también incorpora una confirmación al cerrar la ventana.
-
-El usuario puede:
-
-- guardar y salir;
-- salir sin guardar;
-- cancelar el cierre.
-
-Cuando se selecciona guardar se utiliza:
+Después se ejecuta:
 
 ```java
 guardarDatosBatch()
 ```
 
-sobre la misma instancia de `SistemaClub`.
+De esta forma los datos iniciales quedan persistidos y no se duplican en ejecuciones posteriores.
 
 ---
 
-## 17. Manejo de excepciones
+## 17. Guardado manual y guardado al salir
 
-El proyecto utiliza excepciones de negocio y excepciones relacionadas con el funcionamiento interno del sistema.
+Las dos interfaces permiten guardar manualmente.
 
----
+La consola intenta guardar al seleccionar la opción de salida.
 
-### 17.1 MorosidadException
+La GUI utiliza un control de cierre que permite:
 
-Se utiliza cuando una operación relacionada con reservas no puede realizarse debido a la morosidad del socio.
+- guardar y salir;
+- salir sin guardar;
+- cancelar.
 
----
+El guardado utiliza:
 
-### 17.2 CupoMaximoException
-
-Se utiliza cuando:
-
-- una actividad alcanza su máximo de participantes;
-- se intenta utilizar un valor inválido para el cupo máximo en operaciones que lo validan.
-
----
-
-### 17.3 ConexionBDException
-
-Representa errores relacionados directamente con la conexión a SQLite.
-
-Permite evitar que una `SQLException` se propague directamente desde la capa de persistencia hasta la interfaz.
+```java
+guardarDatosBatch()
+```
 
 ---
 
-### 17.4 PersistenciaDatosException
+## 18. Manejo de excepciones
 
-Representa errores producidos durante:
+El proyecto utiliza:
 
-- lectura de información;
+### 18.1 MorosidadException
+
+Para impedir reservas de socios morosos.
+
+### 18.2 CupoMaximoException
+
+Para validaciones relacionadas con el cupo máximo.
+
+### 18.3 ConexionBDException
+
+Para errores relacionados con la conexión o acceso a SQLite.
+
+### 18.4 PersistenciaDatosException
+
+Para errores durante:
+
+- lectura;
 - escritura;
-- reconstrucción de datos;
+- reconstrucción;
 - detección de información inconsistente.
 
----
+### 18.5 IOException
 
-### 17.5 IOException en exportación CSV
-
-La exportación de socios utiliza operaciones de entrada y salida de Java.
-
-Si el archivo no puede crearse o escribirse se puede producir:
-
-```java
-IOException
-```
-
-Esta excepción se propaga desde el método de exportación y se captura en la interfaz mediante:
-
-```java
-try-catch
-```
-
-De esta manera un error al generar el CSV puede informarse al usuario sin finalizar abruptamente todo el programa.
+La exportación CSV puede producir `IOException` si no es posible crear o escribir el archivo.
 
 ---
 
-## 18. Colecciones utilizadas
+## 19. Colecciones utilizadas
 
-El proyecto utiliza diferentes estructuras pertenecientes al Java Collections Framework.
-
----
-
-### 18.1 HashMap de socios
-
-Los socios se almacenan en:
+### 19.1 HashMap de socios
 
 ```java
 HashMap<String, Socio>
 ```
 
-La clave corresponde al RUT.
-
-Esto permite realizar búsquedas directas utilizando:
-
-```java
-mapaSocios.get(rut)
-```
-
----
-
-### 18.2 ArrayList de actividades
-
-Las actividades se almacenan en:
+### 19.2 ArrayList de actividades
 
 ```java
 ArrayList<Actividad>
 ```
 
-Gracias al polimorfismo, la misma lista almacena objetos de diferentes subtipos.
+### 19.3 ArrayList de reservas
 
----
-
-### 18.3 ArrayList de reservas
-
-Cada socio mantiene:
+Cada socio contiene:
 
 ```java
 ArrayList<Reserva>
 ```
 
-Esta corresponde a una colección anidada dentro de los objetos de la primera colección de socios.
+Esto constituye una colección anidada.
 
 ---
 
-### 18.4 Lista auxiliar para exportación
+## 20. Sobrecarga de métodos
 
-Para generar el CSV se crea temporalmente:
+### 20.1 SistemaClub
 
-```java
-ArrayList<Socio>
-```
-
-a partir de los valores existentes en el mapa.
-
-Su finalidad es ordenar los socios antes de escribir el archivo.
-
-Esta colección no reemplaza al mapa principal y solo se utiliza durante la operación de exportación.
-
----
-
-## 19. Sobrecarga de métodos
-
-El proyecto utiliza sobrecarga en diferentes clases.
-
----
-
-### 19.1 SistemaClub
-
-Existen diferentes versiones de:
+Existen distintas versiones de:
 
 ```java
 agregarActividad()
 ```
 
-para crear:
-
-```text
-ClaseGrupal
-EntrenamientoLibre
-Evento
-```
+para crear los tres tipos de actividad.
 
 También existen:
 
@@ -1066,35 +678,25 @@ pagarFacturacion(String rut)
 pagarFacturacion(String rut, int abono)
 ```
 
----
-
-### 19.2 Socio
-
-La clase `Socio` implementa:
+### 20.2 Socio
 
 ```java
 abonarDeuda()
 abonarDeuda(int monto)
 ```
 
-Una versión salda completamente la deuda y la otra permite realizar un pago parcial.
-
 ---
 
-## 20. Sobrescritura de métodos
+## 21. Sobrescritura de métodos
 
-Las subclases de `Actividad` redefinen distintos métodos heredados.
-
-Entre ellos:
+Las subclases de `Actividad` sobrescriben métodos como:
 
 ```java
 mostrarDetalles()
 getTipoActividad()
 ```
 
-También pueden redefinir getters relacionados con información específica.
-
-Por ejemplo:
+Además:
 
 ```text
 ClaseGrupal
@@ -1107,25 +709,16 @@ Evento
     -> getFecha()
     -> getLugar()
     -> getTipoEvento()
+    -> esEvento()
 ```
-
-Esto permite a `SistemaClub` y `DBConnection` trabajar con referencias del tipo general:
-
-```java
-Actividad
-```
-
-sin comprobar manualmente la clase concreta.
 
 ---
 
-## 21. Interfaces de usuario
+## 22. Interfaces de usuario
 
-### 21.1 Consola
+### 22.1 Consola
 
-`MenuConsola` implementa una interfaz textual.
-
-Su menú principal contiene funcionalidades relacionadas con:
+`MenuConsola` permite administrar:
 
 ```text
 Actividades
@@ -1138,23 +731,15 @@ Guardado
 Salida
 ```
 
-Los submenús permiten acceder a operaciones específicas del controlador.
+### 22.2 Interfaz gráfica
 
----
-
-### 21.2 Interfaz gráfica
-
-`MenuVentana` utiliza Java Swing.
-
-Su ventana principal contiene un:
+`MenuVentana` utiliza Java Swing y organiza las funciones mediante un:
 
 ```java
 JTabbedPane
 ```
 
-que organiza las funcionalidades en pestañas.
-
-Actualmente existen módulos para:
+con pestañas para:
 
 ```text
 Socios
@@ -1163,44 +748,24 @@ Reservas
 Facturación
 ```
 
-La interfaz utiliza componentes como:
+La GUI permite:
 
-```text
-JFrame
-JPanel
-JLabel
-JTextField
-JButton
-JTable
-JScrollPane
-JCheckBox
-JComboBox
-JOptionPane
-```
+- registrar;
+- buscar;
+- modificar;
+- desactivar;
+- reactivar;
+- administrar reservas;
+- administrar facturación;
+- generar cobro mensual;
+- guardar;
+- exportar CSV.
 
-y administradores de disposición de AWT como:
-
-```text
-BorderLayout
-GridLayout
-FlowLayout
-```
-
-La interfaz gráfica continúa en etapa de cierre para garantizar que todas las operaciones exigidas estén disponibles también desde ventana.
-
-La exportación CSV deberá conectarse desde este módulo reutilizando:
-
-```java
-SistemaClub.exportarSociosCSV()
-```
-
-sin volver a implementar la lógica del archivo dentro de `MenuVentana`.
+También utiliza `JFileChooser` para la exportación.
 
 ---
 
-## 22. Flujo general de ejecución
-
-El flujo principal puede representarse como:
+## 23. Flujo general de ejecución
 
 ```text
 Main
@@ -1211,11 +776,13 @@ SistemaClub
  v
 cargarDatosBatch()
  |
- +----> cargar SOCIOS
+ +----> SOCIOS
  |
- +----> cargar ACTIVIDADES
+ +----> ACTIVIDADES
  |
- +----> cargar RESERVAS
+ +----> RESERVAS
+ |
+ +----> datos iniciales si el sistema está vacío
  |
  v
 seleccionar interfaz
@@ -1225,53 +792,11 @@ seleccionar interfaz
  +------> MenuVentana
 ```
 
-Ambas vistas utilizan:
-
-```text
-la misma instancia de SistemaClub
-```
-
-por lo que el flujo de operaciones puede representarse como:
-
-```text
-MenuConsola ---------+
-                     |
-                     v
-                 SistemaClub
-                     ^
-                     |
-MenuVentana ----------+
-```
-
-Para la exportación:
-
-```text
-MenuConsola
-    |
-    v
-SistemaClub.exportarSociosCSV()
-    |
-    v
-Archivo CSV
-```
-
-Una vez integrada en Swing:
-
-```text
-MenuVentana
-    |
-    v
-SistemaClub.exportarSociosCSV()
-    |
-    v
-Archivo CSV
-```
-
 ---
 
-## 23. Dependencias y configuración
+## 24. Dependencias y configuración
 
-El módulo Java requiere:
+El módulo requiere:
 
 ```java
 requires java.sql;
@@ -1279,117 +804,28 @@ requires org.xerial.sqlitejdbc;
 requires java.desktop;
 ```
 
-### `java.sql`
-
-Permite utilizar JDBC y las clases relacionadas con bases de datos.
-
-### `org.xerial.sqlitejdbc`
-
-Corresponde al driver utilizado para conectarse a SQLite.
-
-### `java.desktop`
-
-Permite utilizar Java Swing y AWT para la interfaz gráfica.
-
----
-
-### 23.1 Exportación CSV
-
-La funcionalidad CSV utiliza clases estándar como:
-
-```java
-java.io.PrintWriter
-java.io.IOException
-java.nio.file.Files
-java.nio.file.Paths
-java.nio.charset.StandardCharsets
-```
-
-Estas clases forman parte de los módulos estándar de Java y no requieren incorporar una biblioteca externa al proyecto.
-
----
-
-### 23.2 Driver SQLite
-
-El driver de SQLite se mantiene en el directorio:
+El driver SQLite incluido en el proyecto es:
 
 ```text
-lib
+lib/sqlite-jdbc-3.53.4.0.jar
 ```
 
-del proyecto.
+El `.gitignore` excluye los archivos locales de SQLite, `bin/` y los archivos temporales de LibreOffice.
 
 ---
 
-### 23.3 Archivos ignorados por Git
+## 25. Diagramas del sistema
 
-La base de datos local y sus archivos auxiliares pueden ignorarse mediante `.gitignore`.
-
-Por ejemplo:
-
-```text
-club_deportivo.db
-club_deportivo.db-journal
-club_deportivo.db-wal
-club_deportivo.db-shm
-```
-
-De esta forma cada entorno de ejecución puede mantener su propia base local.
-
-Los archivos CSV generados por el usuario corresponden a salidas de la aplicación y no forman parte obligatoria del código fuente.
-
----
-
-## 24. Diagramas del sistema
-
-Dentro del directorio de planificación se mantienen diagramas que representan distintos aspectos del sistema.
-
----
-
-### 24.1 Diagrama de clases UML
-
-El archivo:
+Dentro de `planificacion/` se incluyen:
 
 ```text
 Diagrama de Clases UML.md
+Diagrama Entidad-Relacion.md
 ```
 
-representa:
+El UML representa clases, atributos, métodos, herencia, composición, dependencias, persistencia, interfaces y excepciones.
 
-- clases;
-- atributos;
-- métodos;
-- herencia;
-- composición;
-- dependencias;
-- controlador;
-- persistencia;
-- interfaces;
-- excepciones.
-
-La operación:
-
-```java
-SistemaClub.exportarSociosCSV(String rutaArchivo)
-```
-
-forma parte de las responsabilidades actuales del controlador.
-
----
-
-### 24.2 Diagrama Entidad-Relación
-
-Representa las entidades persistidas en SQLite:
-
-```text
-SOCIOS
-ACTIVIDADES
-RESERVAS
-```
-
-Una reserva contiene claves hacia un socio y una actividad.
-
-Conceptualmente:
+El modelo entidad-relación representa:
 
 ```text
 SOCIOS 1 -------- N RESERVAS N -------- 1 ACTIVIDADES
@@ -1397,223 +833,104 @@ SOCIOS 1 -------- N RESERVAS N -------- 1 ACTIVIDADES
 
 ---
 
-## 25. Estado actual del proyecto
+## 26. Documentación Javadoc
 
-Actualmente se encuentran implementadas las principales funcionalidades del sistema:
+El proyecto incorpora Javadoc en las clases principales, métodos relevantes, vistas, controlador, persistencia, excepciones y enumeraciones.
 
-- modelo de socios;
-- modelo de actividades;
-- herencia de actividades;
-- polimorfismo;
-- modelo de reservas;
+Cuando corresponde se utilizan:
+
+```text
+@param
+@return
+@throws
+```
+
+---
+
+## 27. Estado final del proyecto
+
+Se encuentran implementadas:
+
 - gestión de socios;
 - gestión de actividades;
 - gestión de reservas;
-- control de morosidad;
-- control de cupo máximo;
 - facturación;
-- pago total;
-- abono parcial;
 - cobro mensual;
-- eliminación lógica de socios;
-- eliminación lógica de actividades;
-- colecciones del Java Collections Framework;
-- colecciones anidadas;
+- morosidad;
+- control de cupo;
+- eliminación lógica;
+- reactivación;
+- herencia;
+- polimorfismo;
 - sobrecarga;
 - sobrescritura;
+- colecciones;
+- colecciones anidadas;
 - persistencia SQLite;
-- carga por lotes;
-- guardado por lotes;
-- reconstrucción de relaciones;
+- carga y guardado por lotes;
 - claves foráneas;
-- excepciones de negocio;
-- excepciones de persistencia;
-- guardado manual;
-- guardado al salir;
-- interfaz de consola;
-- interfaz gráfica mediante Swing;
-- exportación de socios a CSV desde la lógica común de `SistemaClub`;
-- acceso a la exportación desde la interfaz de consola.
+- excepciones personalizadas;
+- consola;
+- GUI Swing;
+- exportación CSV desde ambas interfaces;
+- guardado manual y al salir;
+- datos iniciales;
+- Javadoc;
+- diagramas UML y ER.
 
----
+El proyecto se encuentra en estado final para entrega.
 
-## 26. Elementos pendientes antes del cierre
-
-Antes de considerar la versión final del proyecto terminada, se deben revisar principalmente:
-
-- completar la paridad funcional entre consola y ventana;
-- integrar la exportación CSV en `MenuVentana`;
-- revisar modificaciones y reactivaciones pendientes de la interfaz gráfica;
-- probar todas las acciones gráficas sobre información cargada desde SQLite;
-- probar guardado y reapertura después de utilizar la GUI;
-- realizar una prueba integral final;
-- actualizar el UML después de cualquier modificación restante;
-- actualizar esta documentación después de los últimos cambios;
-- revisar documentación interna y Javadoc;
-- revisar instrucciones de instalación y ejecución.
-
----
-
-## 27. Mejoras futuras posibles
-
-Más allá de los requerimientos actuales, existen distintas mejoras posibles.
-
-### Transacciones SQLite
-
-Actualmente el guardado por lotes realiza varias operaciones consecutivas.
-
-Podría utilizarse una transacción:
+Las instrucciones de instalación y uso se mantienen separadas en:
 
 ```text
-BEGIN
-  guardar socios
-  guardar actividades
-  limpiar reservas
-  guardar reservas
-COMMIT
+README.md
 ```
 
-y ejecutar:
+---
 
-```text
-ROLLBACK
-```
+## 28. Mejoras futuras posibles
 
-si alguna operación falla.
+Estas mejoras no forman parte de los requisitos actuales:
 
-Esto permitiría asegurar que el estado completo se guarde de forma atómica.
+- utilizar transacciones SQLite;
+- reemplazar la generación actual de identificadores de reserva;
+- ampliar las exportaciones;
+- incorporar pruebas automatizadas con JUnit.
 
 ---
 
-### Generación de identificadores de reserva
-
-Actualmente el identificador se genera a partir del tiempo del sistema.
-
-Una implementación futura podría utilizar:
-
-- un contador persistente;
-- UUID;
-- autoincremento de SQLite.
-
-Esto reduciría la posibilidad de colisiones.
-
----
-
-### Exportaciones adicionales
-
-El mismo mecanismo utilizado para los socios podría ampliarse a:
-
-- actividades;
-- reservas;
-- socios morosos;
-- facturación;
-- eventos.
-
----
-
-### Pruebas automatizadas
-
-Se podrían incorporar pruebas unitarias e integrales mediante herramientas como JUnit.
-
-Actualmente la verificación del funcionamiento se realiza principalmente mediante pruebas funcionales del programa.
-
----
-
-## 28. Consideraciones de diseño
-
-Durante el desarrollo se buscó mantener una separación clara de responsabilidades.
+## 29. Consideraciones de diseño
 
 ### Vista
 
-Las clases de vista:
-
-```text
-MenuConsola
-MenuVentana
-```
-
-se encargan principalmente de:
-
-- recibir información del usuario;
-- mostrar información;
-- solicitar acciones al controlador.
-
-No deberían modificar directamente las colecciones internas ni acceder directamente a SQLite.
-
----
+`MenuConsola` y `MenuVentana` reciben datos del usuario, muestran resultados y solicitan acciones al controlador.
 
 ### Controlador
 
-`SistemaClub` coordina:
-
-- socios;
-- actividades;
-- reservas;
-- reglas de negocio;
-- facturación;
-- carga y guardado;
-- exportación de datos.
-
----
+`SistemaClub` coordina socios, actividades, reservas, reglas de negocio, facturación, carga, guardado y exportación.
 
 ### Persistencia
 
 `DBConnection` concentra las operaciones específicas de SQLite.
 
-De esta manera un cambio en la implementación de persistencia requiere menos modificaciones sobre las vistas y entidades del dominio.
-
----
-
-### Exportación
-
-La exportación CSV también utiliza esta separación.
-
-La interfaz determina:
-
-```text
-qué archivo desea generar el usuario
-```
-
-mientras que `SistemaClub` determina:
-
-```text
-qué socios se exportan
-qué información se escribe
-cómo se estructura cada registro
-```
-
-Esto permite reutilizar exactamente la misma lógica desde consola y GUI.
-
----
-
 ### Polimorfismo
 
-Para las actividades se evita comprobar explícitamente sus tipos mediante:
-
-```java
-instanceof
-```
-
-La diferenciación se realiza mediante métodos polimórficos y sobrescritura.
-
-Esto mantiene el código más extensible y coherente con el diseño orientado a objetos.
+La diferenciación entre tipos de actividad se realiza mediante métodos polimórficos y sobrescritura, evitando `instanceof`.
 
 ---
 
-## 29. Conclusión
+## 30. Conclusión
 
-El proyecto evolucionó desde un conjunto de clases de dominio y operaciones almacenadas únicamente en memoria hasta un sistema capaz de administrar información completa de un club deportivo y conservar su estado entre ejecuciones.
+El proyecto evolucionó desde operaciones mantenidas únicamente en memoria hasta un sistema capaz de administrar socios, actividades, reservas y facturación conservando su estado entre ejecuciones.
 
-La incorporación de SQLite permitió persistir socios, actividades y reservas.
+SQLite permite persistir la información. Las colecciones representan tanto registros principales como relaciones anidadas. La herencia y el polimorfismo permiten trabajar con los distintos tipos de actividad mediante una estructura común.
 
-El uso de colecciones permitió representar tanto registros principales como relaciones anidadas.
+Las excepciones diferencian errores de negocio y problemas de persistencia.
 
-La herencia y el polimorfismo permitieron trabajar con diferentes tipos de actividades utilizando una estructura común, evitando comprobaciones explícitas mediante `instanceof`.
+El sistema dispone de una interfaz de consola y una interfaz gráfica mediante Swing, ambas construidas sobre la misma instancia de `SistemaClub`.
 
-Las excepciones permiten diferenciar errores de negocio, problemas de conexión y problemas de persistencia.
+La exportación de socios a CSV está disponible desde ambas interfaces.
 
-El sistema también incorpora dos mecanismos de interacción: una interfaz de consola y una interfaz gráfica mediante Swing, ambas construidas sobre la misma instancia de `SistemaClub`.
+La documentación Javadoc, los diagramas del sistema, el README de uso y el reporte académico complementan el código fuente.
 
-Finalmente, la exportación de socios a CSV amplía las funcionalidades administrativas permitiendo obtener una copia externa de los registros del sistema sin acoplar esta operación a una interfaz específica.
-
-El proyecto se encuentra actualmente en su etapa de cierre, concentrándose principalmente en completar la paridad funcional de la interfaz gráfica, integrar en ella la exportación CSV, actualizar la documentación después de los últimos cambios y ejecutar las pruebas integrales previas a la entrega.
+El proyecto se encuentra preparado para su entrega final.
