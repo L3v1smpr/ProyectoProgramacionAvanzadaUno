@@ -62,7 +62,7 @@ public class Socio {
 	}
 	
 	public ArrayList<Reserva> getListaReservas(){
-		return this.listaReservas;
+		return new ArrayList<>(listaReservas); //Encapsulamiento
 	}
 	
 	//Setters
@@ -91,7 +91,7 @@ public class Socio {
 	}
 	
 	public void setListaReservas(ArrayList<Reserva> listaReservas) {
-		this.listaReservas = listaReservas;
+		this.listaReservas = new ArrayList<>(listaReservas);
 	}
 	
 	//Metodos
