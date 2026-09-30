@@ -95,6 +95,7 @@ public class MenuConsola {
 		System.out.println("5. Listar Eventos");
 		System.out.println("6. Desactivar Actividad");
 		System.out.println("7. Reactivar Actividad");
+		System.out.println("8. Eliminar Actividad permanentemente");
 		System.out.print("Opción: ");
 		int opt = scanner.nextInt();
 		scanner.nextLine();
@@ -318,7 +319,27 @@ public class MenuConsola {
 			        );
 			    }
 			    break;
-				
+
+			case 8: // Eliminar Actividad
+			    System.out.print("ID de la actividad a eliminar: ");
+			    String idEliminar = scanner.nextLine();
+			    modelo.Actividad actividadEliminar = controlador.buscarActividad(idEliminar);
+			    if (actividadEliminar == null) {
+			        System.out.println("No se encontró una actividad con ese ID.");
+			        break;
+			    }
+			    long reservasActividad = controlador.listarReservasGlobales().stream()
+			        .filter(r -> idEliminar.equals(r.getIdActividadEnReserva())).count();
+			    System.out.print("Se eliminará permanentemente " + actividadEliminar.getNombre()
+			        + " y sus " + reservasActividad + " reservas. Escriba SI para confirmar: ");
+			    if ("SI".equalsIgnoreCase(scanner.nextLine().trim())) {
+			        controlador.eliminarActividad(idEliminar);
+			        System.out.println("Actividad y reservas asociadas eliminadas. Guarde los cambios.");
+			    } else {
+			        System.out.println("Operación cancelada.");
+			    }
+			    break;
+
 			default:
 				System.out.println("Opción no válida.");
 		}
@@ -335,6 +356,7 @@ public class MenuConsola {
         System.out.println("6. Buscar Socio");
         System.out.println("7. Desactivar Socio");
         System.out.println("8. Reactivar Socio");
+        System.out.println("9. Eliminar Socio permanentemente");
         System.out.print("Opción: ");
         int opt = scanner.nextInt();
         scanner.nextLine();
@@ -371,7 +393,7 @@ public class MenuConsola {
                     System.out.println("1. Nombre (Actual: " + socioActual.getNombre() + ")");
                     System.out.println("2. Edad (Actual: " + socioActual.getEdad() + ")");
                     System.out.println("3. Deuda (Actual: $" + socioActual.getDeuda() + ")");
-                    System.out.println("4. Estado Moroso (Actual: " + (socioActual.getEsMoroso() ? "Sí" : "No") + ")");
+                    System.out.println("La morosidad se calcula automáticamente según la deuda.");
                     System.out.print("Opción: ");
                     int opcModSocio = scanner.nextInt();
                     scanner.nextLine();
@@ -379,7 +401,6 @@ public class MenuConsola {
                     String nombreFinal = socioActual.getNombre();
                     int edadFinal = socioActual.getEdad();
                     int deudaFinal = socioActual.getDeuda();
-                    boolean morosoFinal = socioActual.getEsMoroso();
 
                     switch (opcModSocio) {
                         case 1:
@@ -396,19 +417,20 @@ public class MenuConsola {
                             deudaFinal = scanner.nextInt();
                             scanner.nextLine();
                             break;
-                        case 4:
-                            System.out.print("¿Es moroso? (true/false): ");
-                            morosoFinal = scanner.nextBoolean();
-                            scanner.nextLine();
-                            break;
                         default:
                             System.out.println("Opción no válida. Cancelando modificación.");
                             opcModSocio = -1;
                     }
 
                     if (opcModSocio != -1) {
-                        controlador.modificarSocio(rutMod, nombreFinal, edadFinal, deudaFinal, morosoFinal);
-                        System.out.println("Socio modificado correctamente.");
+                        try {
+                            if (controlador.modificarSocio(rutMod, nombreFinal, edadFinal, deudaFinal)) {
+                                System.out.println("Socio modificado correctamente. Moroso: "
+                                    + (deudaFinal > 0 ? "Sí" : "No"));
+                            }
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Error: " + e.getMessage());
+                        }
                     }
                 }
                 break;
@@ -510,7 +532,26 @@ public class MenuConsola {
                     System.out.println("Error: No se encontró un socio con ese RUT.");
                 }
                 break;
-                
+
+            case 9: // Eliminar Socio
+                System.out.print("RUT del socio a eliminar: ");
+                String rutEliminar = scanner.nextLine();
+                Socio socioEliminar = controlador.buscarSocio(rutEliminar);
+                if (socioEliminar == null) {
+                    System.out.println("No se encontró un socio con ese RUT.");
+                    break;
+                }
+                System.out.print("Se eliminará permanentemente " + socioEliminar.getNombre()
+                    + " y sus " + socioEliminar.getListaReservas().size()
+                    + " reservas. Escriba SI para confirmar: ");
+                if ("SI".equalsIgnoreCase(scanner.nextLine().trim())) {
+                    controlador.eliminarSocio(rutEliminar);
+                    System.out.println("Socio y reservas asociadas eliminados. Guarde los cambios.");
+                } else {
+                    System.out.println("Operación cancelada.");
+                }
+                break;
+
             default:
                 System.out.println("Opción no válida.");
         }
@@ -523,6 +564,7 @@ public class MenuConsola {
         System.out.println("2. Modificar Reserva");
         System.out.println("3. Listar Reservas");
         System.out.println("4. Cancelar Reserva");
+        System.out.println("5. Buscar Reserva");
         System.out.print("Opción: ");
         int opt = scanner.nextInt();
         scanner.nextLine();
@@ -648,7 +690,27 @@ public class MenuConsola {
                     System.out.println("Error: No se encontró una reserva con ese ID.");
                 }
                 break;
-                
+
+            case 5: // Búsqueda independiente de reservas
+                System.out.print("Ingrese el ID de la reserva: ");
+                try {
+                    int idBuscado = Integer.parseInt(scanner.nextLine().trim());
+                    modelo.Reserva encontrada = controlador.buscarReserva(idBuscado);
+                    if (encontrada == null) {
+                        System.out.println("No se encontró una reserva con ese ID.");
+                    } else {
+                        System.out.println("ID: " + encontrada.getIdReserva()
+                            + " | RUT: " + encontrada.getRutSocio()
+                            + " | Actividad: " + encontrada.getIdActividadEnReserva()
+                            + " | Fecha: " + (encontrada.getFecha() != null
+                                ? sdf.format(encontrada.getFecha()) : "N/A")
+                            + " | Estado: " + encontrada.getEstado());
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("El ID debe ser un número entero.");
+                }
+                break;
+
             default:
                 System.out.println("Opción no válida.");
         }

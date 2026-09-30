@@ -88,7 +88,7 @@ classDiagram
 
         %% Socios
         +agregarSocio(rut: String, nombre: String, edad: int) boolean
-        +modificarSocio(rut: String, nombre: String, edad: int, deuda: int, esMoroso: boolean) boolean
+        +modificarSocio(rut: String, nombre: String, edad: int, deuda: int) boolean
         +eliminarSocio(rut: String) boolean
         +desactivarSocio(rut: String) boolean
         +activarSocio(rut: String) boolean
@@ -119,8 +119,10 @@ classDiagram
         %% Reservas
         +agendarReserva(rut: String, idActividad: String, fecha: Date) boolean
         +modificarReserva(idReserva: int, fecha: Date, estado: EstadoReserva, rutSocio: String, idActividad: String) boolean
+        +buscarReserva(idReserva: int) Reserva
         +eliminarReserva(idReserva: int) boolean
         +listarReservasGlobales() ArrayList~Reserva~
+        -generarIdReserva() int
 
         %% Facturacion
         +pagarFacturacion(rut: String) boolean
@@ -159,6 +161,8 @@ classDiagram
         +cargarReservas() ArrayList~Reserva~
 
         +limpiarReservas() void
+        +datosInicialesCargados() boolean
+        +guardarEstadoCompleto(socios: ArrayList~Socio~, actividades: ArrayList~Actividad~) void
     }
 
 

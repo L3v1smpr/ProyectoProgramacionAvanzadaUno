@@ -54,10 +54,13 @@ public class SistemaClub {
 	 * Solo se ejecuta si el sistema está completamente vacío.
 	 * 
 	 * @return true si se insertaron datos iniciales, false si ya existían datos previos.
+	 * @throws ConexionBDException si no se puede consultar la base de datos
+	 * @throws PersistenciaDatosException si falla la consulta de inicialización
 	 */
-	public boolean cargarDatosIniciales() {
+	public boolean cargarDatosIniciales()
+	        throws ConexionBDException, PersistenciaDatosException {
 
-	    if (!mapaSocios.isEmpty() || !listaActividades.isEmpty()) {
+	    if (connection.datosInicialesCargados() || !mapaSocios.isEmpty() || !listaActividades.isEmpty()) {
 	        return false;
 	    }
 
@@ -91,8 +94,7 @@ public class SistemaClub {
 	        "22.222.222-2",
 	        "Bruno Diaz",
 	        31,
-	        20000,
-	        true
+	        20000
 	    );
 	    
 	    desactivarSocio("44.444.444-4");
@@ -169,12 +171,30 @@ public class SistemaClub {
 	        "EL001"
 	    );
 
-	    buscarSocio("33.333.333-3")
-	        .agregarReserva(reservaCompletada);
+	    buscarSocio("33.333.333-3").agregarReserva(reservaCompletada);
 
 	    return true;
 	}
 	
+	/**
+	 * Genera el ID único de la reserva
+	 *
+	 *@return mayorId + 1 - Toma el valor más grande dentro de los ID existentes,
+	 *			retornando un entero para identificar de manera única.
+	 */
+	private int generarIdReserva() {
+	    int mayorId = 0;
+
+	    for (Socio socio : mapaSocios.values()) {
+	        for (Reserva reserva : socio.getListaReservas()) {
+	            if (reserva.getIdReserva() > mayorId) {
+	                mayorId = reserva.getIdReserva();
+	            }
+	        }
+	    }
+
+	    return mayorId + 1;
+	}
 	
 	//Metodos relacionados a Socio
 	
@@ -202,46 +222,35 @@ public class SistemaClub {
 	/**
 	 * Modifica los datos personales y financieros de un socio existente.
 	 *
-	 * Si el socio deja de encontrarse en estado de morosidad, su deuda
-	 * se establece automáticamente en cero.
+	 * La morosidad se calcula a partir de la deuda: es moroso si deuda > 0.
 	 *
 	 * @param rut RUT del socio que se desea modificar
 	 * @param nombre nuevo nombre del socio
 	 * @param edad nueva edad del socio
-	 * @param deuda nueva deuda asociada al socio
-	 * @param esMoroso indica si el socio debe quedar marcado como moroso
+	 * @param deuda nueva deuda asociada al socio; no puede ser negativa
 	 * @return {@code true} si el socio fue encontrado y modificado;
 	 *         {@code false} si no existe un socio con el RUT indicado
 	 */
-	public boolean modificarSocio(String rut, String nombre, int edad, int deuda, boolean esMoroso) {
-		if (!mapaSocios.containsKey(rut)) {
+	public boolean modificarSocio(String rut, String nombre, int edad, int deuda) {
+		if (deuda < 0) {
+			throw new IllegalArgumentException("La deuda no puede ser negativa.");
+		}
+		Socio socioBuscado = mapaSocios.get(rut);
+		if (socioBuscado == null) {
 			return false;
 		}
-		
-		Socio socioBuscado = mapaSocios.get(rut);
-		
+
 		socioBuscado.setNombre(nombre);
 		socioBuscado.setEdad(edad);
-		socioBuscado.setEsMoroso(esMoroso);
-		if (esMoroso) {
-			socioBuscado.setDeuda(deuda);
-		} else {
-			socioBuscado.setDeuda(0);
-		}
-		
+		socioBuscado.setDeuda(deuda);
+		socioBuscado.setEsMoroso(deuda > 0);
 		return true;
 	}
 	
 	
-	//De uso administrativo, no será utilizado en el menú - Ya que se implementará un sistema de soft-delete
-	//con el atributo "activo : boolean" de Socio.
-	
 	/**
-	 * Elimina físicamente un socio del mapa interno del sistema.
-	 *
-	 * Este método corresponde a una eliminación administrativa permanente.
-	 * El flujo normal de las interfaces utiliza {@link #desactivarSocio(String)}
-	 * para realizar una baja lógica sin perder la información del socio.
+	 * Elimina permanentemente un socio y sus reservas. El cambio se persiste
+	 * cuando se guarda el estado completo del sistema.
 	 *
 	 * @param rut RUT del socio que se desea eliminar
 	 * @return {@code true} si el socio fue eliminado;
@@ -513,11 +522,8 @@ public class SistemaClub {
 	}
 	
 	/**
-	 * Elimina físicamente una actividad de la colección interna del sistema.
-	 *
-	 * El flujo normal de las interfaces utiliza
-	 * {@link #desactivarActividad(String)} para realizar una baja lógica
-	 * y conservar la información de la actividad.
+	 * Elimina permanentemente una actividad y todas las reservas asociadas.
+	 * El cambio se persiste cuando se guarda el estado completo del sistema.
 	 *
 	 * @param idActividad identificador de la actividad que se desea eliminar
 	 * @return {@code true} si la actividad fue eliminada;
@@ -530,6 +536,13 @@ public class SistemaClub {
 			return false;
 		}
 		
+		for (Socio socio : mapaSocios.values()) {
+			for (Reserva reserva : socio.getListaReservas()) {
+				if (idActividad.equals(reserva.getIdActividadEnReserva())) {
+					socio.eliminarReserva(reserva.getIdReserva());
+				}
+			}
+		}
 		listaActividades.remove(actividadBuscada);
 		return true;
 	}
@@ -672,7 +685,7 @@ public class SistemaClub {
 			throw new CupoMaximoException("La actividad alcanzó su límite (" + actividadBuscada.getCupoMaximo() + " cupos).");
 		}
 		
-		int idNuevaReserva = (int) (System.currentTimeMillis() % 100000);
+		int idNuevaReserva = generarIdReserva();
 		Reserva nuevaReserva = new Reserva(idNuevaReserva, fecha, EstadoReserva.PENDIENTE, rut, idActividad);
 		
 		socioBuscado.agregarReserva(nuevaReserva);
@@ -719,6 +732,22 @@ public class SistemaClub {
 		return true;
 	}
 		
+	/**
+	 * Busca una reserva por su ID entre todos los socios del club.
+	 *
+	 * @param idReserva identificador de la reserva
+	 * @return la reserva encontrada o {@code null} si no existe
+	 */
+	public Reserva buscarReserva(int idReserva) {
+		for (Socio socio : mapaSocios.values()) {
+			Reserva reserva = socio.buscarReserva(idReserva);
+			if (reserva != null) {
+				return reserva;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Elimina una reserva de la colección interna del socio que la contiene.
 	 *
@@ -935,21 +964,8 @@ public class SistemaClub {
 
 	    connection.crearTablas();
 
-	    for (Socio socio : mapaSocios.values()) {
-	        connection.guardarSocio(socio);
-	    }
-
-	    for (Actividad actividad : listaActividades) {
-	        connection.guardarActividad(actividad);
-	    }
-
-	    connection.limpiarReservas();
-
-	    for (Socio socio : mapaSocios.values()) {
-
-	        for (Reserva reserva : socio.getListaReservas()) {
-	            connection.guardarReserva(reserva);
-	        }
-	    }
+	    connection.guardarEstadoCompleto(
+	        new ArrayList<>(mapaSocios.values()),
+	        new ArrayList<>(listaActividades));
 	}
 }

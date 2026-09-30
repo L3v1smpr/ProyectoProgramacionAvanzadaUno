@@ -31,6 +31,10 @@ erDiagram
         TEXT id_actividad FK
     }
 
+    CONFIGURACION {
+        TEXT clave PK
+    }
+
     SOCIOS ||--o{ RESERVAS : "agenda"
     ACTIVIDADES ||--o{ RESERVAS : "recibe"
 ```

@@ -208,7 +208,7 @@ Al iniciar:
 
 1. `Main` crea una instancia de `SistemaClub`.
 2. Se ejecuta la carga de datos desde SQLite.
-3. Si no existen socios ni actividades almacenados, el sistema carga automáticamente datos iniciales.
+3. Si la base está vacía y los datos de ejemplo nunca se habían inicializado, el sistema los carga automáticamente.
 4. Estos datos se guardan inmediatamente en la base de datos.
 5. Finalmente se solicita al usuario elegir entre consola o interfaz gráfica.
 
@@ -233,6 +233,8 @@ SOCIOS
 ACTIVIDADES
 RESERVAS
 ```
+
+La tabla auxiliar `CONFIGURACION` recuerda que ya se cargaron los ejemplos. Por eso, eliminar todos los socios y actividades y guardar no vuelve a poblar la base al reiniciar.
 
 Los archivos de la base de datos están excluidos del repositorio mediante `.gitignore`:
 
@@ -296,12 +298,13 @@ Desde el módulo de socios se pueden realizar operaciones como:
 - modificar sus datos;
 - desactivar un socio;
 - reactivar un socio;
+- eliminarlo definitivamente;
 - listar socios;
 - visualizar socios con deuda.
 
 El RUT funciona como identificador principal del socio.
 
-La desactivación corresponde a una baja lógica, por lo que el socio permanece almacenado y puede reactivarse posteriormente.
+La desactivación conserva al socio y permite reactivarlo. La opción **9. Eliminar Socio permanentemente** pide confirmación y borra al socio junto con sus reservas. Al modificar la deuda, el estado de morosidad se actualiza solo: una deuda mayor que cero lo marca como moroso y una deuda de cero lo deja al día.
 
 ## 10.2 Gestión de actividades
 
@@ -320,10 +323,11 @@ Las operaciones disponibles incluyen:
 - modificar actividad;
 - desactivar actividad;
 - reactivar actividad;
+- eliminarla definitivamente;
 - listar actividades;
 - visualizar eventos.
 
-Cada actividad posee un identificador propio.
+Cada actividad posee un identificador propio. La opción **8. Eliminar Actividad permanentemente** confirma el borrado y también elimina sus reservas asociadas. Si se quiere conservar el historial, corresponde desactivar la actividad.
 
 ## 10.3 Gestión de reservas
 
@@ -332,6 +336,7 @@ Desde el módulo de reservas se puede:
 - agendar una reserva;
 - modificar una reserva;
 - cancelar o eliminar una reserva;
+- buscar una reserva directamente por su ID (opción **5. Buscar Reserva**);
 - visualizar las reservas registradas.
 
 Para realizar una reserva deben existir previamente:
@@ -339,7 +344,7 @@ Para realizar una reserva deben existir previamente:
 - el socio;
 - la actividad.
 
-Además, el sistema aplica reglas de negocio relacionadas con morosidad y cupo máximo.
+La búsqueda muestra el RUT del socio, la actividad, la fecha y el estado; no exige entrar a Modificar o Cancelar. Para agendar, el sistema aplica las reglas de morosidad y cupo máximo.
 
 ## 10.4 Facturación
 
@@ -416,10 +421,11 @@ Desde la pestaña de socios se puede:
 - modificar información;
 - desactivar;
 - reactivar;
+- eliminar definitivamente, con confirmación y borrado de sus reservas;
 - filtrar socios deudores;
 - exportar socios a CSV.
 
-La tabla permite visualizar la información administrativa almacenada.
+La tabla permite visualizar la información administrativa almacenada. En **Modificar Seleccionado**, se ingresa la deuda y la morosidad se calcula automáticamente; el estado ya no se edita por separado. Para eliminar a un socio inactivo, use **Eliminar Socio** sin una fila seleccionada e ingrese su RUT.
 
 ---
 
@@ -439,10 +445,11 @@ También permite:
 - modificar;
 - desactivar;
 - reactivar;
+- eliminar definitivamente, incluidas las reservas asociadas;
 - listar actividades;
 - filtrar eventos.
 
-Los campos mostrados cambian según el tipo de actividad ingresada.
+Los campos mostrados cambian según el tipo de actividad ingresada. Para eliminar una actividad inactiva, use **Eliminar Actividad** sin seleccionar una fila e ingrese su ID.
 
 ---
 
@@ -456,6 +463,7 @@ Desde la pestaña de reservas se puede:
 - agendar una reserva;
 - modificar una reserva;
 - cancelar una reserva;
+- buscar una reserva por ID con **Buscar Reserva por ID**;
 - visualizar las reservas existentes.
 
 Antes de agendar, el sistema valida las reglas de negocio correspondientes.
@@ -515,7 +523,7 @@ antes de cerrar.
 
 ## 18.1 Morosidad
 
-Un socio marcado como moroso no puede realizar una nueva reserva.
+La morosidad se deriva de la deuda al modificar los datos del socio: deuda mayor que cero significa moroso; deuda igual a cero significa al día. Un socio moroso no puede realizar una nueva reserva.
 
 Si se intenta registrar una, el sistema utiliza:
 
@@ -541,9 +549,7 @@ Las reservas canceladas no ocupan cupo.
 
 ## 18.3 Socios y actividades inactivas
 
-Socios y actividades pueden desactivarse sin eliminarse físicamente.
-
-Esto permite conservar la información y reactivarla posteriormente.
+Socios y actividades pueden desactivarse para conservar la información y reactivarlos más adelante. La eliminación permanente borra el registro y sus reservas asociadas; ambas interfaces solicitan confirmación y el cambio se guarda en SQLite al usar **Guardar modificaciones** o al salir guardando.
 
 ---
 
