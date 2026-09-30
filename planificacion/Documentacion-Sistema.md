@@ -251,6 +251,7 @@ Las operaciones principales son:
 - filtrar deudores;
 - desactivar;
 - reactivar;
+- eliminar definitivamente, junto con sus reservas;
 - administrar deuda;
 - exportar a CSV.
 
@@ -262,7 +263,7 @@ La desactivación modifica:
 activo = false
 ```
 
-El socio permanece almacenado y puede reactivarse posteriormente.
+El socio permanece almacenado y puede reactivarse posteriormente. La eliminación permanente es una opción distinta de consola y GUI: exige confirmación, quita al socio de memoria y al guardar también lo elimina de SQLite. Sus reservas se borran con él. Al editar su deuda, `modificarSocio` deriva la morosidad de ese monto (`deuda > 0`); no deja que el usuario indique ambos estados por separado.
 
 ---
 
@@ -339,7 +340,8 @@ Las operaciones principales incluyen:
 - listar;
 - filtrar eventos;
 - desactivar;
-- reactivar.
+- reactivar;
+- eliminar definitivamente, junto con las reservas asociadas.
 
 ### 8.1 Eliminación lógica
 
@@ -349,7 +351,7 @@ Las actividades se desactivan mediante:
 activo = false
 ```
 
-sin eliminarlas definitivamente de `listaActividades`.
+sin eliminarlas definitivamente de `listaActividades`. La eliminación permanente, disponible en ambas interfaces con confirmación, retira la actividad y las reservas que la referencian. Al guardar, la eliminación se refleja en SQLite.
 
 ---
 
@@ -366,9 +368,10 @@ Las reservas se administran mediante operaciones para:
 - agendar;
 - modificar;
 - eliminar o cancelar;
+- buscar por ID en todas las reservas, sin entrar a modificar o cancelar;
 - listar globalmente.
 
-`SistemaClub` puede reunir temporalmente las reservas de todos los socios y ordenarlas cronológicamente.
+`SistemaClub.buscarReserva(int)` recorre los socios y devuelve la reserva cuyo ID coincide, o `null` si no existe. Consola y ventana muestran de manera independiente su ID, socio, actividad, fecha y estado. El controlador también puede reunir todas las reservas y ordenarlas cronológicamente. El ID nuevo se calcula a partir del mayor ID que todavía está registrado.
 
 ---
 
@@ -376,7 +379,7 @@ Las reservas se administran mediante operaciones para:
 
 ### 10.1 Morosidad
 
-Un socio moroso no puede registrar una nueva reserva.
+`modificarSocio` guarda la deuda ingresada y establece la morosidad según el monto: si es mayor que cero, el socio queda moroso; si es cero, queda al día. Una deuda negativa se rechaza antes de modificar el objeto. Un socio moroso no puede registrar una nueva reserva.
 
 En este caso se utiliza:
 
@@ -453,7 +456,10 @@ Las tablas principales son:
 SOCIOS
 ACTIVIDADES
 RESERVAS
+CONFIGURACION
 ```
+
+`CONFIGURACION` registra si los datos de ejemplo ya se inicializaron. Así, si se eliminan todos los registros y se guarda, el inicio siguiente respeta el estado vacío.
 
 ### 13.1 SOCIOS
 
@@ -498,7 +504,11 @@ id_actividad
 
 `id_actividad` referencia `ACTIVIDADES`.
 
-### 13.4 Claves foráneas
+### 13.4 CONFIGURACION
+
+La columna `clave` es la clave primaria. El registro `inicializado` evita volver a cargar los datos de ejemplo después de guardar una eliminación total.
+
+### 13.5 Claves foráneas
 
 Al establecer conexión se ejecuta:
 
@@ -510,31 +520,7 @@ PRAGMA foreign_keys = ON;
 
 ## 14. Guardado de datos
 
-El guardado por lotes se coordina desde `SistemaClub`.
-
-Orden:
-
-```text
-1. Socios
-2. Actividades
-3. Reservas
-```
-
-Los socios se guardan mediante:
-
-```java
-DBConnection.guardarSocio()
-```
-
-Las actividades mediante:
-
-```java
-DBConnection.guardarActividad()
-```
-
-Antes de guardar reservas se limpia su tabla y luego se insertan las reservas que existen actualmente en memoria.
-
-Esto evita que una reserva eliminada reaparezca al reiniciar.
+El guardado por lotes se coordina desde `SistemaClub` y se ejecuta en `DBConnection.guardarEstadoCompleto(...)` dentro de una transacción. Primero se eliminan las reservas persistidas, después los socios y actividades; luego se insertan los socios y actividades actuales y finalmente sus reservas. Ese orden respeta las claves foráneas. Si alguna operación falla, SQLite revierte el guardado completo. La marca de inicialización se persiste en la misma transacción. Así, una baja permanente no reaparece al reiniciar y un error no deja un estado guardado a medias.
 
 ---
 
@@ -566,7 +552,7 @@ Finalmente las reservas se vuelven a asociar al socio correspondiente.
 
 ## 16. Datos iniciales
 
-Cuando el sistema se ejecuta sin socios ni actividades almacenados, `Main` utiliza:
+En la primera ejecución, si aún no se han inicializado datos y no hay socios ni actividades almacenados, `Main` utiliza:
 
 ```java
 cargarDatosIniciales()
@@ -755,6 +741,8 @@ La GUI permite:
 - modificar;
 - desactivar;
 - reactivar;
+- eliminar permanentemente socios y actividades;
+- buscar reservas por ID;
 - administrar reservas;
 - administrar facturación;
 - generar cobro mensual;
@@ -782,7 +770,7 @@ cargarDatosBatch()
  |
  +----> RESERVAS
  |
- +----> datos iniciales si el sistema está vacío
+ +----> datos iniciales solo en la primera ejecución vacía
  |
  v
 seleccionar interfaz
@@ -859,6 +847,8 @@ Se encuentran implementadas:
 - morosidad;
 - control de cupo;
 - eliminación lógica;
+- eliminación permanente de socios y actividades;
+- búsqueda independiente de reservas;
 - reactivación;
 - herencia;
 - polimorfismo;
@@ -892,8 +882,6 @@ README.md
 
 Estas mejoras no forman parte de los requisitos actuales:
 
-- utilizar transacciones SQLite;
-- reemplazar la generación actual de identificadores de reserva;
 - ampliar las exportaciones;
 - incorporar pruebas automatizadas con JUnit.
 
@@ -933,4 +921,4 @@ La exportación de socios a CSV está disponible desde ambas interfaces.
 
 La documentación Javadoc, los diagramas del sistema, el README de uso y el reporte académico complementan el código fuente.
 
-El proyecto se encuentra preparado para su entrega final.
+Las correcciones del grupo 36 quedaron integradas al código y a las interfaces. El UML, la guía de uso y este documento describen la versión actual del sistema.

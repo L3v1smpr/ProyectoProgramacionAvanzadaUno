@@ -222,6 +222,9 @@ public class DBConnection {
             + "activo INTEGER NOT NULL"
             + ");";
 
+        String sqlConfig =
+            "CREATE TABLE IF NOT EXISTS CONFIGURACION (clave TEXT PRIMARY KEY);";
+
         String sqlReservas =
             "CREATE TABLE IF NOT EXISTS RESERVAS ("
             + "id_reserva INTEGER PRIMARY KEY, "
@@ -238,6 +241,7 @@ public class DBConnection {
             statement.execute(sqlSocios);
             statement.execute(sqlActividades);
             statement.execute(sqlReservas);
+            statement.execute(sqlConfig);
 
         } catch (SQLException e) {
 
@@ -551,9 +555,8 @@ public class DBConnection {
     /**
      * Elimina todos los registros almacenados en la tabla RESERVAS.
      *
-     * Esta operación se utiliza durante el guardado batch para volver
-     * a insertar únicamente las reservas que existen actualmente
-     * en las colecciones en memoria.
+     * El guardado completo utiliza una transacción propia para sincronizar
+     * reservas, socios y actividades.
      *
      * @throws ConexionBDException si no es posible acceder a la base de datos
      * @throws PersistenciaDatosException si ocurre un error durante
@@ -576,5 +579,70 @@ public class DBConnection {
             );
         }
     }
-    
+
+    /**
+     * Indica si ya se guardó el estado inicial del sistema, incluso si luego
+     * se eliminaron todos los socios y actividades.
+     */
+    public boolean datosInicialesCargados()
+            throws ConexionBDException, PersistenciaDatosException {
+        String sql = "SELECT 1 FROM CONFIGURACION WHERE clave = 'inicializado';";
+        try (PreparedStatement statement = getConnection().prepareStatement(sql);
+             ResultSet resultado = statement.executeQuery()) {
+            return resultado.next();
+        } catch (SQLException e) {
+            throw new PersistenciaDatosException(
+                "No fue posible consultar la inicialización del sistema.", e);
+        }
+    }
+
+    /**
+     * Sustituye el estado persistido por el estado actual en una sola transacción.
+     * Las reservas se borran antes que sus socios y actividades por las claves foráneas.
+     */
+    public void guardarEstadoCompleto(ArrayList<Socio> socios,
+            ArrayList<Actividad> actividades)
+            throws ConexionBDException, PersistenciaDatosException {
+        Connection db = getConnection();
+        try {
+            db.setAutoCommit(false);
+            try (Statement statement = db.createStatement()) {
+                statement.executeUpdate("DELETE FROM RESERVAS;");
+                statement.executeUpdate("DELETE FROM SOCIOS;");
+                statement.executeUpdate("DELETE FROM ACTIVIDADES;");
+            }
+            for (Socio socio : socios) {
+                guardarSocio(socio);
+            }
+            for (Actividad actividad : actividades) {
+                guardarActividad(actividad);
+            }
+            for (Socio socio : socios) {
+                for (Reserva reserva : socio.getListaReservas()) {
+                    guardarReserva(reserva);
+                }
+            }
+            try (Statement statement = db.createStatement()) {
+                statement.executeUpdate(
+                    "INSERT OR IGNORE INTO CONFIGURACION (clave) VALUES ('inicializado');");
+            }
+            db.commit();
+        } catch (SQLException | ConexionBDException | PersistenciaDatosException e) {
+            try {
+                db.rollback();
+            } catch (SQLException rollbackError) {
+                e.addSuppressed(rollbackError);
+            }
+            throw new PersistenciaDatosException(
+                "No fue posible guardar el estado completo del sistema.", e);
+        } finally {
+            try {
+                db.setAutoCommit(true);
+            } catch (SQLException e) {
+                throw new PersistenciaDatosException(
+                    "No fue posible restaurar la conexión tras el guardado.", e);
+            }
+        }
+    }
+
 }

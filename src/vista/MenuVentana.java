@@ -70,6 +70,7 @@ public class MenuVentana {
     private JButton btnModificarSocio;
     private JButton btnDesactivarSocio;
     private JButton btnReactivarSocio;
+    private JButton btnEliminarSocio;
     private JButton btnExportarSocios;
     private JCheckBox chkSoloDeudores;
 
@@ -97,6 +98,7 @@ public class MenuVentana {
     private JButton btnModificarActividad;
     private JButton btnDesactivarActividad;
     private JButton btnReactivarActividad;
+    private JButton btnEliminarActividad;
 
     //Componentes del formulario de Reservas
     private JTextField txtRutReserva;
@@ -110,6 +112,7 @@ public class MenuVentana {
     private DefaultTableModel modeloTablaReservas;
     private JButton btnModificarReserva;
     private JButton btnCancelarReserva;
+    private JButton btnBuscarReserva;
 
     //Componentes del modulo de Facturacion
     private JTextField txtRutFacturacion;
@@ -311,12 +314,14 @@ public class MenuVentana {
         btnModificarSocio = new JButton("Modificar Seleccionado");
         btnDesactivarSocio = new JButton("Desactivar Seleccionado");
         btnReactivarSocio = new JButton("Reactivar Socio");
+        btnEliminarSocio = new JButton("Eliminar Socio");
         btnExportarSocios = new JButton("Exportar Socios CSV");
 
         panelAccionesTabla.add(btnBuscarSocio);
         panelAccionesTabla.add(btnModificarSocio);
         panelAccionesTabla.add(btnDesactivarSocio);
         panelAccionesTabla.add(btnReactivarSocio);
+        panelAccionesTabla.add(btnEliminarSocio);
         panelAccionesTabla.add(btnExportarSocios);
 
         panelSur.add(panelFiltro, BorderLayout.WEST);
@@ -467,16 +472,18 @@ public class MenuVentana {
         chkSoloEventos = new JCheckBox("Mostrar solo eventos");
         panelFiltroAct.add(chkSoloEventos);
 
-        JPanel panelAccionesAct = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 4));
+        JPanel panelAccionesAct = new JPanel(new GridLayout(2, 3, 6, 4));
         btnBuscarActividad = new JButton("Buscar Actividad");
         btnModificarActividad = new JButton("Modificar Seleccionada");
         btnDesactivarActividad = new JButton("Desactivar Seleccionada");
         btnReactivarActividad = new JButton("Reactivar Actividad");
+        btnEliminarActividad = new JButton("Eliminar Actividad");
 
         panelAccionesAct.add(btnBuscarActividad);
         panelAccionesAct.add(btnModificarActividad);
         panelAccionesAct.add(btnDesactivarActividad);
         panelAccionesAct.add(btnReactivarActividad);
+        panelAccionesAct.add(btnEliminarActividad);
 
         panelSurAct.add(panelFiltroAct, BorderLayout.WEST);
         panelSurAct.add(panelAccionesAct, BorderLayout.EAST);
@@ -551,6 +558,8 @@ public class MenuVentana {
 
         btnModificarReserva = new JButton("Modificar Reserva Seleccionada");
         btnCancelarReserva = new JButton("Cancelar Reserva Seleccionada");
+        btnBuscarReserva = new JButton("Buscar Reserva por ID");
+        panelSurRes.add(btnBuscarReserva);
         panelSurRes.add(btnModificarReserva);
         panelSurRes.add(btnCancelarReserva);
 
@@ -903,6 +912,37 @@ public class MenuVentana {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 );
+            }
+        });
+
+        // Búsqueda directa de una reserva sin entrar en modificar o cancelar.
+        btnBuscarReserva.addActionListener(e -> {
+            String entrada = JOptionPane.showInputDialog(
+                ventana, "Ingrese el ID de la reserva:", "Buscar Reserva",
+                JOptionPane.QUESTION_MESSAGE);
+            if (entrada == null) return;
+            try {
+                int id = Integer.parseInt(entrada.trim());
+                Reserva encontrada = controlador.buscarReserva(id);
+                if (encontrada == null) {
+                    JOptionPane.showMessageDialog(ventana,
+                        "No se encontró una reserva con ese ID.",
+                        "Reserva no encontrada", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                SimpleDateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
+                JOptionPane.showMessageDialog(ventana,
+                    "ID: " + encontrada.getIdReserva()
+                    + "\nSocio: " + encontrada.getRutSocio()
+                    + "\nActividad: " + encontrada.getIdActividadEnReserva()
+                    + "\nFecha: " + (encontrada.getFecha() == null
+                        ? "N/A" : formato.format(encontrada.getFecha()))
+                    + "\nEstado: " + encontrada.getEstado(),
+                    "Reserva encontrada", JOptionPane.INFORMATION_MESSAGE);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(ventana,
+                    "El ID debe ser un número entero.",
+                    "ID inválido", JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -1366,6 +1406,39 @@ public class MenuVentana {
             }
         });
 
+        // Eliminación física de una actividad y de sus reservas asociadas.
+        btnEliminarActividad.addActionListener(e -> {
+            int fila = tablaActividades.getSelectedRow();
+            String id = fila >= 0
+                ? (String) modeloTablaActividades.getValueAt(fila, 0)
+                : JOptionPane.showInputDialog(ventana,
+                    "Ingrese el ID de la actividad (también puede estar inactiva):");
+            if (id == null || id.trim().isEmpty()) return;
+            id = id.trim();
+            Actividad actividad = controlador.buscarActividad(id);
+            if (actividad == null) {
+                JOptionPane.showMessageDialog(ventana, "Actividad no encontrada.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int cantidad = 0;
+            for (Reserva reserva : controlador.listarReservasGlobales()) {
+                if (id.equals(reserva.getIdActividadEnReserva())) cantidad++;
+            }
+            int confirma = JOptionPane.showConfirmDialog(ventana,
+                "Se eliminará permanentemente " + actividad.getNombre()
+                + " (ID: " + id + ") y sus " + cantidad
+                + " reservas. ¿Desea continuar?",
+                "Confirmar eliminación permanente",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (confirma != JOptionPane.YES_OPTION) return;
+            controlador.eliminarActividad(id);
+            refrescarTablaActividades();
+            refrescarTablaReservas();
+            JOptionPane.showMessageDialog(ventana,
+                "Actividad eliminada. Guarde las modificaciones para conservar el cambio.");
+        });
+
         //Evento para desactivar actividad seleccionada (baja logica)
         btnDesactivarActividad.addActionListener(e -> {
             int filaSeleccionada = tablaActividades.getSelectedRow();
@@ -1693,8 +1766,6 @@ public class MenuVentana {
             JTextField txtModNombre = new JTextField(socioActual.getNombre());
             JTextField txtModEdad = new JTextField(String.valueOf(socioActual.getEdad()));
             JTextField txtModDeuda = new JTextField(String.valueOf(socioActual.getDeuda()));
-            JCheckBox chkModMoroso = new JCheckBox("Es Moroso", socioActual.getEsMoroso());
-
             JPanel panelEdicion = new JPanel(new GridLayout(4, 2, 6, 6));
             panelEdicion.add(new JLabel("Nombre:"));
             panelEdicion.add(txtModNombre);
@@ -1702,8 +1773,8 @@ public class MenuVentana {
             panelEdicion.add(txtModEdad);
             panelEdicion.add(new JLabel("Deuda:"));
             panelEdicion.add(txtModDeuda);
-            panelEdicion.add(new JLabel("Estado:"));
-            panelEdicion.add(chkModMoroso);
+            panelEdicion.add(new JLabel("Morosidad:"));
+            panelEdicion.add(new JLabel("Se calcula según la deuda"));
 
             int resultado = JOptionPane.showConfirmDialog(
                 ventana,
@@ -1717,7 +1788,6 @@ public class MenuVentana {
                 String nuevoNombre = txtModNombre.getText().trim();
                 String nuevaEdadTxt = txtModEdad.getText().trim();
                 String nuevaDeudaTxt = txtModDeuda.getText().trim();
-                boolean nuevoMoroso = chkModMoroso.isSelected();
 
                 if (nuevoNombre.isEmpty() || nuevaEdadTxt.isEmpty() || nuevaDeudaTxt.isEmpty()) {
                     JOptionPane.showMessageDialog(
@@ -1755,7 +1825,7 @@ public class MenuVentana {
                     return;
                 }
 
-                boolean modificado = controlador.modificarSocio(rut, nuevoNombre, nuevaEdad, nuevaDeuda, nuevoMoroso);
+                boolean modificado = controlador.modificarSocio(rut, nuevoNombre, nuevaEdad, nuevaDeuda);
 
                 if (modificado) {
                     JOptionPane.showMessageDialog(
@@ -1774,6 +1844,35 @@ public class MenuVentana {
                     );
                 }
             }
+        });
+
+        // Eliminación física de un socio y de sus reservas.
+        btnEliminarSocio.addActionListener(e -> {
+            int fila = tablaSocios.getSelectedRow();
+            String rut = fila >= 0
+                ? (String) modeloTablaSocios.getValueAt(fila, 0)
+                : JOptionPane.showInputDialog(ventana,
+                    "Ingrese el RUT del socio (también puede estar inactivo):");
+            if (rut == null || rut.trim().isEmpty()) return;
+            rut = rut.trim();
+            Socio socio = controlador.buscarSocio(rut);
+            if (socio == null) {
+                JOptionPane.showMessageDialog(ventana, "Socio no encontrado.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int confirma = JOptionPane.showConfirmDialog(ventana,
+                "Se eliminará permanentemente " + socio.getNombre()
+                + " (RUT: " + rut + ") y sus "
+                + socio.getListaReservas().size() + " reservas. ¿Desea continuar?",
+                "Confirmar eliminación permanente",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (confirma != JOptionPane.YES_OPTION) return;
+            controlador.eliminarSocio(rut);
+            refrescarTablaSocios();
+            refrescarTablaReservas();
+            JOptionPane.showMessageDialog(ventana,
+                "Socio eliminado. Guarde las modificaciones para conservar el cambio.");
         });
 
         //Evento para desactivar socio seleccionado (baja logica)
