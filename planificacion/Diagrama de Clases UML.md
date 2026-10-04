@@ -372,9 +372,13 @@ classDiagram
 
     Socio "1" *-- "0..*" Reserva : contiene
 
+    note for Socio "getListaReservas() y setListaReservas() usan copias defensivas; la colección interna se modifica mediante operaciones de Socio."
+
     SistemaClub "1" --> "0..*" Socio : gestiona
     SistemaClub "1" --> "0..*" Actividad : gestiona
     SistemaClub "1" --> "1" DBConnection : persistencia
+
+    note for SistemaClub "generarIdReserva() asigna max(idReserva) + 1 sobre las reservas registradas. buscarReserva(idReserva) permite la búsqueda global independiente."
 
 
     %% =====================================================
